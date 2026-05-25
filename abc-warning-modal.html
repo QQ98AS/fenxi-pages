@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABC本人员预警弹框</title>
+  <style>
+    :root {
+      --bg: #efe7db;
+      --overlay: rgba(84, 58, 33, 0.38);
+      --panel: rgba(255, 251, 246, 0.96);
+      --panel-strong: #fffdfa;
+      --line: rgba(109, 77, 47, 0.14);
+      --line-strong: rgba(109, 77, 47, 0.24);
+      --text: #34271b;
+      --muted: #746455;
+      --primary: #8f532c;
+      --primary-soft: rgba(143, 83, 44, 0.12);
+      --accent: #1d6b62;
+      --accent-soft: rgba(29, 107, 98, 0.12);
+      --warn: #c9882c;
+      --warn-soft: rgba(201, 136, 44, 0.14);
+      --danger: #bb5648;
+      --danger-soft: rgba(187, 86, 72, 0.14);
+      --shadow: 0 24px 56px rgba(58, 41, 25, 0.18);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: "Microsoft YaHei UI", "PingFang SC", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(143, 83, 44, 0.12), transparent 24%),
+        radial-gradient(circle at top right, rgba(29, 107, 98, 0.12), transparent 22%),
+        linear-gradient(135deg, #f8f3ec 0%, #efe3d2 52%, #e7d8c9 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: var(--overlay);
+      backdrop-filter: blur(4px);
+    }
+
+    .mock-page {
+      position: fixed;
+      inset: 24px;
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
+        rgba(83, 61, 40, 0.12);
+      pointer-events: none;
+    }
+
+    .modal-wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      justify-items: center;
+      align-items: start;
+      padding: 56px 24px 24px;
+    }
+
+    .modal-shell {
+      width: min(1260px, calc(100vw - 72px));
+      max-height: calc(100vh - 72px);
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 12px;
+      padding: 14px;
+      border-radius: 28px;
+      border: 1px solid rgba(122, 84, 52, 0.16);
+      background:
+        linear-gradient(180deg, rgba(255, 250, 244, 0.97), rgba(249, 241, 232, 0.94)),
+        rgba(255, 255, 255, 0.74);
+      box-shadow:
+        0 30px 80px rgba(50, 35, 20, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      overflow: hidden;
+    }
+
+    .modal-header,
+    .content-panel,
+    .sub-panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header {
+      border-radius: 24px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      background:
+        radial-gradient(circle at top right, rgba(143, 83, 44, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(243, 233, 221, 0.96), rgba(255, 249, 243, 0.98));
+    }
+
+    .header-copy {
+      display: grid;
+      gap: 8px;
+    }
+
+    .header-copy h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.8vw, 2.24rem);
+      line-height: 1.2;
+      color: #412e1f;
+    }
+
+    .header-code {
+      margin-left: 10px;
+      font-size: 0.64em;
+      font-weight: 600;
+      color: #7f6a57;
+      white-space: nowrap;
+    }
+
+    .header-copy p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.92rem;
+    }
+
+    .content-panel {
+      min-height: 0;
+      border-radius: 24px;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr);
+      gap: 14px;
+      overflow: auto;
+    }
+
+    .content-panel[hidden],
+    .detail-panel[hidden] {
+      display: none;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .section-head h2,
+    .section-head h3 {
+      margin: 6px 0 0;
+      font-size: 1.06rem;
+      color: #412e1f;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.84rem;
+    }
+
+    .section-tag {
+      color: var(--primary);
+      font-size: 0.76rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr auto;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field span {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text);
+      outline: none;
+    }
+
+    .field-actions {
+      display: flex;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .action-btn {
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #8f532c, #c9882c);
+      color: #fffaf4;
+      border-color: transparent;
+    }
+
+    .sub-panel {
+      min-height: 0;
+      border-radius: 20px;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      min-height: 0;
+      overflow: visible;
+      border-radius: 16px;
+      border: 1px solid rgba(109, 77, 47, 0.1);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 0.82rem;
+      color: #4d3726;
+      background: #f2e6d6;
+      border-bottom: 1px solid rgba(109, 77, 47, 0.12);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 12px;
+      font-size: 0.84rem;
+      color: #443226;
+      border-bottom: 1px solid rgba(109, 77, 47, 0.08);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(143, 83, 44, 0.05);
+    }
+
+    .count-pair {
+      display: inline-flex;
+      align-items: center;
+      font-weight: 700;
+    }
+
+    .count-pair.lack {
+      color: var(--danger);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-pill.high {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .status-pill.mid {
+      background: var(--warn-soft);
+      color: #9b6310;
+    }
+
+    .status-pill.ok {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .detail-table-wrap {
+      min-height: 0;
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid rgba(109, 77, 47, 0.1);
+      background: rgba(255, 255, 255, 0.78);
+      position: relative;
+    }
+
+    .detail-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .detail-table th,
+    .detail-table td {
+      white-space: normal;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    .detail-table th:nth-child(1),
+    .detail-table td:nth-child(1) {
+      width: 4%;
+      text-align: center;
+    }
+
+    .detail-table th:nth-child(2),
+    .detail-table td:nth-child(2) {
+      width: 8%;
+    }
+
+    .detail-table th:nth-child(3),
+    .detail-table td:nth-child(3) {
+      width: 6%;
+    }
+
+    .detail-table th:nth-child(4),
+    .detail-table td:nth-child(4) {
+      width: 12%;
+    }
+
+    .detail-table th:nth-child(5),
+    .detail-table td:nth-child(5) {
+      width: 10%;
+    }
+
+    .detail-table th:nth-child(6),
+    .detail-table td:nth-child(6) {
+      width: 12%;
+    }
+
+    .detail-table th:nth-child(7),
+    .detail-table td:nth-child(7) {
+      width: 8%;
+    }
+
+    .detail-table th:nth-child(8),
+    .detail-table td:nth-child(8) {
+      width: 10%;
+    }
+
+    .detail-table th:nth-child(9),
+    .detail-table td:nth-child(9) {
+      width: 8%;
+    }
+
+    .detail-table th:nth-child(10),
+    .detail-table td:nth-child(10) {
+      width: 6%;
+      text-align: center;
+    }
+
+    .detail-table th:nth-child(11),
+    .detail-table td:nth-child(11) {
+      width: 16%;
+    }
+
+    .detail-panel {
+      min-height: 0;
+      border-radius: 24px;
+      padding: 14px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .detail-panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .detail-panel-head h3 {
+      margin: 0;
+      font-size: 1.08rem;
+      color: #412e1f;
+    }
+
+    .detail-panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.7;
+    }
+
+    .detail-panel .detail-table-wrap {
+      height: 100%;
+    }
+
+    .detail-filter {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .detail-back {
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      flex: none;
+    }
+
+    .empty-state {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .reason-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .reason-tag.danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .reason-tag.warn {
+      background: var(--warn-soft);
+      color: #9b6310;
+    }
+
+    .reason-tag.info {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: none;
+    }
+
+    .legend-dot.high {
+      background: var(--danger);
+    }
+
+    .legend-dot.mid {
+      background: var(--warn);
+    }
+
+    .legend-dot.ok {
+      background: var(--accent);
+    }
+
+    @media (max-width: 1280px) {
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .modal-wrap {
+        padding: 28px 8px 8px;
+      }
+
+      .modal-shell {
+        width: calc(100vw - 16px);
+        max-height: calc(100vh - 16px);
+        padding: 10px;
+        border-radius: 22px;
+      }
+
+      .warning-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-header {
+        flex-direction: column;
+      }
+
+      .detail-filter {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="mock-page"></div>
+
+  <div class="modal-wrap">
+    <section class="modal-shell">
+      <header class="modal-header">
+        <div class="header-copy">
+          <h1>北京东方建设监理有限公司<span class="header-code">911101087239658344</span></h1>
+          <p>
+            围绕企业各项资质，展示 A 本、B 本、C 本人员实有 / 应有配置情况。
+            实有小于应有时直接标红显示。可通过“人员不足详细说明”按钮查看详情。
+          </p>
+        </div>
+      </header>
+
+      <section class="content-panel" id="mainPanel">
+        <article class="sub-panel">
+          <div class="section-head">
+              <div>
+                <h3>各资质ABC本配置情况</h3>
+              </div>
+              <button class="action-btn primary" type="button" id="detailAllButton">人员不足详细说明</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>资质名称</th>
+                  <th>A本实有 / 应有</th>
+                  <th>B本实有 / 应有</th>
+                  <th>C本实有 / 应有</th>
+                  <th>持续不达标天数</th>
+                  <th>累计不达标天数</th>
+                </tr>
+              </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>建筑工程施工总包贰级</td>
+                    <td><span class="count-pair">2 / 2</span></td>
+                    <td><span class="count-pair lack">2 / 4</span></td>
+                    <td><span class="count-pair lack">5 / 8</span></td>
+                  <td>18</td>
+                  <td>46</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>市政公用工程施工总包贰级</td>
+                    <td><span class="count-pair lack">1 / 2</span></td>
+                    <td><span class="count-pair lack">2 / 3</span></td>
+                    <td><span class="count-pair">6 / 6</span></td>
+                  <td>9</td>
+                  <td>28</td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>机电工程施工总包贰级</td>
+                    <td><span class="count-pair">1 / 1</span></td>
+                    <td><span class="count-pair lack">1 / 2</span></td>
+                    <td><span class="count-pair lack">2 / 4</span></td>
+                  <td>23</td>
+                  <td>67</td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>电力工程施工总包贰级</td>
+                    <td><span class="count-pair">1 / 1</span></td>
+                    <td><span class="count-pair">2 / 2</span></td>
+                    <td><span class="count-pair lack">2 / 3</span></td>
+                  <td>6</td>
+                  <td>19</td>
+                  </tr>
+                <tr>
+                  <td>5</td>
+                  <td>通信工程施工总包贰级</td>
+                  <td><span class="count-pair">1 / 1</span></td>
+                  <td><span class="count-pair">2 / 2</span></td>
+                  <td><span class="count-pair">3 / 3</span></td>
+                  <td>0</td>
+                  <td>0</td>
+                </tr>
+                  <tr>
+                    <td>6</td>
+                    <td>石油化工工程施工总包贰级</td>
+                    <td><span class="count-pair lack">0 / 1</span></td>
+                    <td><span class="count-pair">2 / 2</span></td>
+                    <td><span class="count-pair lack">1 / 3</span></td>
+                  <td>31</td>
+                  <td>88</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="content-panel detail-panel" id="detailPanel" hidden>
+      <div class="detail-panel-head">
+        <div>
+          <h3 id="detailDialogTitle">人员不足详细</h3>
+          <p id="detailDialogDesc">该数据来源“北京市住房和城乡建设领域人员资格管理信息系统”，如有异常，请联系“北京市住房和城乡建设领域人员资格管理信息系统”系统。</p>
+        </div>
+        <button class="detail-back" type="button" id="detailBack">返回</button>
+      </div>
+
+      <div class="detail-filter">
+        <label class="field">
+          <span>姓名 / 身份证号</span>
+          <input type="text" id="detailSearchKeyword" placeholder="请输入姓名或身份证号">
+        </label>
+        <label class="field">
+          <span>证书状态</span>
+          <select id="detailSearchStatus">
+            <option value="">全部状态</option>
+            <option value="已过期">已过期</option>
+            <option value="即将到期">即将到期</option>
+            <option value="有效">有效</option>
+            <option value="未持证">未持证</option>
+            <option value="人员未到岗">人员未到岗</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>是否报部</span>
+          <select id="detailSearchReport">
+            <option value="">全部</option>
+            <option value="是">是</option>
+            <option value="否">否</option>
+          </select>
+        </label>
+        <div class="field-actions">
+          <button class="action-btn" type="button" id="detailResetButton">重置</button>
+          <button class="action-btn primary" type="button" id="detailSearchButton">查询</button>
+        </div>
+      </div>
+
+      <div class="detail-table-wrap">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>更新日期</th>
+              <th>姓名</th>
+              <th>身份证号</th>
+              <th>证书职务</th>
+              <th>证书编号</th>
+              <th>证书状态</th>
+              <th>岗位工种</th>
+              <th>有效期至</th>
+              <th>是否报部</th>
+              <th>报部说明</th>
+            </tr>
+          </thead>
+          <tbody id="detailViewBody"></tbody>
+        </table>
+        <div class="empty-state" id="detailEmpty" hidden>当前资质和证书类别下暂无人员不足详细。</div>
+      </div>
+
+      </section>
+    </section>
+  </div>
+
+  <script>
+    const detailData = [
+      { qualification: "建筑工程施工总包贰级", certType: "B本", updateDate: "2026-05-22", name: "李峰", idCard: "110108199003228816", jobType: "专业监理工程师", certJob: "项目负责人", certNo: "京建安B(2024)0011845", certStatus: "即将到期", expiryDate: "2026-06-27", reportToMinistry: "否", reportDesc: "证书即将到期，已进入续期流程，暂不报部。" },
+      { qualification: "建筑工程施工总包贰级", certType: "C本", updateDate: "2026-05-22", name: "赵敏", idCard: "110106199209145028", jobType: "现场安全员", certJob: "专职安全生产管理人员", certNo: "暂无", certStatus: "未持证", expiryDate: "--", reportToMinistry: "是", reportDesc: "人员未持证且当前资质存在缺口，需报部说明整改计划。" },
+      { qualification: "建筑工程施工总包贰级", certType: "C本", updateDate: "2026-05-22", name: "孙悦", idCard: "110102199511218624", jobType: "安全管理人员", certJob: "专职安全生产管理人员", certNo: "京建安C3(2024)0019038", certStatus: "有效", expiryDate: "2027-02-14", reportToMinistry: "否", reportDesc: "人员证书有效，补充项目到岗证明后可闭环处理。" },
+      { qualification: "市政公用工程施工总包贰级", certType: "A本", updateDate: "2026-05-22", name: "张涛", idCard: "110101198704152415", jobType: "总监理工程师", certJob: "企业主要负责人", certNo: "京建安A(2023)0001824", certStatus: "已过期", expiryDate: "2026-04-18", reportToMinistry: "是", reportDesc: "证书已过期，A本人数不足，需按要求上报处理。" },
+      { qualification: "市政公用工程施工总包贰级", certType: "B本", updateDate: "2026-05-22", name: "陈立", idCard: "110107199106083614", jobType: "专业监理工程师", certJob: "项目负责人", certNo: "京建安C2(2023)0032641", certStatus: "有效", expiryDate: "2026-11-03", reportToMinistry: "是", reportDesc: "证书类型与岗位要求不匹配，短期无法满足资质配置要求。" },
+      { qualification: "机电工程施工总包贰级", certType: "B本", updateDate: "2026-05-22", name: "高宁", idCard: "110115198603054212", jobType: "机电监理工程师", certJob: "项目负责人", certNo: "京建安B(2021)0027815", certStatus: "已过期", expiryDate: "2026-03-29", reportToMinistry: "是", reportDesc: "B本已过期且缺口未补齐，需报部备案并跟踪整改。" },
+      { qualification: "机电工程施工总包贰级", certType: "C本", updateDate: "2026-05-22", name: "王倩", idCard: "110105199412101826", jobType: "安全管理人员", certJob: "专职安全生产管理人员", certNo: "京建安C3(2022)0045817", certStatus: "有效", expiryDate: "2026-08-12", reportToMinistry: "否", reportDesc: "人员证书有效，补充到岗材料后可完成内部核验。" },
+      { qualification: "电力工程施工总包贰级", certType: "C本", updateDate: "2026-05-22", name: "林雪", idCard: "110105199307164228", jobType: "安全管理人员", certJob: "专职安全生产管理人员", certNo: "京建安C3(2023)0017721", certStatus: "人员未到岗", expiryDate: "2027-05-19", reportToMinistry: "否", reportDesc: "证书有效，但项目到岗台账不完整，需补充现场到岗证明。" },
+      { qualification: "石油化工工程施工总包贰级", certType: "A本", updateDate: "2026-05-22", name: "周凯", idCard: "110109198811203317", jobType: "企业负责人", certJob: "企业主要负责人", certNo: "京建安A(2024)0009517", certStatus: "有效", expiryDate: "2027-01-16", reportToMinistry: "否", reportDesc: "属企业内部人员重复占用，调整分配后可整改。" },
+      { qualification: "石油化工工程施工总包贰级", certType: "C本", updateDate: "2026-05-22", name: "郭辰", idCard: "110111199211305641", jobType: "安全管理人员", certJob: "专职安全生产管理人员", certNo: "暂无", certStatus: "未持证", expiryDate: "--", reportToMinistry: "是", reportDesc: "当前C本缺口持续时间较长，未持证人员需纳入报部整改说明。" }
+    ];
+
+    const mainPanel = document.getElementById("mainPanel");
+    const detailPanel = document.getElementById("detailPanel");
+    const detailBack = document.getElementById("detailBack");
+    const detailAllButton = document.getElementById("detailAllButton");
+    const detailDialogTitle = document.getElementById("detailDialogTitle");
+    const detailDialogDesc = document.getElementById("detailDialogDesc");
+    const detailViewBody = document.getElementById("detailViewBody");
+    const detailEmpty = document.getElementById("detailEmpty");
+    const detailSearchKeyword = document.getElementById("detailSearchKeyword");
+    const detailSearchStatus = document.getElementById("detailSearchStatus");
+    const detailSearchReport = document.getElementById("detailSearchReport");
+    const detailResetButton = document.getElementById("detailResetButton");
+    const detailSearchButton = document.getElementById("detailSearchButton");
+
+    let currentDetailItems = [...detailData];
+
+    function sortDetailItems(items) {
+      const reportOrder = { "否": 0, "是": 1 };
+      return [...items].sort((a, b) => {
+        const orderDiff = (reportOrder[a.reportToMinistry] ?? 99) - (reportOrder[b.reportToMinistry] ?? 99);
+        if (orderDiff !== 0) {
+          return orderDiff;
+        }
+        return 0;
+      });
+    }
+
+    function renderDetailRows(items) {
+      if (!items.length) {
+        detailViewBody.innerHTML = "";
+        detailEmpty.hidden = false;
+        return;
+      }
+
+      detailEmpty.hidden = true;
+      detailViewBody.innerHTML = items.map((item, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.updateDate}</td>
+          <td>${item.name}</td>
+          <td>${item.idCard}</td>
+          <td>${item.certJob}</td>
+          <td>${item.certNo}</td>
+          <td>${item.certStatus}</td>
+          <td>${item.jobType}</td>
+          <td>${item.expiryDate}</td>
+          <td>${item.reportToMinistry}</td>
+          <td>${item.reportDesc}</td>
+        </tr>
+      `).join("");
+    }
+
+    function applyDetailFilters() {
+      const keyword = detailSearchKeyword.value.trim();
+      const status = detailSearchStatus.value;
+      const report = detailSearchReport.value;
+
+      const filtered = sortDetailItems(currentDetailItems.filter((item) => {
+        const matchKeyword = !keyword || item.name.includes(keyword) || item.idCard.includes(keyword);
+        const matchStatus = !status || item.certStatus === status;
+        const matchReport = !report || item.reportToMinistry === report;
+        return matchKeyword && matchStatus && matchReport;
+      }));
+
+      renderDetailRows(filtered);
+      return filtered.length;
+    }
+
+    function resetDetailFilters() {
+      detailSearchKeyword.value = "";
+      detailSearchStatus.value = "";
+      detailSearchReport.value = "";
+      renderDetailRows(sortDetailItems(currentDetailItems));
+    }
+
+    function showMainPanel() {
+      detailPanel.hidden = true;
+      mainPanel.hidden = false;
+    }
+
+    function showDetailPanel() {
+      mainPanel.hidden = true;
+      detailPanel.hidden = false;
+    }
+
+    function openDetailDialog(qualification, certType) {
+      const matched = detailData.filter((item) => item.qualification === qualification && item.certType === certType);
+      currentDetailItems = sortDetailItems(matched);
+      detailDialogTitle.textContent = `人员不足详细 - ${qualification}`;
+      detailDialogDesc.textContent = "该数据来源“北京市住房和城乡建设领域人员资格管理信息系统”，如有异常，请联系“北京市住房和城乡建设领域人员资格管理信息系统”系统。";
+      resetDetailFilters();
+      renderDetailRows(currentDetailItems);
+      showDetailPanel();
+    }
+
+    function openAllDetailDialog() {
+      currentDetailItems = sortDetailItems(detailData);
+      detailDialogTitle.textContent = "人员不足详细说明";
+      detailDialogDesc.textContent = "该数据来源“北京市住房和城乡建设领域人员资格管理信息系统”，如有异常，请联系“北京市住房和城乡建设领域人员资格管理信息系统”系统。";
+      resetDetailFilters();
+      renderDetailRows(currentDetailItems);
+      showDetailPanel();
+    }
+
+    detailAllButton.addEventListener("click", openAllDetailDialog);
+    detailSearchButton.addEventListener("click", () => {
+      const count = applyDetailFilters();
+      detailDialogDesc.textContent = "该数据来源“北京市住房和城乡建设领域人员资格管理信息系统”，如有异常，请联系“北京市住房和城乡建设领域人员资格管理信息系统”系统。";
+    });
+    detailResetButton.addEventListener("click", () => {
+      resetDetailFilters();
+      detailDialogDesc.textContent = "该数据来源“北京市住房和城乡建设领域人员资格管理信息系统”，如有异常，请联系“北京市住房和城乡建设领域人员资格管理信息系统”系统。";
+    });
+
+    detailBack.addEventListener("click", showMainPanel);
+  </script>
+</body>
+</html>

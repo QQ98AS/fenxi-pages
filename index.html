@@ -1,0 +1,2455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>建设行业大数据分析平台</title>
+  <style>
+    :root {
+      --bg: #06111f;
+      --bg-soft: #0b1d34;
+      --panel: rgba(7, 28, 48, 0.82);
+      --panel-strong: rgba(9, 38, 64, 0.96);
+      --panel-light: rgba(15, 55, 89, 0.92);
+      --line: rgba(108, 180, 255, 0.18);
+      --line-strong: rgba(108, 180, 255, 0.34);
+      --text: #e9f4ff;
+      --muted: #8da9c4;
+      --primary: #47b2ff;
+      --primary-strong: #7fd6ff;
+      --cyan: #3ed7c8;
+      --gold: #ffce62;
+      --danger: #ff7b8b;
+      --shadow: 0 24px 60px rgba(0, 8, 18, 0.45);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(71, 178, 255, 0.2), transparent 28%),
+        radial-gradient(circle at 86% 16%, rgba(62, 215, 200, 0.16), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(255, 206, 98, 0.1), transparent 24%),
+        linear-gradient(180deg, #07111e 0%, #081627 32%, #06101c 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(127, 214, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(127, 214, 255, 0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.52), transparent 92%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+    }
+
+    .page-shell {
+      width: min(1560px, calc(100vw - 28px));
+      margin: 14px auto;
+      padding: 18px;
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(9, 28, 46, 0.92), rgba(5, 18, 32, 0.94)),
+        rgba(6, 18, 32, 0.92);
+      border: 1px solid rgba(115, 190, 255, 0.16);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      inset: auto -120px -120px auto;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(71, 178, 255, 0.18), transparent 70%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .panel,
+    .metric-card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .module-tabs {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .module-tab {
+      padding: 14px 12px;
+      border-radius: 18px;
+      color: #b7cae2;
+      background: linear-gradient(180deg, rgba(10, 34, 57, 0.9), rgba(5, 22, 39, 0.92));
+      border: 1px solid rgba(108, 180, 255, 0.14);
+      text-align: center;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+    }
+
+    .module-tab strong {
+      display: block;
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .module-tab span {
+      display: block;
+      font-size: 0.75rem;
+      color: #7e9ab7;
+    }
+
+    .module-tab:hover,
+    .module-tab.active {
+      transform: translateY(-2px);
+      color: var(--text);
+      border-color: rgba(127, 214, 255, 0.36);
+      box-shadow: 0 16px 32px rgba(0, 10, 22, 0.28);
+      background:
+        linear-gradient(180deg, rgba(19, 74, 118, 0.98), rgba(8, 35, 57, 0.96));
+    }
+
+    .filter-panel {
+      position: relative;
+      z-index: 1;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(7, 29, 50, 0.96), rgba(4, 19, 33, 0.94));
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .panel-head h2,
+    .panel-head h3 {
+      margin: 8px 0 0;
+      font-size: 1.08rem;
+      letter-spacing: 0.03em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.7;
+    }
+
+    .panel-tag {
+      color: var(--primary-strong);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      color: var(--text);
+      background: rgba(4, 18, 33, 0.88);
+      border: 1px solid rgba(108, 180, 255, 0.16);
+      border-radius: 14px;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: rgba(127, 214, 255, 0.46);
+      box-shadow: 0 0 0 3px rgba(71, 178, 255, 0.12);
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      min-width: 118px;
+      height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary {
+      color: #051322;
+      background: linear-gradient(135deg, #7fd6ff, #3ed7c8);
+      box-shadow: 0 10px 22px rgba(62, 215, 200, 0.22);
+    }
+
+    .btn-secondary {
+      color: #c5d8ed;
+      background: rgba(6, 25, 43, 0.88);
+      border: 1px solid rgba(108, 180, 255, 0.16);
+    }
+
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+      min-height: 20px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(71, 178, 255, 0.12);
+      border: 1px solid rgba(127, 214, 255, 0.16);
+      color: #d8ecff;
+      font-size: 0.82rem;
+    }
+
+    .summary-strip {
+      position: relative;
+      z-index: 1;
+      margin: 16px 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric-card {
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease;
+    }
+
+    .metric-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -36px -36px auto;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(127, 214, 255, 0.18), transparent 72%);
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(127, 214, 255, 0.26);
+    }
+
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 14px;
+    }
+
+    .metric-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-main strong {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1;
+    }
+
+    .metric-main em {
+      font-style: normal;
+      color: var(--cyan);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .dashboard-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(320px, 0.8fr);
+      gap: 16px;
+    }
+
+    .panel {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .dimension-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .dimension-tab {
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(6, 22, 39, 0.86);
+      color: #b6cade;
+      border: 1px solid rgba(108, 180, 255, 0.14);
+      transition: all 180ms ease;
+    }
+
+    .dimension-tab.active,
+    .dimension-tab:hover {
+      background: linear-gradient(135deg, rgba(66, 145, 209, 0.2), rgba(62, 215, 200, 0.16));
+      border-color: rgba(127, 214, 255, 0.34);
+      color: var(--text);
+    }
+
+    .chart-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .chart-card,
+    .sub-card {
+      border-radius: 20px;
+      padding: 16px;
+      background: rgba(5, 21, 37, 0.74);
+      border: 1px solid rgba(108, 180, 255, 0.14);
+    }
+
+    .chart-card h3,
+    .sub-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .chart-card p,
+    .sub-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .line-chart svg {
+      width: 100%;
+      height: 230px;
+      display: block;
+    }
+
+    .chart-note-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .bar-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-item {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: #d7ebff;
+      font-size: 0.86rem;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2cc9ff, #3ed7c8, #ffce62);
+      box-shadow: 0 0 18px rgba(71, 178, 255, 0.22);
+    }
+
+    .dimension-detail {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .detail-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(10, 39, 64, 0.8), rgba(4, 18, 32, 0.82));
+      border: 1px solid rgba(108, 180, 255, 0.14);
+    }
+
+    .detail-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 12px;
+    }
+
+    .detail-card strong {
+      display: block;
+      font-size: 1.28rem;
+      margin-bottom: 6px;
+    }
+
+    .detail-card p {
+      margin: 0;
+      color: #b3c9df;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .data-table-wrap {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(108, 180, 255, 0.14);
+      background: rgba(4, 18, 32, 0.72);
+    }
+
+    table {
+      width: 100%;
+      min-width: 880px;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 14px 12px;
+      text-align: left;
+      font-size: 0.82rem;
+      color: #d8ebff;
+      background: rgba(12, 47, 76, 0.98);
+      border-bottom: 1px solid rgba(127, 214, 255, 0.18);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 12px;
+      font-size: 0.84rem;
+      color: #bfd4ea;
+      border-bottom: 1px solid rgba(108, 180, 255, 0.09);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(71, 178, 255, 0.06);
+    }
+
+    .side-stage {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .insight-list,
+    .ranking-list,
+    .alert-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .insight-item,
+    .ranking-item,
+    .alert-item {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(5, 21, 37, 0.78);
+      border: 1px solid rgba(108, 180, 255, 0.12);
+    }
+
+    .insight-item strong,
+    .ranking-item strong,
+    .alert-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .insight-item p,
+    .ranking-item p,
+    .alert-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ranking-index {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #07111f;
+      font-weight: 800;
+      background: linear-gradient(135deg, #7fd6ff, #ffce62);
+      flex: none;
+    }
+
+    .ranking-copy {
+      flex: 1;
+    }
+
+    .ranking-value {
+      color: var(--cyan);
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .alert-item {
+      border-left: 4px solid var(--gold);
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: #7897b6;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .fade-up {
+      animation: fadeUp 420ms ease;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1280px) {
+      .filter-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .summary-strip,
+      .dimension-detail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dashboard-grid,
+      .chart-layout,
+    }
+
+    @media (max-width: 920px) {
+      .page-shell {
+        width: calc(100vw - 16px);
+        margin: 8px auto;
+        padding: 12px;
+        border-radius: 20px;
+      }
+
+      .module-tabs,
+      .hero-meta,
+      .summary-strip,
+      .dimension-detail,
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-actions {
+        justify-content: stretch;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        flex: 1;
+      }
+
+      .panel,
+      .filter-panel {
+        padding: 14px;
+      }
+
+      .dimension-tabs {
+        overflow: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+
+      .dimension-tab {
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <nav class="module-tabs fade-up" id="moduleTabs"></nav>
+
+    <section class="filter-panel fade-up">
+      <div class="panel-head">
+        <div>
+          <span class="panel-tag">Filter Query</span>
+          <h2>查询条件重设计</h2>
+          <p>延续原页面检索思路，增强为可服务多栏目分析的统一筛选区。</p>
+        </div>
+      </div>
+
+      <form id="queryForm">
+        <div class="filter-grid">
+          <label class="field">
+            <span>企业名称</span>
+            <input type="text" name="enterpriseName" placeholder="请输入企业名称">
+          </label>
+          <label class="field">
+            <span>组织机构代码</span>
+            <input type="text" name="orgCode" placeholder="请输入组织机构代码">
+          </label>
+          <label class="field">
+            <span>企业资质</span>
+            <select name="qualification">
+              <option value="">全部资质</option>
+              <option>施工总承包</option>
+              <option>工程监理</option>
+              <option>质量检测</option>
+              <option>安全生产许可</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>证书等级</span>
+            <select name="grade">
+              <option value="">全部等级</option>
+              <option>特级</option>
+              <option>一级</option>
+              <option>二级</option>
+              <option>三级</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>所属区域</span>
+            <select name="region">
+              <option value="">全部区域</option>
+              <option>朝阳区</option>
+              <option>海淀区</option>
+              <option>丰台区</option>
+              <option>通州区</option>
+              <option>昌平区</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>起始日期</span>
+            <input type="date" name="startDate">
+          </label>
+          <label class="field">
+            <span>截止日期</span>
+            <input type="date" name="endDate">
+          </label>
+          <label class="field">
+            <span>数据状态</span>
+            <select name="status">
+              <option value="">全部状态</option>
+              <option>正常</option>
+              <option>预警</option>
+              <option>待核验</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn-secondary" type="button" id="resetBtn">重置条件</button>
+          <button class="btn-primary" type="submit" id="searchBtn">执行查询</button>
+        </div>
+      </form>
+
+      <div class="active-filters" id="activeFilters"></div>
+    </section>
+
+    <section class="summary-strip fade-up" id="metricStrip"></section>
+
+    <div class="dashboard-grid">
+      <section class="panel fade-up">
+        <div class="panel-head">
+          <div>
+            <span class="panel-tag">Analysis View</span>
+            <h2 id="moduleTitle">建筑业分析</h2>
+            <p id="moduleDesc"></p>
+          </div>
+          <div class="status-time">
+            数据快照<br>
+            <strong id="moduleSnapshot"></strong>
+          </div>
+        </div>
+
+        <div class="dimension-tabs" id="dimensionTabs"></div>
+
+        <div class="chart-layout">
+          <article class="chart-card">
+            <h3 id="trendTitle"></h3>
+            <p id="trendDesc"></p>
+            <div class="line-chart" id="lineChart"></div>
+            <div class="chart-note-row">
+              <span id="trendLeftNote"></span>
+              <span id="trendRightNote"></span>
+            </div>
+          </article>
+
+          <article class="sub-card">
+            <h3 id="compositionTitle"></h3>
+            <p id="compositionDesc"></p>
+            <div class="bar-list" id="barChart"></div>
+          </article>
+        </div>
+
+        <div class="dimension-detail" id="dimensionDetail"></div>
+
+        <article class="sub-card">
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">Sample Table</span>
+              <h3 id="tableTitle"></h3>
+              <p id="tableDesc"></p>
+            </div>
+          </div>
+          <div class="data-table-wrap">
+            <table>
+              <thead id="tableHead"></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <aside class="panel side-stage fade-up">
+        <article class="sub-card">
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">Insight</span>
+              <h3>分析结论</h3>
+              <p>每个统计维度对应的核心观察与管理建议。</p>
+            </div>
+          </div>
+          <div class="insight-list" id="insightList"></div>
+        </article>
+
+        <article class="sub-card">
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">Ranking</span>
+              <h3 id="rankingTitle"></h3>
+              <p>支持切换栏目后同步刷新热度排名与重点区域。</p>
+            </div>
+          </div>
+          <div class="ranking-list" id="rankingList"></div>
+        </article>
+
+        <article class="sub-card">
+          <div class="panel-head">
+            <div>
+              <span class="panel-tag">Alert</span>
+              <h3>重点预警</h3>
+              <p>聚合到期、异常、备案偏低与区域集中度风险。</p>
+            </div>
+          </div>
+          <div class="alert-list" id="alertList"></div>
+        </article>
+      </aside>
+    </div>
+
+    <div class="footer-note">页面为静态演示版，可继续接入真实接口、ECharts 和导出能力。</div>
+  </div>
+
+  <script>
+    const dashboardData = [
+      {
+        id: "construction",
+        name: "建筑业分析",
+        short: "企业画像",
+        description: "围绕建筑企业名录、审批办理、资质等级与区域分布，形成建筑业企业全景分析。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "在册建筑企业", value: "12,864", delta: "+126 较上月" },
+          { label: "本月审批办结", value: "1,248", delta: "办结率 96.2%" },
+          { label: "重点预警企业", value: "186", delta: "-18 较上周" },
+          { label: "高等级资质企业", value: "2,406", delta: "占比 18.7%" }
+        ],
+        dimensions: [
+          {
+            id: "enterprise-directory",
+            name: "企业名录分析",
+            summary: "面向企业底库，观察企业总量、等级结构与区域集中情况。",
+            trendTitle: "近6个月建筑企业净增趋势",
+            trendDesc: "展示建筑企业注册、注销、迁入迁出的综合净增变化。",
+            trend: [82, 95, 103, 121, 118, 134],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "净增高峰：5月",
+            trendRightNote: "样本口径：建筑业企业库",
+            compositionTitle: "企业资质结构占比",
+            compositionDesc: "按建筑业主要资质类型统计。",
+            composition: [
+              { label: "施工总承包", value: 88 },
+              { label: "专业承包", value: 73 },
+              { label: "劳务分包", value: 41 },
+              { label: "设计施工一体化", value: 26 }
+            ],
+            focus: [
+              { label: "重点观察", value: "朝阳区企业活跃度最高", note: "活跃企业 2,142 家，新增企业连续 3 月领先。" },
+              { label: "结构结论", value: "专业承包仍是主体", note: "专业承包类企业占样本总量 32.4%。" },
+              { label: "管理建议", value: "加强外迁企业动态跟踪", note: "近两月企业迁出增幅 9.6%，建议补强持续监测。" }
+            ],
+            tableTitle: "建筑企业名录样本",
+            tableDesc: "选取重点企业样本，展示资质等级、区域与经营状态。",
+            columns: ["企业名称", "资质类别", "资质等级", "所属区域", "成立日期", "经营状态"],
+            rows: [
+              ["北京城建发展建设有限公司", "施工总承包", "一级", "朝阳区", "2004-07-16", "正常"],
+              ["中建华北市政工程有限公司", "专业承包", "一级", "海淀区", "2008-03-21", "正常"],
+              ["京南基础工程集团有限公司", "施工总承包", "特级", "丰台区", "1999-12-02", "重点关注"],
+              ["首都安装技术有限公司", "专业承包", "二级", "通州区", "2011-09-18", "正常"]
+            ],
+            insights: [
+              { title: "企业集聚明显", body: "朝阳、海淀、丰台三地合计占样本企业总量的 57%，区域集中度较高。" },
+              { title: "高等级企业带动强", body: "特级与一级企业数量稳步增长，对重点工程承接形成明显支撑。" }
+            ],
+            rankingTitle: "重点区域企业数量排名",
+            ranking: [
+              { name: "朝阳区", note: "活跃企业", value: "2,142 家" },
+              { name: "海淀区", note: "活跃企业", value: "1,886 家" },
+              { name: "丰台区", note: "活跃企业", value: "1,604 家" }
+            ],
+            alerts: [
+              { title: "企业迁出预警", body: "近30日 24 家企业发生迁出，主要集中在劳务分包类别。" },
+              { title: "异常停业样本", body: "13 家企业经营状态变更为异常，建议联动资质核查。" }
+            ]
+          },
+          {
+            id: "approval",
+            name: "审批情况分析",
+            summary: "统计资质审批受理、办结、退回和超时情况，识别审批瓶颈。",
+            trendTitle: "月度审批办结量走势",
+            trendDesc: "展示建筑业资质审批事项的受理与办结变化。",
+            trend: [740, 768, 812, 925, 1012, 1248],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "本月办结创新高",
+            trendRightNote: "审批口径：资质审批事项",
+            compositionTitle: "审批结果结构",
+            compositionDesc: "按本月事项处理结果统计。",
+            composition: [
+              { label: "已办结", value: 96 },
+              { label: "补正中", value: 21 },
+              { label: "退回", value: 12 },
+              { label: "超时", value: 6 }
+            ],
+            focus: [
+              { label: "重点观察", value: "办结率保持高位", note: "本月办结率 96.2%，平均办结时长缩短至 3.4 天。" },
+              { label: "结构结论", value: "补正事项主要集中材料缺失", note: "补正事项中 61% 为安全管理材料不完整。" },
+              { label: "管理建议", value: "补强高频退件事项模板", note: "针对共性退回原因建立在线材料校验规则。" }
+            ],
+            tableTitle: "审批事项样本",
+            tableDesc: "展示重点审批事项的受理与处理状态。",
+            columns: ["事项编号", "企业名称", "事项类型", "受理日期", "当前状态", "办结时长"],
+            rows: [
+              ["SP-202605-1012", "北京城建发展建设有限公司", "资质延续", "2026-05-03", "已办结", "2.5天"],
+              ["SP-202605-1186", "华北路桥工程股份有限公司", "资质升级", "2026-05-06", "补正中", "4.0天"],
+              ["SP-202605-1218", "京南基础工程集团有限公司", "增项申请", "2026-05-08", "退回", "1.0天"],
+              ["SP-202605-1324", "首都安装技术有限公司", "重新核定", "2026-05-11", "已办结", "3.2天"]
+            ],
+            insights: [
+              { title: "审批效率提升", body: "通过受理前预审，平均办结时长环比下降 12.7%。" },
+              { title: "退件原因集中", body: "企业法人变更、安管资料缺失是当前退件的两类主要原因。" }
+            ],
+            rankingTitle: "审批事项高频区域",
+            ranking: [
+              { name: "朝阳区", note: "审批量", value: "286 件" },
+              { name: "通州区", note: "审批量", value: "214 件" },
+              { name: "海淀区", note: "审批量", value: "198 件" }
+            ],
+            alerts: [
+              { title: "超时事项 6 件", body: "涉及资质延续与增项申请，建议优先清理待审链路。" },
+              { title: "退回率偏高企业 9 家", body: "同一企业多次补正，建议纳入定向辅导名单。" }
+            ]
+          },
+          {
+            id: "grade",
+            name: "资质等级分析",
+            summary: "关注建筑业企业资质等级梯队变化和升级趋势。",
+            trendTitle: "高等级资质企业增长趋势",
+            trendDesc: "按特级、一级企业数量变化判断行业头部能力扩张情况。",
+            trend: [2140, 2194, 2238, 2296, 2358, 2406],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "特一级企业稳步增长",
+            trendRightNote: "统计口径：高等级建筑业企业",
+            compositionTitle: "等级梯队分布",
+            compositionDesc: "按资质等级展示当前梯队结构。",
+            composition: [
+              { label: "特级", value: 18 },
+              { label: "一级", value: 62 },
+              { label: "二级", value: 83 },
+              { label: "三级及以下", value: 45 }
+            ],
+            focus: [
+              { label: "重点观察", value: "一级企业扩张速度最快", note: "一级企业近半年增长 9.4%，成为主力梯队。" },
+              { label: "结构结论", value: "头部能力持续增强", note: "特级企业承接重大项目份额继续抬升。" },
+              { label: "管理建议", value: "加强升级后履约核验", note: "对新晋高等级企业建立履约表现回访机制。" }
+            ],
+            tableTitle: "高等级企业样本",
+            tableDesc: "展示高等级建筑企业的主要资质与项目承接情况。",
+            columns: ["企业名称", "当前等级", "主项资质", "近一年升级次数", "在建重点项目", "状态"],
+            rows: [
+              ["京南基础工程集团有限公司", "特级", "房建总承包", "1", "18", "正常"],
+              ["北京城建发展建设有限公司", "一级", "市政总承包", "1", "12", "正常"],
+              ["中建华北市政工程有限公司", "一级", "市政总承包", "0", "10", "重点关注"],
+              ["华北路桥工程股份有限公司", "一级", "公路总承包", "2", "16", "正常"]
+            ],
+            insights: [
+              { title: "等级晋升带动项目集聚", body: "高等级企业在重点项目中的占比已达 64%，对市场集中度影响明显。" },
+              { title: "二级企业升级意愿强", body: "二级企业中 22% 已提交升级或增项准备材料。" }
+            ],
+            rankingTitle: "高等级企业分布排名",
+            ranking: [
+              { name: "海淀区", note: "高等级企业", value: "426 家" },
+              { name: "朝阳区", note: "高等级企业", value: "398 家" },
+              { name: "丰台区", note: "高等级企业", value: "312 家" }
+            ],
+            alerts: [
+              { title: "升级后项目集中度偏高", body: "部分新晋一级企业项目承接激增，建议跟踪履约与质量表现。" },
+              { title: "等级降级风险样本", body: "7 家企业存在业绩不达标或处罚记录，需重点复核。" }
+            ]
+          },
+          {
+            id: "region",
+            name: "区域分布分析",
+            summary: "从区域视角观察建筑企业数量、增长和项目承接分布。",
+            trendTitle: "区域企业增长热度曲线",
+            trendDesc: "以重点区域样本企业数量变化形成区域热度比较。",
+            trend: [68, 74, 78, 92, 96, 108],
+            trendLabels: ["朝阳", "海淀", "丰台", "通州", "昌平", "大兴"],
+            trendLeftNote: "通州新注册较快",
+            trendRightNote: "单位：区域增长指数",
+            compositionTitle: "区域企业占比",
+            compositionDesc: "展示重点区域企业数量占总量的分布。",
+            composition: [
+              { label: "朝阳区", value: 84 },
+              { label: "海淀区", value: 76 },
+              { label: "丰台区", value: 64 },
+              { label: "通州区", value: 52 }
+            ],
+            focus: [
+              { label: "重点观察", value: "朝阳区总量领先", note: "企业总量和活跃企业数均处第一位。" },
+              { label: "结构结论", value: "通州区增速最快", note: "近三个月注册企业增速达 14.3%。" },
+              { label: "管理建议", value: "对新区企业加强前期辅导", note: "通州、大兴新增企业多，建议强化备案与审批指引。" }
+            ],
+            tableTitle: "区域分布样本",
+            tableDesc: "展示各区域建筑业企业数量和增速情况。",
+            columns: ["区域", "企业总量", "活跃企业", "近30日新增", "增速", "重点特征"],
+            rows: [
+              ["朝阳区", "2,142", "1,936", "42", "2.0%", "总部型企业集中"],
+              ["海淀区", "1,886", "1,702", "36", "1.9%", "科技配套建设活跃"],
+              ["丰台区", "1,604", "1,438", "28", "1.6%", "基础设施项目较多"],
+              ["通州区", "1,266", "1,148", "54", "4.5%", "新注册企业增速高"]
+            ],
+            insights: [
+              { title: "新区增长显著", body: "通州、大兴受项目落地带动，新注册建筑企业增速明显快于主城区。" },
+              { title: "传统核心区仍具优势", body: "朝阳、海淀凭借总部和项目资源，保持较强集聚效应。" }
+            ],
+            rankingTitle: "区域热度排名",
+            ranking: [
+              { name: "朝阳区", note: "热度指数", value: "92.4" },
+              { name: "海淀区", note: "热度指数", value: "88.7" },
+              { name: "通州区", note: "热度指数", value: "84.9" }
+            ],
+            alerts: [
+              { title: "区域集中度风险", body: "前三城区企业占比过高，市场分布不均衡仍较明显。" },
+              { title: "新区辅导压力上升", body: "新增企业快速增加，对备案、审批和监管提出更高要求。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "supervision",
+        name: "监理企业分析",
+        short: "名录办件",
+        description: "聚焦监理企业名录信息和办件流程，展示企业底数、区域分布，以及一段时间内各事项在各办理环节的流转情况。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "监理企业总量", value: "2,486", delta: "+24 较上月" },
+          { label: "统计期办件总量", value: "1,128", delta: "区间内事项量" },
+          { label: "在途环节事项", value: "82", delta: "含受理/退回/补正/审核" },
+          { label: "重点预警企业", value: "42", delta: "-5 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "supervision-directory",
+            name: "企业名录分析",
+            summary: "关注监理企业总量、资质结构、区域分布与企业活跃程度。",
+            trendTitle: "监理企业数量变化趋势",
+            trendDesc: "近6个月监理企业净增数量走势。",
+            trend: [12, 14, 18, 20, 19, 24],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "新增保持平稳",
+            trendRightNote: "样本口径：监理企业库",
+            compositionTitle: "监理企业类型占比",
+            compositionDesc: "按主要监理专业资质统计。",
+            composition: [
+              { label: "房建监理", value: 86 },
+              { label: "市政监理", value: 62 },
+              { label: "机电监理", value: 38 },
+              { label: "综合监理", value: 24 }
+            ],
+            focus: [
+              { label: "重点观察", value: "房建监理企业仍占主导", note: "房建类企业占样本总量 41.8%。" },
+              { label: "结构结论", value: "综合监理企业数量有限", note: "综合资质监理企业集中在头部企业。" },
+              { label: "管理建议", value: "加强中型企业能力升级", note: "鼓励具备项目经验的监理企业拓展综合监理能力。" }
+            ],
+            tableTitle: "监理企业样本",
+            tableDesc: "展示重点监理企业资质与区域分布。",
+            columns: ["企业名称", "资质类别", "资质等级", "所属区域", "注册资本", "状态"],
+            rows: [
+              ["北京东方建设监理有限公司", "房建监理", "甲级", "朝阳区", "3000万", "正常"],
+              ["华建市政监理集团", "市政监理", "甲级", "海淀区", "2600万", "正常"],
+              ["中京工程顾问有限公司", "综合监理", "甲级", "丰台区", "5000万", "重点关注"],
+              ["京城机电监理有限公司", "机电监理", "乙级", "通州区", "1200万", "正常"]
+            ],
+            insights: [
+              { title: "区域分布相对集中", body: "监理企业主要分布于朝阳、海淀和丰台，头部区位明显。" },
+              { title: "综合资质门槛高", body: "综合监理企业数量少，但项目覆盖范围广，市场影响力高。" }
+            ],
+            rankingTitle: "监理企业数量排名",
+            ranking: [
+              { name: "朝阳区", note: "监理企业", value: "442 家" },
+              { name: "海淀区", note: "监理企业", value: "396 家" },
+              { name: "丰台区", note: "监理企业", value: "288 家" }
+            ],
+            alerts: [
+              { title: "异地项目履约偏弱", body: "5 家企业跨区项目较多但人员派驻不足，需重点跟进。" },
+              { title: "经营异常样本", body: "4 家监理企业近期状态变更为异常，建议核验后续承接资格。" }
+            ]
+          },
+          {
+            id: "supervision-processing",
+            name: "办件情况分析",
+            summary: "分析统计时间段内各事项在受理、退回、补正、审核、决定五个环节的流转数量、停留情况和办理效率。",
+            trendTitle: "统计期内事项环节流转走势",
+            trendDesc: "展示所选时间段内监理企业事项在各办理环节的流转总量变化。",
+            trend: [842, 214, 326, 978, 1128],
+            trendLabels: ["受理", "退回", "补正", "审核", "决定"],
+            trendLeftNote: "补正与审核为主要堆积环节",
+            trendRightNote: "统计口径：时间段内事项环节流转量",
+            compositionTitle: "事项办理环节分布",
+            compositionDesc: "按当前所处办理环节统计事项分布情况。",
+            composition: [
+              { label: "受理环节", value: 48 },
+              { label: "退回环节", value: 18 },
+              { label: "补正环节", value: 52 },
+              { label: "审核环节", value: 76 },
+              { label: "决定环节", value: 96 }
+            ],
+            focus: [
+              { label: "重点观察", value: "补正环节停留最明显", note: "统计期内补正环节事项停留时间最长，是影响整体效率的核心节点。" },
+              { label: "结构结论", value: "不同事项在环节间差异明显", note: "资质延续、资质增项、人员变更在退回、补正和审核环节的耗时差异较大。" },
+              { label: "管理建议", value: "按事项建立环节预警", note: "建议对每个事项的受理、退回、补正、审核、决定环节分别设置超时阈值。" }
+            ],
+            tableTitle: "事项环节办理样本",
+            tableDesc: "展示统计时间段内各事项在不同办理环节的流转与停留情况。",
+            columns: ["事项编号", "企业名称", "事项类型", "当前环节", "环节开始时间", "环节停留时长"],
+            rows: [
+              ["JL-202605-012", "北京东方建设监理有限公司", "资质延续", "决定", "2026-05-03 09:20", "2.1天"],
+              ["JL-202605-057", "华建市政监理集团", "人员变更", "补正环节", "2026-05-06 14:10", "3.8天"],
+              ["JL-202605-081", "中京工程顾问有限公司", "资质增项", "审核环节", "2026-05-08 11:35", "1.4天"],
+              ["JL-202605-106", "京城机电监理有限公司", "企业备案", "受理环节", "2026-05-11 10:05", "0.6天"]
+            ],
+            insights: [
+              { title: "环节视角更能反映堵点", body: "单看办结量不足以定位问题，按受理、退回、补正、审核、决定拆分后更容易识别堵点环节。" },
+              { title: "补正与审核是效率关键", body: "多数事项在补正和审核环节出现停留，说明材料规范性和内部复核效率仍需加强。" }
+            ],
+            rankingTitle: "高频事项类型排名",
+            ranking: [
+              { name: "资质延续", note: "统计期事项量", value: "286 件" },
+              { name: "人员变更", note: "统计期事项量", value: "214 件" },
+              { name: "资质增项", note: "统计期事项量", value: "168 件" }
+            ],
+            alerts: [
+              { title: "补正环节积压", body: "当前仍有 26 件事项停留在补正环节超过预警时长，建议优先清理。" },
+              { title: "事项环节超时", body: "18 件事项在审核或决定前环节超时，建议按事项类型逐类排查。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "safety",
+        name: "安全证分析",
+        short: "证照预警",
+        description: "围绕安全生产许可证与安管人员 A/B/C 证开展证照存量、趋势与预警分析。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "有效安全证", value: "18,642", delta: "+248 较上月" },
+          { label: "近90日到期", value: "1,126", delta: "预警占比 6.0%" },
+          { label: "A/B/C证持证人", value: "46,218", delta: "+3.4%" },
+          { label: "异常换证事项", value: "73", delta: "-12 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "abc-distribution",
+            name: "A/B/C证分布分析",
+            summary: "统计安管人员 A/B/C 证结构和分布情况。",
+            trendTitle: "A/B/C证持证人数趋势",
+            trendDesc: "按月观察主要证书类型持证人数变化。",
+            trend: [42120, 42860, 43492, 44126, 45208, 46218],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "持证人持续增加",
+            trendRightNote: "统计口径：有效持证人员",
+            compositionTitle: "证书类型占比",
+            compositionDesc: "按 A/B/C 证分类统计持证人数。",
+            composition: [
+              { label: "A证", value: 32 },
+              { label: "B证", value: 58 },
+              { label: "C证", value: 92 },
+              { label: "综合类", value: 18 }
+            ],
+            focus: [
+              { label: "重点观察", value: "C证人数占比最高", note: "项目一线安全管理人员数量增长最明显。" },
+              { label: "结构结论", value: "B证增长带动项目配置", note: "B证持证人近三月增长 6.2%。" },
+              { label: "管理建议", value: "建立岗位与持证关联校验", note: "确保项目岗位配置与持证等级匹配。" }
+            ],
+            tableTitle: "安管人员证书样本",
+            tableDesc: "展示不同证书类型持证人员样本信息。",
+            columns: ["姓名", "企业名称", "证书类型", "证书编号", "发证日期", "状态"],
+            rows: [
+              ["张涛", "北京城建发展建设有限公司", "A证", "AQ-A-110012", "2024-08-11", "有效"],
+              ["李峰", "京南基础工程集团有限公司", "B证", "AQ-B-220731", "2025-01-07", "有效"],
+              ["赵敏", "首都安装技术有限公司", "C证", "AQ-C-331406", "2023-12-18", "90日内到期"],
+              ["王倩", "华北路桥工程股份有限公司", "B证", "AQ-B-221084", "2025-03-12", "有效"]
+            ],
+            insights: [
+              { title: "一线安全配置增强", body: "C证人员增长快于 A 证和 B 证，说明项目现场配置持续加强。" },
+              { title: "岗位匹配需进一步校验", body: "个别项目存在岗位与持证等级不完全匹配的现象。" }
+            ],
+            rankingTitle: "持证人数企业排名",
+            ranking: [
+              { name: "京南基础工程集团有限公司", note: "持证人数", value: "826 人" },
+              { name: "北京城建发展建设有限公司", note: "持证人数", value: "768 人" },
+              { name: "华北路桥工程股份有限公司", note: "持证人数", value: "702 人" }
+            ],
+            alerts: [
+              { title: "岗位匹配异常 11 项", body: "项目岗位与证书类型匹配关系存在异常，需复核派驻名单。" },
+              { title: "集中到期压力上升", body: "C证到期集中在未来 60 日，建议提前启动续期提醒。" }
+            ]
+          },
+          {
+            id: "expiry-warning",
+            name: "到期预警分析",
+            summary: "聚焦近90日到期的安全证、安管证和企业安全许可证。",
+            trendTitle: "近90日到期证书数量走势",
+            trendDesc: "按周监测即将到期证照数量变化。",
+            trend: [864, 902, 944, 1016, 1078, 1126],
+            trendLabels: ["第1周", "第2周", "第3周", "第4周", "第5周", "第6周"],
+            trendLeftNote: "到期压力持续上升",
+            trendRightNote: "统计口径：90日内到期",
+            compositionTitle: "到期证书结构",
+            compositionDesc: "按证书类型展示即将到期占比。",
+            composition: [
+              { label: "企业安全证", value: 24 },
+              { label: "A证", value: 18 },
+              { label: "B证", value: 44 },
+              { label: "C证", value: 78 }
+            ],
+            focus: [
+              { label: "重点观察", value: "B/C证到期最集中", note: "未来 90 日内 B/C 证占全部到期量 74%。" },
+              { label: "结构结论", value: "续期提醒需前置", note: "建议至少提前 45 日推送续期指引。" },
+              { label: "管理建议", value: "对重点企业建立批量提醒", note: "持证人数较多企业应批量推送续期任务。" }
+            ],
+            tableTitle: "到期预警样本",
+            tableDesc: "展示近期到期证照样本和预警状态。",
+            columns: ["企业名称", "姓名/证照", "类型", "到期日期", "剩余天数", "预警级别"],
+            rows: [
+              ["首都安装技术有限公司", "赵敏", "C证", "2026-06-22", "32天", "高"],
+              ["京南基础工程集团有限公司", "企业安全许可证", "企业安全证", "2026-07-03", "43天", "中"],
+              ["北京城建发展建设有限公司", "张涛", "A证", "2026-07-14", "54天", "中"],
+              ["华北路桥工程股份有限公司", "李峰", "B证", "2026-06-18", "28天", "高"]
+            ],
+            insights: [
+              { title: "到期结构集中于项目证书", body: "B 证和 C 证到期量占比较高，对项目现场配置影响更直接。" },
+              { title: "企业级证照续期不可忽视", body: "企业安全许可证数量虽少，但一旦到期影响面更大。" }
+            ],
+            rankingTitle: "到期预警企业排名",
+            ranking: [
+              { name: "京南基础工程集团有限公司", note: "近90日到期", value: "68 本" },
+              { name: "北京城建发展建设有限公司", note: "近90日到期", value: "54 本" },
+              { name: "华北路桥工程股份有限公司", note: "近90日到期", value: "49 本" }
+            ],
+            alerts: [
+              { title: "高预警证书 312 本", body: "剩余天数低于 30 天的证书数量快速增加，需优先处理。" },
+              { title: "重点企业续期批量集中", body: "3 家头部企业到期量明显偏高，建议定向跟踪。" }
+            ]
+          },
+          {
+            id: "issue-trend",
+            name: "发证趋势分析",
+            summary: "分析安全证与安管证的新增发证、换证和补证情况。",
+            trendTitle: "月度发证数量变化",
+            trendDesc: "按月观察安全证发证和换证总量。",
+            trend: [1260, 1318, 1422, 1468, 1536, 1612],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "发证量稳定增长",
+            trendRightNote: "统计口径：新增发证+换证",
+            compositionTitle: "发证类型结构",
+            compositionDesc: "按新增、延续、变更、补证构成统计。",
+            composition: [
+              { label: "新增发证", value: 58 },
+              { label: "延续换证", value: 82 },
+              { label: "信息变更", value: 28 },
+              { label: "补证", value: 14 }
+            ],
+            focus: [
+              { label: "重点观察", value: "延续换证占比高", note: "当前发证工作重心仍在续期和延续办理。" },
+              { label: "结构结论", value: "新增发证持续增加", note: "新开工项目带动 B/C 证新增办理需求。" },
+              { label: "管理建议", value: "建立高峰期分流机制", note: "针对集中换证月份配置更多审核资源。" }
+            ],
+            tableTitle: "发证办理样本",
+            tableDesc: "展示本月重点发证和换证样本。",
+            columns: ["受理编号", "企业名称", "证书类型", "办理类型", "受理日期", "办理状态"],
+            rows: [
+              ["AQ-202605-011", "北京城建发展建设有限公司", "B证", "新增发证", "2026-05-02", "已办结"],
+              ["AQ-202605-072", "华北路桥工程股份有限公司", "企业安全证", "延续换证", "2026-05-06", "已办结"],
+              ["AQ-202605-109", "首都安装技术有限公司", "C证", "补证", "2026-05-11", "审核中"],
+              ["AQ-202605-133", "京南基础工程集团有限公司", "A证", "信息变更", "2026-05-13", "已办结"]
+            ],
+            insights: [
+              { title: "发证节奏更平稳", body: "通过分时预约和预审，发证高峰期的积压问题明显缓解。" },
+              { title: "新增需求受项目带动", body: "B/C 证新增发证与新开工项目数变化保持高度相关。" }
+            ],
+            rankingTitle: "发证办理量企业排名",
+            ranking: [
+              { name: "北京城建发展建设有限公司", note: "办理量", value: "46 件" },
+              { name: "京南基础工程集团有限公司", note: "办理量", value: "42 件" },
+              { name: "华北路桥工程股份有限公司", note: "办理量", value: "39 件" }
+            ],
+            alerts: [
+              { title: "换证高峰临近", body: "7 月前后将迎来一批证照集中延续，需提前调配审核资源。" },
+              { title: "补证事项异常偏高", body: "个别企业补证频次过高，建议核验证书管理流程。" }
+            ]
+          },
+          {
+            id: "abnormal-renewal",
+            name: "异常换证分析",
+            summary: "识别短期频繁换证、重复补证和信息异常变更行为。",
+            trendTitle: "异常换证事项趋势",
+            trendDesc: "统计短期内异常换证事项数量变化。",
+            trend: [38, 44, 52, 57, 81, 73],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "4月为异常峰值",
+            trendRightNote: "统计口径：异常换证规则识别",
+            compositionTitle: "异常类型分布",
+            compositionDesc: "按异常规则类型拆解异常换证事项。",
+            composition: [
+              { label: "重复补证", value: 28 },
+              { label: "短期多次变更", value: 44 },
+              { label: "身份信息异常", value: 16 },
+              { label: "跨企业频繁流转", value: 21 }
+            ],
+            focus: [
+              { label: "重点观察", value: "短期多次变更最常见", note: "异常项中 43% 与短期多次信息变更有关。" },
+              { label: "结构结论", value: "跨企业流转需重点关注", note: "部分人员在不同企业之间频繁变更挂靠信息。" },
+              { label: "管理建议", value: "引入规则评分模型", note: "对高频变更、重复补证人员赋予风险评分。" }
+            ],
+            tableTitle: "异常换证样本",
+            tableDesc: "展示被规则识别的异常换证样本信息。",
+            columns: ["企业名称", "人员/证照", "异常类型", "近90日次数", "最近办理日期", "处理建议"],
+            rows: [
+              ["首都安装技术有限公司", "赵敏 / C证", "重复补证", "3", "2026-05-12", "人工复核"],
+              ["京南基础工程集团有限公司", "李峰 / B证", "短期多次变更", "4", "2026-05-10", "纳入监测"],
+              ["华北路桥工程股份有限公司", "王倩 / B证", "跨企业频繁流转", "2", "2026-05-08", "核验关联关系"],
+              ["北京城建发展建设有限公司", "张涛 / A证", "身份信息异常", "1", "2026-05-06", "补充证明"]
+            ],
+            insights: [
+              { title: "异常换证具可识别规律", body: "短期高频变更和重复补证可通过规则显著筛出高风险样本。" },
+              { title: "人工复核仍然必要", body: "部分异常源于正常岗位调整，需要结合项目场景进行判断。" }
+            ],
+            rankingTitle: "异常事项企业排名",
+            ranking: [
+              { name: "京南基础工程集团有限公司", note: "异常事项", value: "12 件" },
+              { name: "首都安装技术有限公司", note: "异常事项", value: "9 件" },
+              { name: "华北路桥工程股份有限公司", note: "异常事项", value: "8 件" }
+            ],
+            alerts: [
+              { title: "跨企业流转风险", body: "涉及多人在短时间内跨企业变更，存在挂靠嫌疑需人工复核。" },
+              { title: "重复补证集中", body: "个别企业补证次数异常偏高，建议核查内部证照保管机制。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "quality",
+        name: "质量检测分析",
+        short: "检测质量",
+        description: "围绕检测机构分布、检测类别、合格率和报告时效建立质量检测分析视图。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "检测机构总量", value: "468", delta: "+9 较上月" },
+          { label: "本月检测批次", value: "32,418", delta: "+11.6%" },
+          { label: "平均合格率", value: "98.2%", delta: "+0.4pct" },
+          { label: "超时报告", value: "126", delta: "-18 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "lab-distribution",
+            name: "检测机构分布分析",
+            summary: "从区域和机构等级看检测资源分布情况。",
+            trendTitle: "检测机构数量变化",
+            trendDesc: "近6个月检测机构净增数量走势。",
+            trend: [3, 4, 5, 6, 7, 9],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "机构新增稳定",
+            trendRightNote: "统计口径：备案检测机构",
+            compositionTitle: "机构类别结构",
+            compositionDesc: "按综合检测与专项检测机构分类。",
+            composition: [
+              { label: "综合检测", value: 62 },
+              { label: "主体结构", value: 48 },
+              { label: "地基基础", value: 36 },
+              { label: "节能材料", value: 28 }
+            ],
+            focus: [
+              { label: "重点观察", value: "综合检测机构为主力", note: "综合检测机构覆盖面广、项目渗透率高。" },
+              { label: "结构结论", value: "专项机构布局不均", note: "地基基础、节能材料类机构集中在少数区域。" },
+              { label: "管理建议", value: "补强新区专项检测能力", note: "建议引导专项检测资源向新区倾斜配置。" }
+            ],
+            tableTitle: "检测机构样本",
+            tableDesc: "展示重点检测机构类别、区域和状态。",
+            columns: ["机构名称", "机构类别", "所属区域", "能力项数", "近月批次", "状态"],
+            rows: [
+              ["北京建科检测中心", "综合检测", "海淀区", "36", "2460", "正常"],
+              ["首都结构检测有限公司", "主体结构", "朝阳区", "18", "1822", "正常"],
+              ["京北地基基础检测院", "地基基础", "昌平区", "12", "934", "重点关注"],
+              ["通州节能材料实验室", "节能材料", "通州区", "10", "708", "正常"]
+            ],
+            insights: [
+              { title: "机构资源向核心区集中", body: "海淀、朝阳机构密度高，新区专项检测供给相对不足。" },
+              { title: "专项机构补位需求明确", body: "地基基础和节能材料检测能力在新建区域需求上升。" }
+            ],
+            rankingTitle: "检测机构区域排名",
+            ranking: [
+              { name: "海淀区", note: "机构数", value: "96 家" },
+              { name: "朝阳区", note: "机构数", value: "88 家" },
+              { name: "通州区", note: "机构数", value: "54 家" }
+            ],
+            alerts: [
+              { title: "专项能力分布不均", body: "地基基础专项检测集中度较高，部分区域存在响应不足风险。" },
+              { title: "重点机构负荷偏高", body: "头部综合机构批次量持续攀升，需关注产能与质量平衡。" }
+            ]
+          },
+          {
+            id: "test-category",
+            name: "检测类别分析",
+            summary: "统计主体结构、材料、节能、地基等不同检测类别批次与占比。",
+            trendTitle: "检测批次趋势",
+            trendDesc: "展示各类检测业务总体批次变化。",
+            trend: [26180, 27240, 28612, 29854, 31108, 32418],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "材料检测增长明显",
+            trendRightNote: "统计口径：全部检测批次",
+            compositionTitle: "检测类别占比",
+            compositionDesc: "按检测业务类别统计月度占比。",
+            composition: [
+              { label: "主体结构", value: 84 },
+              { label: "建筑材料", value: 92 },
+              { label: "地基基础", value: 52 },
+              { label: "节能检测", value: 46 }
+            ],
+            focus: [
+              { label: "重点观察", value: "材料检测批次最高", note: "材料送检需求持续高位运行。" },
+              { label: "结构结论", value: "节能检测增长稳定", note: "绿色建筑项目带动节能检测需求上升。" },
+              { label: "管理建议", value: "建立高频类别阈值监测", note: "对材料和主体结构类批次异常波动及时预警。" }
+            ],
+            tableTitle: "检测类别样本",
+            tableDesc: "展示重点检测类别的批次和合格情况。",
+            columns: ["检测类别", "本月批次", "环比增幅", "合格率", "重点区域", "备注"],
+            rows: [
+              ["建筑材料", "12,486", "8.2%", "98.8%", "海淀/通州", "送检量最大"],
+              ["主体结构", "9,204", "6.4%", "97.9%", "朝阳/丰台", "项目覆盖广"],
+              ["地基基础", "5,118", "4.1%", "98.1%", "昌平/大兴", "专项需求稳定"],
+              ["节能检测", "3,642", "9.7%", "99.0%", "通州/海淀", "绿色项目带动"]
+            ],
+            insights: [
+              { title: "材料检测为绝对主力", body: "材料类批次占比最高，仍是质量检测工作的核心组成。" },
+              { title: "节能检测增长值得关注", body: "绿色建筑和更新改造项目持续拉动节能检测需求。" }
+            ],
+            rankingTitle: "检测类别热度排名",
+            ranking: [
+              { name: "建筑材料", note: "本月批次", value: "12,486" },
+              { name: "主体结构", note: "本月批次", value: "9,204" },
+              { name: "地基基础", note: "本月批次", value: "5,118" }
+            ],
+            alerts: [
+              { title: "高频类别产能压力", body: "材料检测高峰期明显，需关注机构排队和出报告时效。" },
+              { title: "专项类别区域不平衡", body: "地基基础检测在个别区域需求快速上升，需提前协调资源。" }
+            ]
+          },
+          {
+            id: "pass-rate",
+            name: "合格率分析",
+            summary: "分析不同检测类别、机构和区域的合格率水平。",
+            trendTitle: "月度合格率趋势",
+            trendDesc: "按全口径样本统计月度平均合格率。",
+            trend: [97.1, 97.4, 97.6, 97.9, 98.0, 98.2],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "整体质量稳定提升",
+            trendRightNote: "单位：%",
+            compositionTitle: "类别合格率对比",
+            compositionDesc: "按主要检测类别展示合格率水平。",
+            composition: [
+              { label: "建筑材料", value: 99 },
+              { label: "主体结构", value: 97 },
+              { label: "地基基础", value: 98 },
+              { label: "节能检测", value: 99 }
+            ],
+            focus: [
+              { label: "重点观察", value: "总体合格率保持高位", note: "近6个月平均合格率提升 1.1 个百分点。" },
+              { label: "结构结论", value: "主体结构波动更明显", note: "主体结构检测受现场条件影响，波动略高于其他类别。" },
+              { label: "管理建议", value: "强化低合格率项目回溯", note: "建议对连续不合格项目建立问题闭环台账。" }
+            ],
+            tableTitle: "合格率样本",
+            tableDesc: "展示重点机构和类别的合格率表现。",
+            columns: ["机构名称", "检测类别", "本月批次", "合格率", "不合格批次", "备注"],
+            rows: [
+              ["北京建科检测中心", "建筑材料", "2460", "99.1%", "22", "稳定"],
+              ["首都结构检测有限公司", "主体结构", "1822", "97.4%", "47", "波动略高"],
+              ["京北地基基础检测院", "地基基础", "934", "98.3%", "16", "正常"],
+              ["通州节能材料实验室", "节能检测", "708", "99.2%", "6", "表现良好"]
+            ],
+            insights: [
+              { title: "整体质量受控", body: "全口径合格率维持在 98% 左右，行业质量总体平稳。" },
+              { title: "问题仍需追溯到项目", body: "少量不合格样本集中在个别项目和机构，应强化追踪整改。" }
+            ],
+            rankingTitle: "合格率机构排名",
+            ranking: [
+              { name: "通州节能材料实验室", note: "合格率", value: "99.2%" },
+              { name: "北京建科检测中心", note: "合格率", value: "99.1%" },
+              { name: "京北地基基础检测院", note: "合格率", value: "98.3%" }
+            ],
+            alerts: [
+              { title: "主体结构波动样本", body: "个别机构主体结构类合格率连续低于均值，需开展专项复盘。" },
+              { title: "连续不合格项目", body: "4 个项目出现连续不合格记录，建议纳入质量专项督办。" }
+            ]
+          },
+          {
+            id: "report-time",
+            name: "报告时效分析",
+            summary: "分析检测报告出具时长和超时风险。",
+            trendTitle: "报告平均出具时长",
+            trendDesc: "统计从送检到出具报告的平均工作日。",
+            trend: [4.8, 4.6, 4.5, 4.3, 4.1, 3.9],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "整体时效持续优化",
+            trendRightNote: "单位：工作日",
+            compositionTitle: "报告时效结构",
+            compositionDesc: "按时、预警、超时三类报告分布。",
+            composition: [
+              { label: "按时出具", value: 94 },
+              { label: "临界预警", value: 22 },
+              { label: "超时出具", value: 8 },
+              { label: "补充说明", value: 16 }
+            ],
+            focus: [
+              { label: "重点观察", value: "平均时效降至 3.9 天", note: "机构线上流程优化对时效改善效果明显。" },
+              { label: "结构结论", value: "超时主要集中专项报告", note: "地基基础和复杂结构检测报告更易超时。" },
+              { label: "管理建议", value: "对专项报告建立节点预警", note: "在采样、复检、出报告各节点设置超时提醒。" }
+            ],
+            tableTitle: "报告时效样本",
+            tableDesc: "展示检测机构报告出具时效情况。",
+            columns: ["机构名称", "检测类别", "平均时长", "超时数量", "本月批次", "状态"],
+            rows: [
+              ["北京建科检测中心", "建筑材料", "3.2天", "12", "2460", "正常"],
+              ["首都结构检测有限公司", "主体结构", "4.4天", "38", "1822", "预警"],
+              ["京北地基基础检测院", "地基基础", "5.1天", "44", "934", "重点关注"],
+              ["通州节能材料实验室", "节能检测", "3.1天", "6", "708", "正常"]
+            ],
+            insights: [
+              { title: "时效改善来自流程标准化", body: "线上流转和批量模板应用显著压缩了报告生成时间。" },
+              { title: "专项检测仍有瓶颈", body: "复杂项目的复检和专家审核环节容易造成超时。" }
+            ],
+            rankingTitle: "报告时效优先机构排名",
+            ranking: [
+              { name: "通州节能材料实验室", note: "平均时长", value: "3.1天" },
+              { name: "北京建科检测中心", note: "平均时长", value: "3.2天" },
+              { name: "首都结构检测有限公司", note: "平均时长", value: "4.4天" }
+            ],
+            alerts: [
+              { title: "专项报告超时 126 份", body: "地基基础和复杂结构类报告超时占比偏高，需要专项压降。" },
+              { title: "单机构积压风险", body: "个别机构待出报告队列持续增长，需关注产能瓶颈。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "outside-construction",
+        name: "外省施工分析",
+        short: "外省入场",
+        description: "对外省施工企业入场备案、来源结构、项目分布和履约情况进行分析。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "外省施工企业", value: "1,326", delta: "+38 较上月" },
+          { label: "在建入场项目", value: "2,408", delta: "+6.2%" },
+          { label: "完成备案企业", value: "1,204", delta: "备案率 90.8%" },
+          { label: "重点预警企业", value: "31", delta: "+4 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "outside-directory",
+            name: "入场企业分析",
+            summary: "分析外省施工企业总量、来源层级和入场活跃程度。",
+            trendTitle: "外省施工企业入场趋势",
+            trendDesc: "展示近6个月外省施工企业入场数量变化。",
+            trend: [1142, 1178, 1204, 1248, 1288, 1326],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "入场企业持续增加",
+            trendRightNote: "统计口径：有效入场备案企业",
+            compositionTitle: "企业来源结构",
+            compositionDesc: "按来源区域大类统计外省施工企业。",
+            composition: [
+              { label: "华北地区", value: 88 },
+              { label: "华东地区", value: 76 },
+              { label: "华中地区", value: 52 },
+              { label: "西南地区", value: 36 }
+            ],
+            focus: [
+              { label: "重点观察", value: "华北、华东企业占主体", note: "两大区域合计占比超过 60%。" },
+              { label: "结构结论", value: "大型企业更易进入重点项目", note: "头部外省企业主要承接基础设施和综合项目。" },
+              { label: "管理建议", value: "强化入场前信息核验", note: "对跨省入场企业加强历史履约和处罚记录复核。" }
+            ],
+            tableTitle: "外省施工企业样本",
+            tableDesc: "展示外省施工企业来源地、资质和项目状态。",
+            columns: ["企业名称", "来源省份", "资质等级", "在建项目", "备案状态", "风险状态"],
+            rows: [
+              ["山东鲁建工程集团", "山东省", "一级", "8", "已备案", "正常"],
+              ["江苏华盛建设股份", "江苏省", "特级", "12", "已备案", "正常"],
+              ["河北远通市政工程", "河北省", "一级", "6", "已备案", "重点关注"],
+              ["河南中城建设有限公司", "河南省", "二级", "3", "待补充", "预警"]
+            ],
+            insights: [
+              { title: "来源区域较集中", body: "华北和华东企业因距离和资源优势，成为入场主力。" },
+              { title: "头部企业项目集聚明显", body: "特级和一级企业更易承接重点项目，市场集中度较高。" }
+            ],
+            rankingTitle: "来源省份企业数量排名",
+            ranking: [
+              { name: "山东省", note: "入场企业", value: "168 家" },
+              { name: "江苏省", note: "入场企业", value: "146 家" },
+              { name: "河北省", note: "入场企业", value: "138 家" }
+            ],
+            alerts: [
+              { title: "待补充备案 122 家", body: "部分外省企业资料补充不完整，影响项目入场效率。" },
+              { title: "跨区履约核验不足", body: "少数外省企业历史履约记录缺失，需要重点追踪。" }
+            ]
+          },
+          {
+            id: "outside-province",
+            name: "来源省份分析",
+            summary: "从省份角度观察外省施工企业来源热度和承接结构。",
+            trendTitle: "来源省份热度指数",
+            trendDesc: "按重点来源省份形成入场热度对比。",
+            trend: [82, 76, 72, 64, 58, 53],
+            trendLabels: ["山东", "江苏", "河北", "河南", "浙江", "山西"],
+            trendLeftNote: "山东来源热度最高",
+            trendRightNote: "单位：来源热度指数",
+            compositionTitle: "重点省份占比",
+            compositionDesc: "展示重点来源省份的企业占比。",
+            composition: [
+              { label: "山东省", value: 84 },
+              { label: "江苏省", value: 76 },
+              { label: "河北省", value: 72 },
+              { label: "河南省", value: 58 }
+            ],
+            focus: [
+              { label: "重点观察", value: "山东、江苏来源最活跃", note: "综合施工能力强、项目资源匹配度高。" },
+              { label: "结构结论", value: "河北来源企业以市政类为主", note: "河北企业在市政和基础设施项目中更活跃。" },
+              { label: "管理建议", value: "按省份建立准入画像", note: "对高频来源省份形成标准化核验模板。" }
+            ],
+            tableTitle: "来源省份样本",
+            tableDesc: "展示重点来源省份企业数量与项目情况。",
+            columns: ["来源省份", "企业数量", "重点项目", "平均资质等级", "备案率", "备注"],
+            rows: [
+              ["山东省", "168", "64", "一级", "93.4%", "房建与基础设施并重"],
+              ["江苏省", "146", "58", "一级", "95.1%", "头部企业占比高"],
+              ["河北省", "138", "49", "一级", "90.6%", "市政类活跃"],
+              ["河南省", "112", "32", "二级", "86.8%", "资料补充较多"]
+            ],
+            insights: [
+              { title: "高频来源省份特征清晰", body: "不同省份企业在资质、项目类型和备案规范性上呈现明显差异。" },
+              { title: "省份画像有利于准入管理", body: "建立来源省份画像可提升预审效率并减少重复核验。" }
+            ],
+            rankingTitle: "来源省份热度排名",
+            ranking: [
+              { name: "山东省", note: "热度指数", value: "92.1" },
+              { name: "江苏省", note: "热度指数", value: "88.6" },
+              { name: "河北省", note: "热度指数", value: "84.4" }
+            ],
+            alerts: [
+              { title: "备案规范差异大", body: "部分来源省份企业材料标准不统一，造成补件比例上升。" },
+              { title: "准入审核量集中", body: "高频来源省份带来集中审核压力，建议建立模板化预审。" }
+            ]
+          },
+          {
+            id: "outside-project",
+            name: "在建项目分析",
+            summary: "统计外省施工企业承接的在建项目数量、类型和区域覆盖。",
+            trendTitle: "外省企业在建项目趋势",
+            trendDesc: "按月观察外省施工企业在建项目总量变化。",
+            trend: [2054, 2118, 2192, 2266, 2332, 2408],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "项目数量稳步增长",
+            trendRightNote: "统计口径：在建项目",
+            compositionTitle: "项目类型分布",
+            compositionDesc: "按项目类型统计外省企业承接结构。",
+            composition: [
+              { label: "房建项目", value: 86 },
+              { label: "市政项目", value: 68 },
+              { label: "轨道交通", value: 24 },
+              { label: "工业项目", value: 31 }
+            ],
+            focus: [
+              { label: "重点观察", value: "房建项目占比最高", note: "房建类项目占外省企业项目 48% 以上。" },
+              { label: "结构结论", value: "基础设施项目由头部企业主导", note: "轨道、市政项目主要集中在特一级企业。" },
+              { label: "管理建议", value: "加强项目履约过程监测", note: "重点关注跨省企业项目现场质量和安全管理。" }
+            ],
+            tableTitle: "外省在建项目样本",
+            tableDesc: "展示外省施工企业重点在建项目情况。",
+            columns: ["企业名称", "项目类型", "在建项目数", "重点项目数", "覆盖区域", "履约状态"],
+            rows: [
+              ["江苏华盛建设股份", "房建项目", "12", "4", "朝阳/通州", "正常"],
+              ["山东鲁建工程集团", "市政项目", "8", "3", "海淀/丰台", "正常"],
+              ["河北远通市政工程", "市政项目", "6", "2", "丰台/大兴", "重点关注"],
+              ["河南中城建设有限公司", "房建项目", "3", "1", "通州", "预警"]
+            ],
+            insights: [
+              { title: "头部企业承接能力更强", body: "高等级外省企业在重点项目中占据主导地位。" },
+              { title: "项目分布向新区扩展", body: "通州、大兴等区域项目吸引更多外省企业进入。" }
+            ],
+            rankingTitle: "外省项目承接排名",
+            ranking: [
+              { name: "江苏华盛建设股份", note: "在建项目", value: "12 个" },
+              { name: "山东鲁建工程集团", note: "在建项目", value: "8 个" },
+              { name: "河北远通市政工程", note: "在建项目", value: "6 个" }
+            ],
+            alerts: [
+              { title: "跨区域项目履约风险", body: "少数企业项目分布较散，现场管理半径扩大带来风险。" },
+              { title: "新入场项目增多", body: "近期外省企业新开工项目较多，需加强早期核验和巡查。" }
+            ]
+          },
+          {
+            id: "outside-record",
+            name: "备案情况分析",
+            summary: "分析外省施工企业入场备案完成率、补件率和审核效率。",
+            trendTitle: "备案完成率走势",
+            trendDesc: "近6个月外省施工企业备案完成率变化。",
+            trend: [86.2, 87.6, 88.4, 89.1, 90.0, 90.8],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "备案规范性提升",
+            trendRightNote: "单位：%",
+            compositionTitle: "备案状态分布",
+            compositionDesc: "按已备案、补件中、待受理、退回四类统计。",
+            composition: [
+              { label: "已备案", value: 92 },
+              { label: "补件中", value: 24 },
+              { label: "待受理", value: 12 },
+              { label: "退回", value: 8 }
+            ],
+            focus: [
+              { label: "重点观察", value: "备案完成率升至 90.8%", note: "受理前预审对提升通过率作用明显。" },
+              { label: "结构结论", value: "补件事项主要集中材料不全", note: "法人、授权和业绩证明仍是高频补件项。" },
+              { label: "管理建议", value: "建立来源省份差异化指引", note: "针对高频来源省份输出标准化备案清单。" }
+            ],
+            tableTitle: "外省备案样本",
+            tableDesc: "展示外省施工企业备案事项与状态。",
+            columns: ["企业名称", "来源省份", "备案申请日期", "当前状态", "补件次数", "处理时长"],
+            rows: [
+              ["江苏华盛建设股份", "江苏省", "2026-05-04", "已备案", "0", "1.8天"],
+              ["山东鲁建工程集团", "山东省", "2026-05-07", "已备案", "1", "2.4天"],
+              ["河南中城建设有限公司", "河南省", "2026-05-10", "补件中", "2", "4.1天"],
+              ["河北远通市政工程", "河北省", "2026-05-11", "已备案", "1", "2.0天"]
+            ],
+            insights: [
+              { title: "预审效果明显", body: "备案完成率持续提升，补件事项有所下降，但高频问题仍然集中。" },
+              { title: "标准化指引空间大", body: "不同来源省份企业材料准备标准差异较大，需继续细化指引。" }
+            ],
+            rankingTitle: "备案效率企业排名",
+            ranking: [
+              { name: "江苏华盛建设股份", note: "处理时长", value: "1.8天" },
+              { name: "河北远通市政工程", note: "处理时长", value: "2.0天" },
+              { name: "山东鲁建工程集团", note: "处理时长", value: "2.4天" }
+            ],
+            alerts: [
+              { title: "补件事项仍有 122 件", body: "高频补件集中在授权资料和履约业绩证明，需继续压降。" },
+              { title: "退回事项跟踪不足", body: "部分被退回企业后续未重新提交，建议建立跟踪提醒机制。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "outside-supervision",
+        name: "外省监理分析",
+        short: "外省监理",
+        description: "分析外省监理企业来源、备案趋势、项目覆盖和履约表现。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "外省监理企业", value: "286", delta: "+12 较上月" },
+          { label: "覆盖项目", value: "742", delta: "+5.8%" },
+          { label: "完成备案企业", value: "264", delta: "备案率 92.3%" },
+          { label: "重点关注企业", value: "14", delta: "+2 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "outside-supervision-directory",
+            name: "外省监理企业分析",
+            summary: "统计外省监理企业数量、等级和区域来源结构。",
+            trendTitle: "外省监理企业入场趋势",
+            trendDesc: "近6个月外省监理企业数量变化。",
+            trend: [236, 244, 252, 264, 274, 286],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "入场监理企业平稳增长",
+            trendRightNote: "统计口径：有效备案监理企业",
+            compositionTitle: "企业等级结构",
+            compositionDesc: "按甲级、乙级及综合监理统计。",
+            composition: [
+              { label: "甲级", value: 78 },
+              { label: "乙级", value: 42 },
+              { label: "综合监理", value: 18 },
+              { label: "专项监理", value: 24 }
+            ],
+            focus: [
+              { label: "重点观察", value: "甲级企业占比高", note: "外省入场监理企业以高等级企业为主。" },
+              { label: "结构结论", value: "综合监理数量不多但覆盖广", note: "综合资质企业主要服务复杂项目。" },
+              { label: "管理建议", value: "加强外省监理履约台账", note: "对跨区域派驻情况建立常态化跟踪。" }
+            ],
+            tableTitle: "外省监理企业样本",
+            tableDesc: "展示外省监理企业来源、等级和项目覆盖。",
+            columns: ["企业名称", "来源省份", "资质等级", "在监项目", "备案状态", "风险状态"],
+            rows: [
+              ["江苏鼎衡监理集团", "江苏省", "甲级", "9", "已备案", "正常"],
+              ["山东建和监理有限公司", "山东省", "甲级", "7", "已备案", "正常"],
+              ["河北工程顾问监理公司", "河北省", "乙级", "4", "已备案", "重点关注"],
+              ["河南卓远项目管理有限公司", "河南省", "甲级", "5", "补件中", "预警"]
+            ],
+            insights: [
+              { title: "外省监理以高等级企业为主", body: "甲级和综合资质企业更容易进入重点项目监理名单。" },
+              { title: "来源区域仍较集中", body: "江苏、山东、河北是外省监理企业主要来源地。" }
+            ],
+            rankingTitle: "外省监理来源排名",
+            ranking: [
+              { name: "江苏省", note: "企业数", value: "46 家" },
+              { name: "山东省", note: "企业数", value: "42 家" },
+              { name: "河北省", note: "企业数", value: "38 家" }
+            ],
+            alerts: [
+              { title: "补件监理企业 22 家", body: "部分外省监理企业材料补充不及时，影响项目准入。" },
+              { title: "派驻一致性待核验", body: "少数企业项目监理人员派驻台账更新不及时。" }
+            ]
+          },
+          {
+            id: "outside-supervision-region",
+            name: "来源区域分析",
+            summary: "从省份和区域视角分析外省监理企业来源结构。",
+            trendTitle: "来源区域热度指数",
+            trendDesc: "按重点来源省份形成外省监理入场热度。",
+            trend: [78, 72, 68, 54, 48, 42],
+            trendLabels: ["江苏", "山东", "河北", "河南", "浙江", "山西"],
+            trendLeftNote: "江苏、山东最活跃",
+            trendRightNote: "单位：来源热度指数",
+            compositionTitle: "重点省份占比",
+            compositionDesc: "展示主要来源省份的监理企业占比。",
+            composition: [
+              { label: "江苏省", value: 82 },
+              { label: "山东省", value: 76 },
+              { label: "河北省", value: 68 },
+              { label: "河南省", value: 54 }
+            ],
+            focus: [
+              { label: "重点观察", value: "长三角与华北来源明显", note: "两类区域企业在大型项目监理中优势突出。" },
+              { label: "结构结论", value: "不同来源地项目偏好不同", note: "江苏企业偏综合项目，河北企业偏市政配套。" },
+              { label: "管理建议", value: "建立来源区域履约画像", note: "结合历史项目数据形成区域化准入画像。" }
+            ],
+            tableTitle: "外省监理来源样本",
+            tableDesc: "展示外省监理企业来源省份和承接结构。",
+            columns: ["来源省份", "企业数量", "覆盖项目", "备案率", "主要项目类型", "备注"],
+            rows: [
+              ["江苏省", "46", "138", "95.7%", "综合项目", "头部企业占比高"],
+              ["山东省", "42", "116", "93.6%", "房建项目", "履约表现稳定"],
+              ["河北省", "38", "92", "90.4%", "市政项目", "区域邻近优势明显"],
+              ["河南省", "26", "64", "86.8%", "房建项目", "补件较多"]
+            ],
+            insights: [
+              { title: "来源省份差异较强", body: "不同来源地区企业在项目类型、备案质量和履约能力上存在明显差异。" },
+              { title: "画像化管理有必要", body: "通过来源区域画像可提升准入效率并降低管理成本。" }
+            ],
+            rankingTitle: "来源区域热度排名",
+            ranking: [
+              { name: "江苏省", note: "热度指数", value: "89.4" },
+              { name: "山东省", note: "热度指数", value: "86.1" },
+              { name: "河北省", note: "热度指数", value: "82.6" }
+            ],
+            alerts: [
+              { title: "备案质量差异明显", body: "个别来源省份企业材料规范性偏弱，导致补件比例偏高。" },
+              { title: "区域集中度较高", body: "来源区域过度集中，容易形成单一来源依赖。" }
+            ]
+          },
+          {
+            id: "outside-supervision-record",
+            name: "备案趋势分析",
+            summary: "统计外省监理企业备案申请、办结和补件趋势。",
+            trendTitle: "备案办结量趋势",
+            trendDesc: "近6个月外省监理备案办结数量变化。",
+            trend: [28, 31, 35, 38, 42, 46],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "备案办结持续提升",
+            trendRightNote: "统计口径：办结备案事项",
+            compositionTitle: "备案状态结构",
+            compositionDesc: "按已办结、补件中、退回、待受理统计。",
+            composition: [
+              { label: "已办结", value: 92 },
+              { label: "补件中", value: 18 },
+              { label: "退回", value: 6 },
+              { label: "待受理", value: 8 }
+            ],
+            focus: [
+              { label: "重点观察", value: "备案办结效率提升", note: "通过标准化预审，平均办结时长缩短到 2.1 天。" },
+              { label: "结构结论", value: "补件仍集中在授权材料", note: "法人授权和项目委托文件是高频问题。" },
+              { label: "管理建议", value: "建立监理专用申报模板", note: "针对外省监理企业补齐常见材料模板。" }
+            ],
+            tableTitle: "外省监理备案样本",
+            tableDesc: "展示外省监理企业备案事项与处理状态。",
+            columns: ["企业名称", "来源省份", "申请日期", "当前状态", "补件次数", "办结时长"],
+            rows: [
+              ["江苏鼎衡监理集团", "江苏省", "2026-05-02", "已办结", "0", "1.6天"],
+              ["山东建和监理有限公司", "山东省", "2026-05-06", "已办结", "1", "2.0天"],
+              ["河南卓远项目管理有限公司", "河南省", "2026-05-09", "补件中", "2", "4.4天"],
+              ["河北工程顾问监理公司", "河北省", "2026-05-11", "已办结", "1", "2.3天"]
+            ],
+            insights: [
+              { title: "标准化预审效果显著", body: "办结效率持续提升，退回事项数量有所下降。" },
+              { title: "补件集中于通用材料", body: "通过模板化指导有望进一步压缩补件比例。" }
+            ],
+            rankingTitle: "备案效率排名",
+            ranking: [
+              { name: "江苏鼎衡监理集团", note: "办结时长", value: "1.6天" },
+              { name: "山东建和监理有限公司", note: "办结时长", value: "2.0天" },
+              { name: "河北工程顾问监理公司", note: "办结时长", value: "2.3天" }
+            ],
+            alerts: [
+              { title: "补件事项 22 件", body: "高频问题未完全消化，建议继续优化模板和说明。" },
+              { title: "退回事项后续跟踪不足", body: "部分企业退回后长期未重新提交，需补建跟踪机制。" }
+            ]
+          },
+          {
+            id: "outside-supervision-project",
+            name: "项目覆盖分析",
+            summary: "分析外省监理企业覆盖项目数量、区域和复杂度结构。",
+            trendTitle: "覆盖项目数量趋势",
+            trendDesc: "近6个月外省监理企业在监项目数量变化。",
+            trend: [612, 634, 662, 688, 716, 742],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "项目覆盖持续上升",
+            trendRightNote: "统计口径：覆盖项目数",
+            compositionTitle: "项目类型分布",
+            compositionDesc: "按房建、市政、综合、工业项目统计。",
+            composition: [
+              { label: "房建项目", value: 82 },
+              { label: "市政项目", value: 56 },
+              { label: "综合项目", value: 28 },
+              { label: "工业项目", value: 16 }
+            ],
+            focus: [
+              { label: "重点观察", value: "房建和市政为主要覆盖方向", note: "项目数量和区域覆盖均保持增长。" },
+              { label: "结构结论", value: "综合项目集中于头部企业", note: "复杂项目仍由少数甲级企业承接。" },
+              { label: "管理建议", value: "关注跨区派驻稳定性", note: "项目覆盖扩张后需同步检查监理人员到岗情况。" }
+            ],
+            tableTitle: "外省监理项目样本",
+            tableDesc: "展示外省监理企业项目覆盖和履约情况。",
+            columns: ["企业名称", "项目类型", "覆盖项目数", "重点项目", "覆盖区域", "履约状态"],
+            rows: [
+              ["江苏鼎衡监理集团", "综合项目", "9", "4", "朝阳/通州", "正常"],
+              ["山东建和监理有限公司", "房建项目", "7", "2", "海淀/丰台", "正常"],
+              ["河南卓远项目管理有限公司", "房建项目", "5", "1", "通州/大兴", "预警"],
+              ["河北工程顾问监理公司", "市政项目", "4", "1", "丰台", "重点关注"]
+            ],
+            insights: [
+              { title: "头部外省监理企业集中承接复杂项目", body: "综合类项目对企业资质、人员和经验要求更高。" },
+              { title: "新区项目带动覆盖扩张", body: "通州、大兴新增项目增多，外省监理参与度同步上升。" }
+            ],
+            rankingTitle: "项目覆盖企业排名",
+            ranking: [
+              { name: "江苏鼎衡监理集团", note: "覆盖项目", value: "9 个" },
+              { name: "山东建和监理有限公司", note: "覆盖项目", value: "7 个" },
+              { name: "河南卓远项目管理有限公司", note: "覆盖项目", value: "5 个" }
+            ],
+            alerts: [
+              { title: "跨区派驻风险", body: "项目覆盖区域扩张后，需关注总监和专业监理工程师到岗一致性。" },
+              { title: "新区资源紧张", body: "新区项目持续增加，外省监理资源调度压力同步提升。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "bidding",
+        name: "招投标分析",
+        short: "市场热度",
+        description: "对招标公告、中标金额、区域热度和招标类型占比进行综合分析。",
+        snapshot: "2026-05-21 09:00",
+        metrics: [
+          { label: "本月招标公告", value: "3,182", delta: "+9.4%" },
+          { label: "中标金额", value: "486.3亿", delta: "+12.1%" },
+          { label: "活跃招标单位", value: "642", delta: "+36 家" },
+          { label: "异常低价预警", value: "27", delta: "+3 较上周" }
+        ],
+        dimensions: [
+          {
+            id: "tender-notice",
+            name: "招标公告分析",
+            summary: "统计招标公告数量、发布节奏和主办单位活跃度。",
+            trendTitle: "招标公告月度走势",
+            trendDesc: "展示近6个月招标公告发布数量变化。",
+            trend: [2486, 2594, 2718, 2846, 2962, 3182],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "公告数量持续走高",
+            trendRightNote: "统计口径：公开招标公告",
+            compositionTitle: "公告类型结构",
+            compositionDesc: "按房建、市政、装饰、机电等类型统计。",
+            composition: [
+              { label: "房建工程", value: 92 },
+              { label: "市政工程", value: 74 },
+              { label: "机电安装", value: 48 },
+              { label: "装饰装修", value: 36 }
+            ],
+            focus: [
+              { label: "重点观察", value: "房建工程公告最活跃", note: "房建类公告占总量近 38%。" },
+              { label: "结构结论", value: "市政公告增长更快", note: "基础设施和更新改造项目持续拉动市政招标需求。" },
+              { label: "管理建议", value: "强化公告节奏监测", note: "对集中发布周期做好市场热度预判和资源准备。" }
+            ],
+            tableTitle: "招标公告样本",
+            tableDesc: "展示重点招标公告类型与金额信息。",
+            columns: ["项目名称", "招标类型", "公告日期", "招标单位", "预算金额", "所属区域"],
+            rows: [
+              ["通州副中心综合体项目", "房建工程", "2026-05-03", "通州建设集团", "12.4亿", "通州区"],
+              ["海淀科创园市政配套工程", "市政工程", "2026-05-06", "海淀市政投资公司", "8.2亿", "海淀区"],
+              ["朝阳文化中心机电工程", "机电安装", "2026-05-10", "朝阳文旅建设公司", "3.6亿", "朝阳区"],
+              ["丰台综合改造装修工程", "装饰装修", "2026-05-11", "丰台更新建设公司", "1.8亿", "丰台区"]
+            ],
+            insights: [
+              { title: "市场活跃度持续上行", body: "招标公告数量连续增长，房建和市政工程仍是市场主轴。" },
+              { title: "新区项目对公告增长贡献显著", body: "通州、大兴等区域项目带动公告发布数量提升。" }
+            ],
+            rankingTitle: "公告发布区域排名",
+            ranking: [
+              { name: "通州区", note: "公告数", value: "486 条" },
+              { name: "朝阳区", note: "公告数", value: "432 条" },
+              { name: "海淀区", note: "公告数", value: "418 条" }
+            ],
+            alerts: [
+              { title: "集中发布高峰", body: "月中和月底为公告高峰，市场资源响应压力明显上升。" },
+              { title: "公告信息标准不一", body: "个别项目公告字段不完整，影响后续分析和企业投标准备。" }
+            ]
+          },
+          {
+            id: "winning-amount",
+            name: "中标金额分析",
+            summary: "分析中标金额规模、项目类别和头部单位集中度。",
+            trendTitle: "中标金额月度走势",
+            trendDesc: "统计近6个月中标金额变化趋势。",
+            trend: [352.6, 368.4, 394.2, 421.7, 448.9, 486.3],
+            trendLabels: ["12月", "1月", "2月", "3月", "4月", "5月"],
+            trendLeftNote: "中标金额快速增长",
+            trendRightNote: "单位：亿元",
+            compositionTitle: "金额结构分布",
+            compositionDesc: "按项目类别展示中标金额占比。",
+            composition: [
+              { label: "房建工程", value: 88 },
+              { label: "市政工程", value: 72 },
+              { label: "轨道交通", value: 34 },
+              { label: "机电安装", value: 28 }
+            ],
+            focus: [
+              { label: "重点观察", value: "房建和市政金额占主导", note: "两类项目中标金额合计占比超过 65%。" },
+              { label: "结构结论", value: "头部项目金额拉动明显", note: "单体金额 10 亿以上项目数量明显增加。" },
+              { label: "管理建议", value: "关注高金额项目风险", note: "对超大额项目建立履约和资金联动跟踪。" }
+            ],
+            tableTitle: "中标金额样本",
+            tableDesc: "展示重点中标项目与金额信息。",
+            columns: ["项目名称", "中标单位", "项目类型", "中标金额", "所属区域", "中标日期"],
+            rows: [
+              ["通州副中心综合体项目", "北京城建发展建设有限公司", "房建工程", "11.8亿", "通州区", "2026-05-09"],
+              ["海淀科创园市政配套工程", "中建华北市政工程有限公司", "市政工程", "7.6亿", "海淀区", "2026-05-12"],
+              ["朝阳文化中心机电工程", "首都安装技术有限公司", "机电安装", "3.2亿", "朝阳区", "2026-05-14"],
+              ["丰台轨道交通配套项目", "华北路桥工程股份有限公司", "轨道交通", "6.8亿", "丰台区", "2026-05-17"]
+            ],
+            insights: [
+              { title: "大项目集中拉动金额增长", body: "本月高金额项目明显增加，是中标金额增长的主要原因。" },
+              { title: "头部企业竞争优势明显", body: "高等级企业在大额项目中中标概率更高，市场集中度上升。" }
+            ],
+            rankingTitle: "中标金额企业排名",
+            ranking: [
+              { name: "北京城建发展建设有限公司", note: "中标金额", value: "21.6亿" },
+              { name: "华北路桥工程股份有限公司", note: "中标金额", value: "17.4亿" },
+              { name: "中建华北市政工程有限公司", note: "中标金额", value: "16.2亿" }
+            ],
+            alerts: [
+              { title: "大额项目集中度高", body: "头部企业金额占比较高，需关注市场竞争充分性。" },
+              { title: "异常低价预警 27 项", body: "部分项目报价明显偏低，建议开展成本与履约能力校验。" }
+            ]
+          },
+          {
+            id: "bidding-region",
+            name: "区域热度分析",
+            summary: "从区域维度分析招投标活动热度和金额分布。",
+            trendTitle: "区域招投标热度指数",
+            trendDesc: "按重点区域公告数、金额和参与度形成综合热度。",
+            trend: [92, 88, 81, 95, 73, 68],
+            trendLabels: ["朝阳", "海淀", "丰台", "通州", "昌平", "大兴"],
+            trendLeftNote: "通州热度最高",
+            trendRightNote: "单位：区域热度指数",
+            compositionTitle: "区域金额占比",
+            compositionDesc: "按区域统计本月中标金额分布。",
+            composition: [
+              { label: "通州区", value: 94 },
+              { label: "朝阳区", value: 88 },
+              { label: "海淀区", value: 76 },
+              { label: "丰台区", value: 68 }
+            ],
+            focus: [
+              { label: "重点观察", value: "通州区域市场最热", note: "公告数和中标金额均处于高位。" },
+              { label: "结构结论", value: "传统核心区与新区双热", note: "朝阳、海淀与通州同时保持较高活跃度。" },
+              { label: "管理建议", value: "区域市场策略需差异化", note: "新区偏综合体和基础设施，核心区偏更新改造与配套。" }
+            ],
+            tableTitle: "区域招投标样本",
+            tableDesc: "展示重点区域招投标热度和金额信息。",
+            columns: ["区域", "公告数量", "中标金额", "活跃招标单位", "热度指数", "特点"],
+            rows: [
+              ["通州区", "486", "92.6亿", "84", "95.2", "综合体与基础设施集中"],
+              ["朝阳区", "432", "84.1亿", "76", "92.4", "文化与商业项目活跃"],
+              ["海淀区", "418", "73.8亿", "69", "88.7", "科创配套项目较多"],
+              ["丰台区", "366", "61.2亿", "58", "83.1", "轨道交通与更新改造"]
+            ],
+            insights: [
+              { title: "区域热度与项目类型强相关", body: "新区以大体量综合项目为主，核心区以更新和配套类项目为主。" },
+              { title: "市场资源分布更为多元", body: "招投标热度不再集中于单一区域，形成多点活跃格局。" }
+            ],
+            rankingTitle: "区域热度排名",
+            ranking: [
+              { name: "通州区", note: "热度指数", value: "95.2" },
+              { name: "朝阳区", note: "热度指数", value: "92.4" },
+              { name: "海淀区", note: "热度指数", value: "88.7" }
+            ],
+            alerts: [
+              { title: "新区项目聚集风险", body: "高热度区域项目集中度高，可能导致资源调度紧张。" },
+              { title: "核心区更新项目标准复杂", body: "部分更新改造项目招标条件复杂，存在投标门槛差异。" }
+            ]
+          },
+          {
+            id: "bidding-type",
+            name: "招标类型占比分析",
+            summary: "观察不同招标方式与项目类型的结构占比变化。",
+            trendTitle: "招标类型结构变化",
+            trendDesc: "以月度样本观察不同招标类型的份额变化。",
+            trend: [42, 46, 49, 54, 58, 62],
+            trendLabels: ["公开招标", "邀请招标", "资格预审", "EPC", "竞争性磋商", "框架采购"],
+            trendLeftNote: "公开招标仍为主流",
+            trendRightNote: "单位：类型份额指数",
+            compositionTitle: "招标方式占比",
+            compositionDesc: "按主要招标方式统计项目占比。",
+            composition: [
+              { label: "公开招标", value: 92 },
+              { label: "邀请招标", value: 36 },
+              { label: "EPC总承包", value: 42 },
+              { label: "竞争性磋商", value: 26 }
+            ],
+            focus: [
+              { label: "重点观察", value: "公开招标仍占绝对主导", note: "公开招标在数量和金额上均明显领先。" },
+              { label: "结构结论", value: "EPC项目比例提升", note: "综合开发和基础设施项目推动 EPC 模式增加。" },
+              { label: "管理建议", value: "加强招标方式差异分析", note: "针对 EPC 和复杂招标方式建立专项统计视图。" }
+            ],
+            tableTitle: "招标类型样本",
+            tableDesc: "展示不同招标类型的数量和金额分布。",
+            columns: ["招标方式", "项目数量", "金额规模", "主要项目类型", "平均周期", "备注"],
+            rows: [
+              ["公开招标", "2146", "302.8亿", "房建/市政", "18天", "主流方式"],
+              ["邀请招标", "468", "54.6亿", "配套工程", "12天", "用于特定项目"],
+              ["EPC总承包", "322", "96.4亿", "综合体/基础设施", "24天", "金额较高"],
+              ["竞争性磋商", "246", "18.2亿", "服务与改造类", "9天", "灵活度高"]
+            ],
+            insights: [
+              { title: "结构分化更清晰", body: "不同招标方式适配不同类型项目，市场结构逐步成熟。" },
+              { title: "EPC模式值得持续跟踪", body: "EPC项目金额高、周期长，对履约和资金管理要求更高。" }
+            ],
+            rankingTitle: "招标方式金额排名",
+            ranking: [
+              { name: "公开招标", note: "金额规模", value: "302.8亿" },
+              { name: "EPC总承包", note: "金额规模", value: "96.4亿" },
+              { name: "邀请招标", note: "金额规模", value: "54.6亿" }
+            ],
+            alerts: [
+              { title: "EPC项目履约复杂", body: "EPC 项目数量和金额同步增长，后续履约监测需要加强。" },
+              { title: "部分类型统计口径待统一", body: "个别项目招标方式标注不一致，影响结构占比准确性。" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const state = {
+      activeModuleId: dashboardData[0].id,
+      activeDimensionId: dashboardData[0].dimensions[0].id,
+      filters: {}
+    };
+
+    const elements = {
+      moduleTabs: document.getElementById("moduleTabs"),
+      metricStrip: document.getElementById("metricStrip"),
+      moduleTitle: document.getElementById("moduleTitle"),
+      moduleDesc: document.getElementById("moduleDesc"),
+      moduleSnapshot: document.getElementById("moduleSnapshot"),
+      dimensionTabs: document.getElementById("dimensionTabs"),
+      trendTitle: document.getElementById("trendTitle"),
+      trendDesc: document.getElementById("trendDesc"),
+      trendLeftNote: document.getElementById("trendLeftNote"),
+      trendRightNote: document.getElementById("trendRightNote"),
+      lineChart: document.getElementById("lineChart"),
+      compositionTitle: document.getElementById("compositionTitle"),
+      compositionDesc: document.getElementById("compositionDesc"),
+      barChart: document.getElementById("barChart"),
+      dimensionDetail: document.getElementById("dimensionDetail"),
+      tableTitle: document.getElementById("tableTitle"),
+      tableDesc: document.getElementById("tableDesc"),
+      tableHead: document.getElementById("tableHead"),
+      tableBody: document.getElementById("tableBody"),
+      insightList: document.getElementById("insightList"),
+      rankingTitle: document.getElementById("rankingTitle"),
+      rankingList: document.getElementById("rankingList"),
+      alertList: document.getElementById("alertList"),
+      activeFilters: document.getElementById("activeFilters"),
+      queryForm: document.getElementById("queryForm"),
+      resetBtn: document.getElementById("resetBtn"),
+      statusModuleName: null
+    };
+
+    function getActiveModule() {
+      return dashboardData.find((item) => item.id === state.activeModuleId) || dashboardData[0];
+    }
+
+    function getActiveDimension(module = getActiveModule()) {
+      return module.dimensions.find((item) => item.id === state.activeDimensionId) || module.dimensions[0];
+    }
+
+    function renderModuleTabs() {
+      elements.moduleTabs.innerHTML = dashboardData.map((module) => `
+        <button class="module-tab ${module.id === state.activeModuleId ? "active" : ""}" type="button" data-module-id="${module.id}">
+          <strong>${module.name}</strong>
+          <span>${module.short}</span>
+        </button>
+      `).join("");
+    }
+
+    function renderMetrics(module) {
+      elements.metricStrip.innerHTML = module.metrics.map((item) => `
+        <article class="metric-card">
+          <span>${item.label}</span>
+          <div class="metric-main">
+            <strong>${item.value}</strong>
+            <em>${item.delta}</em>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderDimensionTabs(module) {
+      elements.dimensionTabs.innerHTML = module.dimensions.map((item) => `
+        <button class="dimension-tab ${item.id === state.activeDimensionId ? "active" : ""}" type="button" data-dimension-id="${item.id}">
+          ${item.name}
+        </button>
+      `).join("");
+    }
+
+    function renderLineChart(dimension) {
+      const width = 720;
+      const height = 230;
+      const paddingX = 44;
+      const paddingTop = 24;
+      const paddingBottom = 42;
+      const values = dimension.trend;
+      const labels = dimension.trendLabels;
+      const max = Math.max(...values);
+      const min = Math.min(...values);
+      const range = max - min || 1;
+      const stepX = (width - paddingX * 2) / Math.max(values.length - 1, 1);
+
+      const points = values.map((value, index) => {
+        const x = paddingX + stepX * index;
+        const y = paddingTop + ((max - value) / range) * (height - paddingTop - paddingBottom);
+        return { x, y, value, label: labels[index] };
+      });
+
+      const polyline = points.map((point) => `${point.x},${point.y}`).join(" ");
+      const area = `${paddingX},${height - paddingBottom} ${polyline} ${points[points.length - 1].x},${height - paddingBottom}`;
+      const gridLines = 4;
+
+      elements.lineChart.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${dimension.trendTitle}">
+          <defs>
+            <linearGradient id="lineFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(71,178,255,0.36)"></stop>
+              <stop offset="100%" stop-color="rgba(71,178,255,0.02)"></stop>
+            </linearGradient>
+            <linearGradient id="lineStroke" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#47b2ff"></stop>
+              <stop offset="100%" stop-color="#3ed7c8"></stop>
+            </linearGradient>
+          </defs>
+          ${Array.from({ length: gridLines + 1 }).map((_, index) => {
+            const y = paddingTop + ((height - paddingTop - paddingBottom) / gridLines) * index;
+            return `<line x1="${paddingX}" y1="${y}" x2="${width - paddingX}" y2="${y}" stroke="rgba(127,214,255,0.1)" stroke-dasharray="4 6"></line>`;
+          }).join("")}
+          <polygon points="${area}" fill="url(#lineFill)"></polygon>
+          <polyline points="${polyline}" fill="none" stroke="url(#lineStroke)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          ${points.map((point) => `
+            <g>
+              <circle cx="${point.x}" cy="${point.y}" r="5.5" fill="#06111f" stroke="#7fd6ff" stroke-width="3"></circle>
+              <text x="${point.x}" y="${point.y - 14}" fill="#dff2ff" font-size="12" text-anchor="middle">${point.value}</text>
+              <text x="${point.x}" y="${height - 16}" fill="#8da9c4" font-size="12" text-anchor="middle">${point.label}</text>
+            </g>
+          `).join("")}
+        </svg>
+      `;
+    }
+
+    function renderBars(dimension) {
+      const max = Math.max(...dimension.composition.map((item) => item.value), 1);
+      elements.barChart.innerHTML = dimension.composition.map((item) => `
+        <div class="bar-item">
+          <div class="bar-top">
+            <span>${item.label}</span>
+            <strong>${item.value}</strong>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${(item.value / max) * 100}%"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderDimensionDetail(dimension) {
+      elements.dimensionDetail.innerHTML = dimension.focus.map((item) => `
+        <article class="detail-card">
+          <span>${item.label}</span>
+          <strong>${item.value}</strong>
+          <p>${item.note}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderTable(dimension) {
+      elements.tableTitle.textContent = dimension.tableTitle;
+      elements.tableDesc.textContent = dimension.tableDesc;
+      elements.tableHead.innerHTML = `
+        <tr>
+          ${dimension.columns.map((item) => `<th>${item}</th>`).join("")}
+        </tr>
+      `;
+      elements.tableBody.innerHTML = dimension.rows.map((row) => `
+        <tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>
+      `).join("");
+    }
+
+    function renderInsights(dimension) {
+      elements.insightList.innerHTML = dimension.insights.map((item) => `
+        <article class="insight-item">
+          <strong>${item.title}</strong>
+          <p>${item.body}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderRanking(dimension) {
+      elements.rankingTitle.textContent = dimension.rankingTitle;
+      elements.rankingList.innerHTML = dimension.ranking.map((item, index) => `
+        <article class="ranking-item">
+          <div class="ranking-index">${index + 1}</div>
+          <div class="ranking-copy">
+            <strong>${item.name}</strong>
+            <p>${item.note}</p>
+          </div>
+          <div class="ranking-value">${item.value}</div>
+        </article>
+      `).join("");
+    }
+
+    function renderAlerts(dimension) {
+      elements.alertList.innerHTML = dimension.alerts.map((item) => `
+        <article class="alert-item">
+          <strong>${item.title}</strong>
+          <p>${item.body}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderFilters() {
+      const entries = Object.entries(state.filters).filter(([, value]) => value);
+      if (!entries.length) {
+        elements.activeFilters.innerHTML = '<span class="filter-chip">当前未设置额外筛选条件，展示为全量统计视图。</span>';
+        return;
+      }
+
+      const labelMap = {
+        enterpriseName: "企业名称",
+        orgCode: "组织机构代码",
+        qualification: "企业资质",
+        grade: "证书等级",
+        region: "所属区域",
+        startDate: "起始日期",
+        endDate: "截止日期",
+        status: "数据状态"
+      };
+
+      elements.activeFilters.innerHTML = entries.map(([key, value]) => `
+        <span class="filter-chip">${labelMap[key] || key}：${value}</span>
+      `).join("");
+    }
+
+    function render() {
+      const module = getActiveModule();
+      const dimension = getActiveDimension(module);
+
+      elements.moduleTitle.textContent = module.name;
+      elements.moduleDesc.textContent = `${module.description} 当前维度：${dimension.name}。${dimension.summary}`;
+      elements.moduleSnapshot.textContent = module.snapshot;
+
+      elements.trendTitle.textContent = dimension.trendTitle;
+      elements.trendDesc.textContent = dimension.trendDesc;
+      elements.trendLeftNote.textContent = dimension.trendLeftNote;
+      elements.trendRightNote.textContent = dimension.trendRightNote;
+      elements.compositionTitle.textContent = dimension.compositionTitle;
+      elements.compositionDesc.textContent = dimension.compositionDesc;
+
+      renderModuleTabs();
+      renderMetrics(module);
+      renderDimensionTabs(module);
+      renderLineChart(dimension);
+      renderBars(dimension);
+      renderDimensionDetail(dimension);
+      renderTable(dimension);
+      renderInsights(dimension);
+      renderRanking(dimension);
+      renderAlerts(dimension);
+      renderFilters();
+    }
+
+    elements.moduleTabs.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-module-id]");
+      if (!button) return;
+      const nextModule = dashboardData.find((item) => item.id === button.dataset.moduleId);
+      if (!nextModule) return;
+      state.activeModuleId = nextModule.id;
+      state.activeDimensionId = nextModule.dimensions[0].id;
+      render();
+    });
+
+    elements.dimensionTabs.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-dimension-id]");
+      if (!button) return;
+      state.activeDimensionId = button.dataset.dimensionId;
+      render();
+    });
+
+    elements.queryForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(elements.queryForm);
+      state.filters = Object.fromEntries(formData.entries());
+      renderFilters();
+    });
+
+    elements.resetBtn.addEventListener("click", () => {
+      elements.queryForm.reset();
+      state.filters = {};
+      renderFilters();
+    });
+
+    render();
+  </script>
+</body>
+</html>
