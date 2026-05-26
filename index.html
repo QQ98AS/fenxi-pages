@@ -1,32 +1,28 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>建筑行业分析驾驶舱</title>
+  <title>Analysis Workspace</title>
   <style>
     :root {
-      --bg: #eef2f6;
-      --bg-deep: #0f2438;
+      --bg: #eef3f7;
       --panel: rgba(255, 255, 255, 0.9);
       --panel-strong: #ffffff;
-      --line: rgba(31, 61, 92, 0.12);
-      --line-strong: rgba(31, 61, 92, 0.2);
-      --text: #1c2d3f;
-      --muted: #627487;
-      --primary: #0b7fab;
-      --primary-strong: #0a9ed8;
-      --accent: #f08c2e;
-      --accent-soft: rgba(240, 140, 46, 0.14);
-      --success: #198b73;
-      --success-soft: rgba(25, 139, 115, 0.14);
-      --warning: #de5f3c;
-      --warning-soft: rgba(222, 95, 60, 0.12);
-      --shadow: 0 24px 54px rgba(17, 43, 71, 0.1);
-      --radius-xl: 30px;
-      --radius-lg: 24px;
-      --radius-md: 18px;
-      --radius-sm: 14px;
+      --line: rgba(25, 58, 87, 0.1);
+      --line-strong: rgba(25, 58, 87, 0.18);
+      --text: #1b3147;
+      --muted: #667a8f;
+      --primary: #1685b8;
+      --primary-strong: #21a4dd;
+      --teal: #1e9b82;
+      --amber: #f19a34;
+      --danger: #df6a49;
+      --shadow: 0 22px 54px rgba(15, 35, 55, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
     * {
@@ -37,12 +33,12 @@
     body {
       margin: 0;
       min-height: 100%;
-      color: var(--text);
-      font-family: "Bahnschrift", "PingFang SC", "Microsoft YaHei UI", sans-serif;
       background:
-        radial-gradient(circle at 0% 0%, rgba(10, 158, 216, 0.16), transparent 26%),
-        radial-gradient(circle at 100% 12%, rgba(240, 140, 46, 0.12), transparent 20%),
-        linear-gradient(180deg, #f7fafc 0%, #edf2f6 42%, #e6edf3 100%);
+        radial-gradient(circle at 0% 0%, rgba(22, 133, 184, 0.16), transparent 24%),
+        radial-gradient(circle at 100% 16%, rgba(241, 154, 52, 0.12), transparent 20%),
+        linear-gradient(180deg, #f7fafc 0%, #edf2f6 44%, #e7edf3 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
     }
 
     body::before {
@@ -51,10 +47,10 @@
       inset: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(rgba(15, 36, 56, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15, 36, 56, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(12, 35, 58, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(12, 35, 58, 0.03) 1px, transparent 1px);
       background-size: 32px 32px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.52), transparent 90%);
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
     }
 
     button,
@@ -69,16 +65,16 @@
     }
 
     .page-shell {
-      width: min(1520px, calc(100vw - 28px));
+      width: min(1500px, calc(100vw - 28px));
       margin: 14px auto;
-      padding: 20px;
-      border-radius: 34px;
+      padding: 14px;
+      border-radius: 30px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 249, 252, 0.94)),
-        rgba(255, 255, 255, 0.84);
-      border: 1px solid rgba(255, 255, 255, 0.7);
+        rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.76);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(16px);
       position: relative;
       overflow: hidden;
     }
@@ -86,11 +82,11 @@
     .page-shell::after {
       content: "";
       position: absolute;
-      inset: -80px auto auto -60px;
+      inset: -90px auto auto -80px;
       width: 260px;
       height: 260px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(10, 158, 216, 0.16), transparent 72%);
+      background: radial-gradient(circle, rgba(22, 133, 184, 0.16), transparent 72%);
       pointer-events: none;
     }
 
@@ -98,9 +94,9 @@
       position: relative;
       z-index: 1;
       display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
-      gap: 18px;
-      margin-bottom: 18px;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .hero-main,
@@ -110,7 +106,7 @@
     .metric-card {
       background: var(--panel);
       border: 1px solid var(--line);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(10px);
     }
 
@@ -118,16 +114,15 @@
     .hero-side,
     .section-panel {
       border-radius: var(--radius-xl);
-      padding: 22px;
+      padding: 14px;
     }
 
     .hero-main {
       background:
-        linear-gradient(135deg, rgba(14, 53, 83, 0.98), rgba(8, 108, 150, 0.9) 56%, rgba(17, 148, 122, 0.84)),
-        var(--bg-deep);
+        linear-gradient(135deg, rgba(14, 50, 78, 0.98), rgba(10, 113, 151, 0.92) 56%, rgba(18, 148, 126, 0.84));
       color: #eef8ff;
-      overflow: hidden;
       position: relative;
+      overflow: hidden;
     }
 
     .hero-main::after {
@@ -143,53 +138,57 @@
     .hero-tag {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      padding: 6px 10px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.12);
-      color: #d9f4ff;
-      font-size: 0.82rem;
+      color: #e2f7ff;
+      font-size: 0.74rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
+    .hero-tag:empty,
+    .hero-main p:empty,
+    .hero-chips:empty {
+      display: none;
+    }
+
     .hero-main h1 {
-      margin: 16px 0 10px;
-      font-size: clamp(2rem, 4vw, 3.3rem);
-      line-height: 1.06;
+      margin: 8px 0 4px;
+      font-size: clamp(1.42rem, 2.6vw, 2.2rem);
+      line-height: 1.08;
       letter-spacing: 0.02em;
     }
 
     .hero-main p {
-      max-width: 860px;
       margin: 0;
+      max-width: 980px;
       color: rgba(232, 245, 255, 0.84);
-      font-size: 0.96rem;
-      line-height: 1.9;
+      font-size: 0.84rem;
+      line-height: 1.56;
     }
 
     .hero-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 18px;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .hero-chip {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 16px;
+      padding: 6px 10px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: #f3fbff;
-      font-size: 0.84rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f4fbff;
+      font-size: 0.74rem;
     }
 
     .hero-side {
       display: grid;
-      gap: 14px;
+      gap: 8px;
       align-content: start;
     }
 
@@ -200,66 +199,79 @@
       letter-spacing: 0.02em;
     }
 
+    .section-head h2 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .section-inline-desc {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
     .hero-side p,
     .section-head p,
     .panel-card p {
-      margin: 8px 0 0;
+      margin: 5px 0 0;
       color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.75;
+      font-size: 0.82rem;
+      line-height: 1.56;
+    }
+
+    .section-tag {
+      color: var(--primary);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .status-list {
       display: grid;
-      gap: 10px;
+      gap: 6px;
     }
 
     .status-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(15, 127, 171, 0.06);
-      border: 1px solid rgba(15, 127, 171, 0.1);
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(22, 133, 184, 0.06);
+      border: 1px solid rgba(22, 133, 184, 0.08);
     }
 
     .status-item strong {
-      font-size: 0.96rem;
+      display: block;
+      font-size: 0.84rem;
+      margin-bottom: 2px;
     }
 
     .status-item span {
       color: var(--muted);
-      font-size: 0.82rem;
+      font-size: 0.74rem;
     }
 
     .section-panel {
       position: relative;
       z-index: 1;
-      margin-bottom: 18px;
-      padding: 20px;
+      margin-bottom: 10px;
+      padding: 14px;
     }
 
     .section-head {
       display: flex;
       justify-content: space-between;
       align-items: end;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-
-    .section-tag {
-      color: var(--primary);
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      gap: 12px;
+      margin-bottom: 10px;
     }
 
     .filter-grid {
       display: grid;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .filter-grid-issue {
@@ -267,27 +279,35 @@
     }
 
     .filter-grid-directory {
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(12, minmax(0, 1fr));
     }
 
     .field {
       display: grid;
-      gap: 8px;
+      gap: 4px;
+      min-width: 0;
     }
 
     .field label {
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 600;
+      color: #61778d;
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .field-compact {
+      padding: 0;
+      border: 0;
+      background: transparent;
     }
 
     .field input,
     .field select {
       width: 100%;
-      min-height: 46px;
-      padding: 0 14px;
+      min-height: 40px;
+      padding: 0 12px;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid var(--line);
       border-radius: 14px;
       outline: none;
@@ -296,21 +316,119 @@
 
     .field input:focus,
     .field select:focus {
-      border-color: rgba(10, 158, 216, 0.46);
-      box-shadow: 0 0 0 3px rgba(10, 158, 216, 0.12);
+      border-color: rgba(22, 133, 184, 0.48);
+      box-shadow: 0 0 0 3px rgba(22, 133, 184, 0.12);
+    }
+
+    .multi-select-wrap {
+      position: relative;
+      min-width: 0;
+    }
+
+    .multi-select-trigger {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 34px 0 12px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .multi-select-trigger::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid #536a81;
+      border-bottom: 2px solid #536a81;
+      transform: translateY(-60%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .multi-select-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: none;
+      min-width: max-content;
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      box-shadow: 0 18px 36px rgba(15, 35, 55, 0.12);
+    }
+
+    .multi-select-panel.is-open {
+      display: grid;
+      gap: 8px;
+    }
+
+    .multi-select-option {
+      display: grid;
+      grid-template-columns: 14px 1fr;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      min-width: 0;
+      padding: 0 8px;
+      border-radius: 12px;
+      background: rgba(244, 248, 251, 0.88);
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .multi-select-option input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: #1685b8;
+    }
+
+    .multi-select-option span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .field-actions {
       display: flex;
       align-items: end;
-      gap: 10px;
+      justify-content: flex-start;
+      flex-wrap: nowrap;
+      gap: 8px;
+      white-space: nowrap;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      min-width: 0;
+    }
+
+    .field-actions .btn-primary,
+    .field-actions .btn-secondary {
+      min-width: 92px;
+      flex: 0 0 auto;
     }
 
     .btn-primary,
     .btn-secondary {
-      min-width: 110px;
-      min-height: 46px;
-      padding: 0 18px;
+      min-width: 100px;
+      min-height: 40px;
+      padding: 0 16px;
       border-radius: 999px;
       font-weight: 700;
       letter-spacing: 0.02em;
@@ -318,26 +436,26 @@
 
     .btn-primary {
       color: #fff;
-      background: linear-gradient(135deg, #0a9ed8, #0d7ea6);
-      box-shadow: 0 12px 22px rgba(10, 158, 216, 0.18);
+      background: linear-gradient(135deg, #1da2dd, #147ca7);
+      box-shadow: 0 12px 20px rgba(22, 133, 184, 0.18);
     }
 
     .btn-secondary {
       color: var(--text);
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.84);
       border: 1px solid var(--line-strong);
     }
 
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 10px;
     }
 
     .metric-card {
-      border-radius: 22px;
-      padding: 18px;
+      border-radius: 20px;
+      padding: 12px;
       position: relative;
       overflow: hidden;
     }
@@ -345,25 +463,25 @@
     .metric-card::after {
       content: "";
       position: absolute;
-      inset: auto -36px -36px auto;
-      width: 110px;
-      height: 110px;
+      inset: auto -30px -30px auto;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(10, 158, 216, 0.14), transparent 72%);
+      background: radial-gradient(circle, rgba(22, 133, 184, 0.14), transparent 72%);
     }
 
     .metric-card span {
       display: block;
       color: var(--muted);
-      font-size: 0.82rem;
-      margin-bottom: 16px;
+      font-size: 0.76rem;
+      margin-bottom: 8px;
     }
 
     .metric-card strong {
       display: block;
-      font-size: clamp(1.7rem, 3vw, 2.4rem);
+      font-size: clamp(1.3rem, 2vw, 1.82rem);
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       position: relative;
       z-index: 1;
     }
@@ -373,20 +491,20 @@
       z-index: 1;
       color: var(--primary);
       font-style: normal;
-      font-size: 0.84rem;
+      font-size: 0.72rem;
       font-weight: 700;
     }
 
     .two-column {
       display: grid;
-      grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
-      gap: 14px;
-      margin-bottom: 16px;
+      grid-template-columns: minmax(0, 1.38fr) minmax(300px, 0.86fr);
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .panel-card {
       border-radius: var(--radius-lg);
-      padding: 18px;
+      padding: 12px;
       background: rgba(255, 255, 255, 0.72);
     }
 
@@ -394,28 +512,31 @@
       display: flex;
       justify-content: space-between;
       align-items: start;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 8px;
     }
 
     .panel-note {
       color: var(--muted);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       text-align: right;
       white-space: nowrap;
     }
 
     .matter-list,
-    .district-list {
+    .district-list,
+    .legend-list {
       display: grid;
-      gap: 12px;
+      gap: 8px;
     }
 
-    .matter-card {
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(248, 251, 253, 0.94), rgba(241, 247, 250, 0.92));
-      border: 1px solid rgba(15, 127, 171, 0.08);
+    .matter-card,
+    .legend-item,
+    .district-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(248, 251, 253, 0.94);
+      border: 1px solid rgba(22, 133, 184, 0.08);
     }
 
     .matter-top {
@@ -428,12 +549,12 @@
 
     .matter-top strong,
     .district-item strong {
-      font-size: 0.95rem;
+      font-size: 0.94rem;
     }
 
     .matter-total {
       color: var(--primary);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -443,7 +564,7 @@
       height: 12px;
       border-radius: 999px;
       overflow: hidden;
-      background: rgba(16, 45, 71, 0.08);
+      background: rgba(15, 43, 70, 0.08);
       margin-bottom: 10px;
     }
 
@@ -452,19 +573,19 @@
     }
 
     .segment-accept {
-      background: linear-gradient(90deg, #0a9ed8, #37b8e3);
+      background: linear-gradient(90deg, #18a2db, #33b6ea);
     }
 
     .segment-review {
-      background: linear-gradient(90deg, #188f7a, #29b69a);
+      background: linear-gradient(90deg, #1e9b82, #2db79a);
     }
 
     .segment-decision {
-      background: linear-gradient(90deg, #f08c2e, #f6ab49);
+      background: linear-gradient(90deg, #f19a34, #f6b04f);
     }
 
     .segment-bureau {
-      background: linear-gradient(90deg, #d96445, #f07b58);
+      background: linear-gradient(90deg, #df6a49, #ef8564);
     }
 
     .stage-inline {
@@ -477,23 +598,14 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 12px;
+      padding: 7px 11px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       background: rgba(15, 36, 56, 0.05);
-      color: var(--text);
     }
 
-    .legend-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .legend-item {
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.76);
-      border: 1px solid rgba(31, 61, 92, 0.08);
+    .legend-item,
+    .district-item {
       display: flex;
       justify-content: space-between;
       gap: 12px;
@@ -513,30 +625,37 @@
       flex: none;
     }
 
-    .legend-copy span {
+    .legend-copy span,
+    .district-item span {
       display: block;
-      color: var(--muted);
-      font-size: 0.8rem;
       margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.78rem;
     }
 
-    .legend-value {
+    .legend-value,
+    .district-item em {
       color: var(--text);
-      font-size: 1.1rem;
+      font-size: 1rem;
+      font-style: normal;
       font-weight: 800;
       white-space: nowrap;
     }
 
+    .district-item em {
+      color: var(--primary);
+    }
+
     .table-wrap {
       overflow: auto;
-      border-radius: 20px;
-      border: 1px solid rgba(31, 61, 92, 0.08);
-      background: rgba(255, 255, 255, 0.7);
+      border-radius: 18px;
+      border: 1px solid rgba(25, 58, 87, 0.08);
+      background: rgba(255, 255, 255, 0.72);
     }
 
     table {
       width: 100%;
-      min-width: 920px;
+      min-width: 1360px;
       border-collapse: collapse;
     }
 
@@ -547,9 +666,9 @@
       padding: 14px 12px;
       text-align: left;
       font-size: 0.82rem;
-      color: #31506a;
+      color: #34536d;
       background: rgba(238, 245, 249, 0.98);
-      border-bottom: 1px solid rgba(31, 61, 92, 0.12);
+      border-bottom: 1px solid rgba(25, 58, 87, 0.12);
       white-space: nowrap;
     }
 
@@ -557,64 +676,174 @@
       padding: 14px 12px;
       font-size: 0.84rem;
       color: var(--text);
-      border-bottom: 1px solid rgba(31, 61, 92, 0.07);
-      vertical-align: top;
+      border-bottom: 1px solid rgba(25, 58, 87, 0.07);
+      vertical-align: middle;
     }
 
     tbody tr:hover {
-      background: rgba(10, 158, 216, 0.04);
+      background: rgba(22, 133, 184, 0.04);
     }
 
-    .directory-layout {
+    .group-cell {
+      background: rgba(244, 249, 252, 0.76);
+      vertical-align: middle;
+    }
+
+    .enterprise-group {
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.82fr);
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 2px;
+      justify-content: center;
     }
 
-    .directory-side {
+    .enterprise-note-list {
       display: grid;
-      gap: 14px;
-      align-content: start;
+      gap: 6px;
+      margin-top: 6px;
     }
 
-    .district-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(248, 251, 253, 0.94);
-      border: 1px solid rgba(31, 61, 92, 0.08);
-    }
-
-    .district-item span {
-      color: var(--muted);
-      font-size: 0.82rem;
-      display: block;
-      margin-top: 3px;
-    }
-
-    .district-item em {
-      color: var(--primary);
-      font-style: normal;
+    .enterprise-group strong {
       font-size: 0.9rem;
-      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .enterprise-group span,
+    .certificate-meta,
+    .qualification-meta {
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    .certificate-stack,
+    .qualification-stack {
+      display: grid;
+      gap: 2px;
+    }
+
+    .certificate-stack {
+      justify-content: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    #enterpriseHeadCertificateNo,
+    .certificate-cell {
+      text-align: center;
+    }
+
+    .validity-stack {
+      display: grid;
+      gap: 4px;
+    }
+
+    .validity-stack strong {
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .validity-stack strong.is-expired-date {
+      color: var(--danger);
+    }
+
+    .validity-note {
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+
+    .legal-person-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 12px;
+      background: rgba(22, 133, 184, 0.08);
+      color: #21506f;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .legal-person-mismatch {
+      background: rgba(223, 106, 73, 0.16);
+      color: #9d3f2c;
+      box-shadow: inset 0 0 0 1px rgba(223, 106, 73, 0.16);
+    }
+
+    .certificate-risk-note {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(223, 106, 73, 0.12);
+      color: #9d3f2c;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .cell-tag {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(22, 133, 184, 0.1);
+      color: var(--primary);
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .qualification-stack strong,
+    .certificate-stack strong {
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 78px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
       white-space: nowrap;
     }
 
+    .status-valid {
+      color: #0f6e60;
+      background: rgba(30, 155, 130, 0.12);
+    }
+
+    .status-soon {
+      color: #9a5a00;
+      background: rgba(241, 154, 52, 0.16);
+    }
+
+    .status-expired {
+      color: #a23d2b;
+      background: rgba(223, 106, 73, 0.16);
+    }
+
+    .directory-layout {
+      display: block;
+      margin-bottom: 10px;
+    }
+
     .empty-state {
-      padding: 28px 18px;
+      padding: 24px 16px;
       text-align: center;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
     .footer-note {
       color: var(--muted);
-      font-size: 0.82rem;
-      line-height: 1.75;
+      font-size: 0.8rem;
+      line-height: 1.7;
       text-align: right;
     }
 
@@ -636,8 +865,7 @@
 
     @media (max-width: 1280px) {
       .hero,
-      .two-column,
-      .directory-layout {
+      .two-column {
         grid-template-columns: 1fr;
       }
 
@@ -646,7 +874,7 @@
       }
 
       .filter-grid-directory {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
 
       .metric-grid {
@@ -659,7 +887,7 @@
         width: calc(100vw - 16px);
         margin: 8px auto;
         padding: 12px;
-        border-radius: 24px;
+        border-radius: 22px;
       }
 
       .hero-main,
@@ -667,7 +895,7 @@
       .section-panel,
       .panel-card,
       .metric-card {
-        padding: 16px;
+        padding: 12px;
       }
 
       .filter-grid-issue,
@@ -677,7 +905,8 @@
       }
 
       .field-actions {
-        display: grid;
+        display: flex;
+        flex-wrap: wrap;
       }
 
       .btn-primary,
@@ -695,331 +924,478 @@
   <div class="page-shell">
     <header class="hero fade-up">
       <section class="hero-main">
-        <span class="hero-tag">Data Analysis Cockpit</span>
-        <h1>建筑行业事项办理与企业名录分析台</h1>
-        <p>聚焦两个核心场景：一是按办结时间统计一段时间内各事项的办理情况，直接观察受理、审核、决定、专业局审批各阶段数量；二是对企业名录进行多字段检索，支持按注册地区县、资质类别、资质等级、证书编号、有效期等条件快速筛选。</p>
-        <div class="hero-chips">
-          <span class="hero-chip">事项统计口径：按办结时间区间聚合</span>
-          <span class="hero-chip">目录筛选口径：企业基础信息 + 资质证书</span>
-          <span class="hero-chip">页面类型：静态原型，可继续接真实接口</span>
-        </div>
+        <span class="hero-tag" id="heroTag"></span>
+        <h1 id="heroTitle"></h1>
+        <p id="heroDesc"></p>
+        <div class="hero-chips" id="heroChips"></div>
       </section>
-
-      <aside class="hero-side">
-        <div>
-          <span class="section-tag">Overview</span>
-          <h2>当前页面包含两类分析工作台</h2>
-          <p>适合在汇报、方案评审、需求确认时快速展示统计维度、查询字段和数据呈现方式。</p>
-        </div>
-        <div class="status-list">
-          <div class="status-item">
-            <div>
-              <strong>事项办理分析</strong>
-              <span>时间过滤、阶段总量、事项分布、统计明细</span>
-            </div>
-          </div>
-          <div class="status-item">
-            <div>
-              <strong>企业名录查询</strong>
-              <span>区县、资质、等级、证书、有效期等条件查询</span>
-            </div>
-          </div>
-        </div>
-      </aside>
     </header>
 
     <section class="section-panel fade-up">
       <div class="section-head">
         <div>
-          <span class="section-tag">Part 01</span>
-          <h2>事项办理情况分析</h2>
-          <p>按照办结时间筛选统计区间，汇总各个事项在受理、审核、决定、专业局审批四个环节的办理情况。</p>
-        </div>
-      </div>
-
-      <form id="issueFilterForm">
-        <div class="filter-grid filter-grid-issue">
-          <div class="field">
-            <label for="issueStartDate">办结开始时间</label>
-            <input id="issueStartDate" name="issueStartDate" type="date">
-          </div>
-          <div class="field">
-            <label for="issueEndDate">办结结束时间</label>
-            <input id="issueEndDate" name="issueEndDate" type="date">
-          </div>
-          <div class="field">
-            <label for="issueMatter">事项名称</label>
-            <select id="issueMatter" name="issueMatter">
-              <option value="">全部事项</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="issueRegion">办理区域</label>
-            <select id="issueRegion" name="issueRegion">
-              <option value="">全部区域</option>
-            </select>
-          </div>
-          <div class="field field-actions">
-            <button class="btn-secondary" type="button" id="issueResetBtn">重置条件</button>
-            <button class="btn-primary" type="submit">执行统计</button>
-          </div>
-        </div>
-      </form>
-
-      <div class="metric-grid" id="issueMetricGrid"></div>
-
-      <div class="two-column">
-        <article class="panel-card">
-          <div class="panel-card-head">
-            <div>
-              <h3>事项分布与阶段构成</h3>
-              <p>按事项汇总四类办理环节数量，条形色带用于直观看各阶段占比。</p>
-            </div>
-            <div class="panel-note" id="issueRangeNote"></div>
-          </div>
-          <div class="matter-list" id="issueMatterList"></div>
-        </article>
-
-        <article class="panel-card">
-          <div class="panel-card-head">
-            <div>
-              <h3>办理阶段总量</h3>
-              <p>统计区间内全部事项的阶段合计，可用于看环节积压和流程结构。</p>
-            </div>
-          </div>
-          <div class="legend-list" id="issueLegendList"></div>
-        </article>
-      </div>
-
-      <article class="panel-card">
-        <div class="panel-card-head">
-          <div>
-            <h3>事项办理统计明细</h3>
-            <p>每一行展示一个事项在当前时间区间内的累计办理情况。</p>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>事项名称</th>
-                <th>统计条目数</th>
-                <th>受理</th>
-                <th>审核</th>
-                <th>决定</th>
-                <th>专业局审批</th>
-                <th>阶段总量</th>
-                <th>最新办结时间</th>
-              </tr>
-            </thead>
-            <tbody id="issueTableBody"></tbody>
-          </table>
-        </div>
-      </article>
-    </section>
-
-    <section class="section-panel fade-up">
-      <div class="section-head">
-        <div>
-          <span class="section-tag">Part 02</span>
-          <h2>企业名录查询</h2>
-          <p>支持按照注册地区县、资质类别、资质等级、证书编号、有效期等字段进行组合查询，适合做企业检索和证书筛查。</p>
+          <span class="section-tag" id="enterpriseSectionTag"></span>
+          <h2>
+            <span id="enterpriseSectionTitle"></span>
+            <span class="section-inline-desc" id="enterpriseSectionInlineDesc"></span>
+          </h2>
         </div>
       </div>
 
       <form id="enterpriseFilterForm">
         <div class="filter-grid filter-grid-directory">
-          <div class="field">
-            <label for="enterpriseName">企业名称</label>
-            <input id="enterpriseName" name="enterpriseName" type="text" placeholder="输入企业名称关键字">
+          <div class="field field-compact" style="grid-column: span 3;">
+            <label for="enterpriseName" id="labelEnterpriseName"></label>
+            <input id="enterpriseName" name="enterpriseName" type="text">
           </div>
-          <div class="field">
-            <label for="district">注册地区县</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="district" id="labelDistrict"></label>
             <select id="district" name="district">
-              <option value="">全部区县</option>
+              <option value="" id="districtAllOption"></option>
             </select>
           </div>
-          <div class="field">
-            <label for="qualificationType">资质类别</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="qualificationType" id="labelQualificationType"></label>
             <select id="qualificationType" name="qualificationType">
-              <option value="">全部类别</option>
+              <option value="" id="qualificationTypeAllOption"></option>
             </select>
           </div>
-          <div class="field">
-            <label for="qualificationGrade">资质等级</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="qualificationGrade" id="labelQualificationGrade"></label>
             <select id="qualificationGrade" name="qualificationGrade">
-              <option value="">全部等级</option>
+              <option value="" id="qualificationGradeAllOption"></option>
             </select>
           </div>
-          <div class="field">
-            <label for="certificateNo">证书编号</label>
-            <input id="certificateNo" name="certificateNo" type="text" placeholder="输入证书编号">
+          <div class="field field-compact" style="grid-column: span 3;">
+            <label id="labelCertificateType"></label>
+            <div class="multi-select-wrap">
+              <button class="multi-select-trigger" type="button" id="certificateTypeTrigger"></button>
+              <div class="multi-select-panel" id="certificateTypePanel"></div>
+            </div>
           </div>
-          <div class="field">
-            <label for="validFrom">有效期起</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="certificateNo" id="labelCertificateNo"></label>
+            <input id="certificateNo" name="certificateNo" type="text">
+          </div>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="validFrom" id="labelValidFrom"></label>
             <input id="validFrom" name="validFrom" type="date">
           </div>
-          <div class="field">
-            <label for="validTo">有效期止</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="validTo" id="labelValidTo"></label>
             <input id="validTo" name="validTo" type="date">
           </div>
-        </div>
-
-        <div class="filter-grid filter-grid-directory">
-          <div class="field">
-            <label for="validityStatus">证书状态</label>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="validityStatus" id="labelValidityStatus"></label>
             <select id="validityStatus" name="validityStatus">
-              <option value="">全部状态</option>
-              <option value="有效">有效</option>
-              <option value="即将到期">即将到期</option>
-              <option value="已过期">已过期</option>
+              <option value="" id="validityStatusAllOption"></option>
+              <option value="有效" id="validityStatusValidOption"></option>
+              <option value="即将到期" id="validityStatusSoonOption"></option>
+              <option value="已过期" id="validityStatusExpiredOption"></option>
             </select>
           </div>
-          <div class="field field-actions">
-            <button class="btn-secondary" type="button" id="enterpriseResetBtn">重置条件</button>
-            <button class="btn-primary" type="submit">执行查询</button>
+          <div class="field field-actions" style="grid-column: span 4;">
+            <button class="btn-secondary" type="button" id="enterpriseResetBtn"></button>
+            <button class="btn-primary" type="submit" id="enterpriseSearchBtn"></button>
+            <button class="btn-secondary" type="button" id="enterpriseExportBtn"></button>
           </div>
         </div>
       </form>
-
-      <div class="metric-grid" id="enterpriseMetricGrid"></div>
 
       <div class="directory-layout">
         <article class="panel-card">
           <div class="panel-card-head">
             <div>
-              <h3>企业名录查询结果</h3>
-              <p>展示符合当前筛选条件的企业基础信息和资质证书情况。</p>
+              <h3 id="enterpriseTableTitle"></h3>
+              <p id="enterpriseTableDesc"></p>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>企业名称</th>
-                  <th>注册地区县</th>
-                  <th>资质类别</th>
-                  <th>资质等级</th>
-                  <th>证书编号</th>
-                  <th>有效期至</th>
-                  <th>法定代表人</th>
-                  <th>状态</th>
+                  <th id="enterpriseHeadIndex"></th>
+                  <th id="enterpriseHeadName"></th>
+                  <th id="enterpriseHeadDistrict"></th>
+                  <th id="enterpriseHeadCertificateNo"></th>
+                  <th id="enterpriseHeadQualificationSeries"></th>
+                  <th id="enterpriseHeadValidityDate"></th>
+                  <th id="enterpriseHeadLegalPerson"></th>
+                  <th id="enterpriseHeadStatus"></th>
                 </tr>
               </thead>
               <tbody id="enterpriseTableBody"></tbody>
             </table>
           </div>
         </article>
-
-        <aside class="directory-side">
-          <article class="panel-card">
-            <div class="panel-card-head">
-              <div>
-                <h3>区县分布</h3>
-                <p>根据当前查询结果自动生成区县企业数量排名。</p>
-              </div>
-            </div>
-            <div class="district-list" id="districtList"></div>
-          </article>
-
-          <article class="panel-card">
-            <div class="panel-card-head">
-              <div>
-                <h3>查询说明</h3>
-                <p>这部分字段结构已经适合后续接企业名录、资质证书、到期预警等真实数据接口。</p>
-              </div>
-            </div>
-            <div class="legend-list">
-              <div class="legend-item">
-                <div class="legend-left">
-                  <span class="legend-dot segment-accept"></span>
-                  <div class="legend-copy">
-                    <strong>支持组合查询</strong>
-                    <span>可同时使用区县、资质、等级、证书编号和有效期</span>
-                  </div>
-                </div>
-              </div>
-              <div class="legend-item">
-                <div class="legend-left">
-                  <span class="legend-dot segment-review"></span>
-                  <div class="legend-copy">
-                    <strong>适合做预警筛查</strong>
-                    <span>可进一步扩展“近 30 日到期”“异常证书”等规则</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </article>
-        </aside>
       </div>
 
-      <div class="footer-note">当前页面为静态分析原型。你后续只要继续改这个本地 `index.html` 并重新上传到 `fenxi-pages` 仓库，GitHub Pages 就会自动重新发布。</div>
+      <div class="footer-note" id="footerNote"></div>
     </section>
   </div>
 
   <script>
+    const textMap = {
+      pageTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
+      heroTag: "企业名录",
+      heroTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
+      heroDesc: "",
+      heroOverviewTag: "",
+      heroOverviewTitle: "",
+      heroOverviewDesc: "",
+      heroStatus1Title: "",
+      heroStatus1Desc: "",
+      heroStatus2Title: "",
+      heroStatus2Desc: "",
+      issueSectionTag: "Part 01",
+      issueSectionTitle: "\u76d1\u7406\u4f01\u4e1a\u4e8b\u9879\u529e\u7406\u60c5\u51b5\u5206\u6790",
+      issueSectionDesc: "\u6309\u7167\u529e\u7ed3\u65f6\u95f4\u7b5b\u9009\u7edf\u8ba1\u533a\u95f4\uff0c\u6c47\u603b\u5404\u4e2a\u76d1\u7406\u4f01\u4e1a\u4e8b\u9879\u5728\u53d7\u7406\u3001\u5ba1\u6838\u3001\u51b3\u5b9a\u3001\u4e13\u4e1a\u5c40\u5ba1\u6279\u56db\u4e2a\u73af\u8282\u7684\u529e\u7406\u60c5\u51b5\u3002",
+      labelIssueStartDate: "\u529e\u7ed3\u5f00\u59cb\u65f6\u95f4",
+      labelIssueEndDate: "\u529e\u7ed3\u7ed3\u675f\u65f6\u95f4",
+      labelIssueMatter: "\u4e8b\u9879\u540d\u79f0",
+      labelIssueRegion: "\u529e\u7406\u533a\u57df",
+      issueMatterAllOption: "\u5168\u90e8\u4e8b\u9879",
+      issueRegionAllOption: "\u5168\u90e8\u533a\u57df",
+      issueResetBtn: "\u91cd\u7f6e\u6761\u4ef6",
+      issueSearchBtn: "\u6267\u884c\u7edf\u8ba1",
+      issueChartTitle: "\u4e8b\u9879\u5206\u5e03\u4e0e\u9636\u6bb5\u6784\u6210",
+      issueChartDesc: "\u6309\u4e8b\u9879\u6c47\u603b\u56db\u7c7b\u529e\u7406\u73af\u8282\u6570\u91cf\uff0c\u6761\u5f62\u8272\u5e26\u7528\u4e8e\u76f4\u89c2\u67e5\u770b\u5404\u9636\u6bb5\u5360\u6bd4\u3002",
+      issueLegendTitle: "\u529e\u7406\u9636\u6bb5\u603b\u91cf",
+      issueLegendDesc: "\u7edf\u8ba1\u533a\u95f4\u5185\u5168\u90e8\u4e8b\u9879\u7684\u9636\u6bb5\u5408\u8ba1\uff0c\u7528\u4e8e\u770b\u73af\u8282\u79ef\u538b\u548c\u6d41\u7a0b\u7ed3\u6784\u3002",
+      issueTableTitle: "\u4e8b\u9879\u529e\u7406\u7edf\u8ba1\u660e\u7ec6",
+      issueTableDesc: "\u6bcf\u4e00\u884c\u5c55\u793a\u4e00\u4e2a\u4e8b\u9879\u5728\u5f53\u524d\u65f6\u95f4\u533a\u95f4\u5185\u7684\u7d2f\u8ba1\u529e\u7406\u60c5\u51b5\u3002",
+      issueHeadMatter: "\u4e8b\u9879\u540d\u79f0",
+      issueHeadCount: "\u7edf\u8ba1\u6761\u76ee\u6570",
+      issueHeadAccepted: "\u53d7\u7406",
+      issueHeadReviewed: "\u5ba1\u6838",
+      issueHeadDecided: "\u51b3\u5b9a",
+      issueHeadBureau: "\u4e13\u4e1a\u5c40\u5ba1\u6279",
+      issueHeadTotal: "\u9636\u6bb5\u603b\u91cf",
+      issueHeadDate: "\u6700\u65b0\u529e\u7ed3\u65f6\u95f4",
+      enterpriseSectionTag: "Part 01",
+      enterpriseSectionTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
+      enterpriseSectionInlineDesc: "\u805a\u7126\u4f01\u4e1a\u540d\u5f55\u67e5\u8be2\u4e0e\u8bc1\u4e66\u8d44\u8d28\u5173\u7cfb\u5c55\u793a\uff0c\u652f\u6301\u6309\u6ce8\u518c\u5730\u533a\u53bf\u3001\u8d44\u8d28\u7c7b\u522b\u3001\u8d44\u8d28\u7b49\u7ea7\u3001\u8bc1\u4e66\u7c7b\u578b\u548c\u6709\u6548\u671f\u7b49\u6761\u4ef6\u8fdb\u884c\u7ec4\u5408\u67e5\u8be2\u3002",
+      labelEnterpriseName: "\u4f01\u4e1a\u540d\u79f0",
+      labelDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
+      labelQualificationType: "\u8d44\u8d28\u7c7b\u522b",
+      labelQualificationGrade: "\u8d44\u8d28\u7b49\u7ea7",
+      labelCertificateType: "\u8bc1\u4e66\u7c7b\u578b",
+      labelCertificateNo: "\u8bc1\u4e66\u7f16\u53f7",
+      certificateTypePlaceholder: "\u5168\u90e8\u8bc1\u4e66\u7c7b\u578b",
+      labelValidFrom: "\u6709\u6548\u671f\u8d77",
+      labelValidTo: "\u6709\u6548\u671f\u6b62",
+      labelValidityStatus: "\u6709\u6548\u72b6\u6001",
+      districtAllOption: "\u5168\u90e8\u533a\u53bf",
+      qualificationTypeAllOption: "\u5168\u90e8\u7c7b\u522b",
+      qualificationGradeAllOption: "\u5168\u90e8\u7b49\u7ea7",
+      validityStatusAllOption: "\u5168\u90e8\u72b6\u6001",
+      validityStatusValidOption: "\u6709\u6548",
+      validityStatusSoonOption: "\u5373\u5c06\u5230\u671f",
+      validityStatusExpiredOption: "\u5df2\u8fc7\u671f",
+      enterpriseResetBtn: "\u91cd\u7f6e\u6761\u4ef6",
+      enterpriseSearchBtn: "\u6267\u884c\u67e5\u8be2",
+      enterpriseExportBtn: "\u5bfc\u51fa\u7ed3\u679c",
+      enterpriseTableTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
+      enterpriseTableDesc: "\u6309\u201c\u4f01\u4e1a - \u8bc1\u4e66 - \u8d44\u8d28\u201d\u5173\u7cfb\u5c55\u793a\u6570\u636e\u3002",
+      enterpriseHeadIndex: "\u5e8f\u53f7",
+      enterpriseHeadName: "\u4f01\u4e1a\u540d\u79f0",
+      enterpriseHeadDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
+      enterpriseHeadCertificateNo: "\u8bc1\u4e66\u7f16\u53f7",
+      enterpriseHeadQualificationSeries: "\u8d44\u8d28\u5e8f\u5217",
+      enterpriseHeadValidityDate: "\u8bc1\u4e66/\u8d44\u8d28\u6709\u6548\u671f\u6b62",
+      enterpriseHeadLegalPerson: "\u8bc1\u4e66\u6cd5\u4eba",
+      enterpriseHeadStatus: "\u6709\u6548\u72b6\u6001",
+      footerNote: "\u5f53\u524d\u9875\u9762\u4e3a\u9759\u6001\u5206\u6790\u539f\u578b\u3002\u4f60\u540e\u7eed\u53ea\u8981\u7ee7\u7eed\u4fee\u6539\u8fd9\u4e2a\u672c\u5730 index.html \u5e76\u91cd\u65b0\u4e0a\u4f20\u5230 fenxi-pages \u4ed3\u5e93\uff0cGitHub Pages \u5c31\u4f1a\u81ea\u52a8\u91cd\u65b0\u53d1\u5e03\u3002",
+      noIssueData: "\u5f53\u524d\u65f6\u95f4\u533a\u95f4\u6ca1\u6709\u5339\u914d\u5230\u4e8b\u9879\u6570\u636e\u3002",
+      noIssueTableData: "\u5f53\u524d\u6761\u4ef6\u4e0b\u6ca1\u6709\u4e8b\u9879\u529e\u7406\u7edf\u8ba1\u7ed3\u679c\u3002",
+      noEnterpriseData: "\u5f53\u524d\u6761\u4ef6\u4e0b\u6ca1\u6709\u5339\u914d\u5230\u4f01\u4e1a\u540d\u5f55\u3002",
+      exportFilePrefix: "\u4f01\u4e1a\u540d\u5f55\u5bfc\u51fa\u7ed3\u679c",
+      issueCountNote: "\u6309\u529e\u7ed3\u65f6\u95f4\u547d\u4e2d\u7684\u7edf\u8ba1\u8bb0\u5f55",
+      enterpriseCountNote: "\u5f53\u524d\u7b5b\u9009\u6761\u4ef6\u547d\u4e2d\u4f01\u4e1a",
+      validCountNote: "\u8bc1\u4e66\u72b6\u6001\u4e3a\u6709\u6548",
+      soonCountNote: "\u53ef\u4f5c\u4e3a\u5230\u671f\u9884\u8b66\u540d\u5355",
+      expiredCountNote: "\u9700\u91cd\u70b9\u6838\u67e5\u66f4\u65b0\u60c5\u51b5",
+      stageTotalPrefix: "\u9636\u6bb5\u603b\u91cf",
+      rangeEmpty: "\u5f53\u524d\u65e0\u7edf\u8ba1\u7ed3\u679c"
+    };
+
+    const matterCatalog = [
+      "\u76d1\u7406\u4f01\u4e1a\uff08\u4e59\u7ea7\u53ca\u4ee5\u4e0b\uff09\u540d\u79f0\u3001\u5730\u5740\u3001\u6ce8\u518c\u8d44\u672c\u91d1\u3001\u6cd5\u4eba\u3001\u7ecf\u6d4e\u6027\u8d28\u53d8\u66f4",
+      "\u76d1\u7406\u4f01\u4e1a\uff08\u7532\u7ea7\u3001\u7efc\u5408\uff09\u540d\u79f0\u3001\u5730\u5740\u3001\u6ce8\u518c\u8d44\u672c\u91d1\u3001\u6cd5\u4eba\u3001\u7ecf\u6d4e\u6027\u8d28\u3001\u6280\u672f\u8d1f\u8d23\u4eba\u3001\u4f01\u4e1a\u8d1f\u8d23\u4eba\u53d8\u66f4",
+      "\u5de5\u7a0b\u76d1\u7406\u7535\u5b50\u8bc1\u4e66\u6279\u51c6\u4ef6\u7533\u8bf7",
+      "\u5de5\u7a0b\u76d1\u7406\u7535\u5b50\u8bc1\u4e66\u4f7f\u7528\u4ef6\u7533\u8bf7",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u65b0\u8bbe\u7acb\u8d44\u8d28\u7533\u8bf7",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u65b0\u589e\u8d44\u8d28\u7533\u8bf7",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u5ef6\u7eed\u8d44\u8d28\u7533\u8bf7",
+      "\u5916\u7701\u5e02\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\uff08\u7efc\u5408\u8d44\u8d28\u3001\u4e13\u4e1a\u7532\u7ea7\u8d44\u8d28\uff09\u8fc1\u5165\u5317\u4eac",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u6280\u672f\u8d1f\u8d23\u4eba\u53d8\u66f4",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u4f01\u4e1a\u8d1f\u8d23\u4eba\u53d8\u66f4",
+      "\u4f01\u4e1a\u5438\u6536\u5408\u5e76\u3001\u65b0\u8bbe\u5408\u5e76\u540e\u4e0d\u7533\u8bf7\u8d44\u8d28\u5347\u7ea7\u548c\u589e\u52a0\u5176\u4ed6\u4e13\u4e1a\u8d44\u8d28\u7684\u53d8\u66f4",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u51fa\u4eac\u8bc1\u660e",
+      "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u5168\u8d44\u5b50\u516c\u53f8\u95f4\u91cd\u7ec4\u3001\u5206\u7acb\uff0c\u56fd\u6709\u4f01\u4e1a\u6539\u5236\u91cd\u7ec4\u3001\u5206\u7acb",
+      "\u62a5\u4f4f\u5efa\u90e8\u6279\u51c6\u7684\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u4fe1\u606f\u8865\u5f55"
+    ];
+
     const issueRecords = [
-      { matter: "建筑业企业资质新办", region: "朝阳区", finishedDate: "2026-05-02", accepted: 42, reviewed: 31, decided: 24, bureau: 9 },
-      { matter: "建筑业企业资质新办", region: "海淀区", finishedDate: "2026-05-11", accepted: 38, reviewed: 29, decided: 22, bureau: 8 },
-      { matter: "建筑业企业资质延续", region: "通州区", finishedDate: "2026-05-07", accepted: 53, reviewed: 41, decided: 30, bureau: 10 },
-      { matter: "建筑业企业资质延续", region: "丰台区", finishedDate: "2026-05-18", accepted: 46, reviewed: 34, decided: 26, bureau: 9 },
-      { matter: "安全生产许可证新办", region: "昌平区", finishedDate: "2026-05-05", accepted: 61, reviewed: 48, decided: 32, bureau: 12 },
-      { matter: "安全生产许可证新办", region: "朝阳区", finishedDate: "2026-05-19", accepted: 58, reviewed: 43, decided: 29, bureau: 11 },
-      { matter: "安全生产许可证延期", region: "海淀区", finishedDate: "2026-05-09", accepted: 47, reviewed: 37, decided: 25, bureau: 9 },
-      { matter: "安全生产许可证延期", region: "通州区", finishedDate: "2026-05-22", accepted: 44, reviewed: 33, decided: 24, bureau: 8 },
-      { matter: "监理企业资质核定", region: "西城区", finishedDate: "2026-05-08", accepted: 28, reviewed: 19, decided: 15, bureau: 6 },
-      { matter: "监理企业资质核定", region: "海淀区", finishedDate: "2026-05-24", accepted: 31, reviewed: 22, decided: 17, bureau: 7 },
-      { matter: "施工许可变更", region: "朝阳区", finishedDate: "2026-05-15", accepted: 35, reviewed: 27, decided: 19, bureau: 7 },
-      { matter: "施工许可变更", region: "大兴区", finishedDate: "2026-05-27", accepted: 33, reviewed: 24, decided: 18, bureau: 6 }
+      { matter: matterCatalog[0], region: "\u671d\u9633\u533a", finishedDate: "2026-05-03", accepted: 35, reviewed: 26, decided: 19, bureau: 7 },
+      { matter: matterCatalog[1], region: "\u6d77\u6dc0\u533a", finishedDate: "2026-05-06", accepted: 28, reviewed: 21, decided: 16, bureau: 6 },
+      { matter: matterCatalog[2], region: "\u901a\u5dde\u533a", finishedDate: "2026-05-08", accepted: 22, reviewed: 18, decided: 12, bureau: 5 },
+      { matter: matterCatalog[3], region: "\u897f\u57ce\u533a", finishedDate: "2026-05-10", accepted: 18, reviewed: 14, decided: 10, bureau: 4 },
+      { matter: matterCatalog[4], region: "\u4e30\u53f0\u533a", finishedDate: "2026-05-12", accepted: 31, reviewed: 23, decided: 17, bureau: 6 },
+      { matter: matterCatalog[5], region: "\u660c\u5e73\u533a", finishedDate: "2026-05-14", accepted: 26, reviewed: 20, decided: 15, bureau: 5 },
+      { matter: matterCatalog[6], region: "\u671d\u9633\u533a", finishedDate: "2026-05-16", accepted: 42, reviewed: 31, decided: 23, bureau: 8 },
+      { matter: matterCatalog[7], region: "\u5927\u5174\u533a", finishedDate: "2026-05-18", accepted: 24, reviewed: 18, decided: 12, bureau: 4 },
+      { matter: matterCatalog[8], region: "\u6d77\u6dc0\u533a", finishedDate: "2026-05-19", accepted: 17, reviewed: 12, decided: 8, bureau: 3 },
+      { matter: matterCatalog[9], region: "\u901a\u5dde\u533a", finishedDate: "2026-05-21", accepted: 14, reviewed: 10, decided: 7, bureau: 2 },
+      { matter: matterCatalog[10], region: "\u4e1c\u57ce\u533a", finishedDate: "2026-05-23", accepted: 12, reviewed: 9, decided: 6, bureau: 2 },
+      { matter: matterCatalog[11], region: "\u987a\u4e49\u533a", finishedDate: "2026-05-24", accepted: 16, reviewed: 11, decided: 8, bureau: 3 },
+      { matter: matterCatalog[12], region: "\u77f3\u666f\u5c71\u533a", finishedDate: "2026-05-26", accepted: 9, reviewed: 7, decided: 5, bureau: 2 },
+      { matter: matterCatalog[13], region: "\u6d77\u6dc0\u533a", finishedDate: "2026-05-27", accepted: 11, reviewed: 8, decided: 5, bureau: 2 }
     ];
 
     const enterpriseDirectory = [
-      { name: "北京城建发展建设有限公司", district: "朝阳区", qualificationType: "施工总承包", qualificationGrade: "一级", certificateNo: "A10001", validTo: "2027-04-18", legalPerson: "张成", validityStatus: "有效" },
-      { name: "中建华北市政工程有限公司", district: "海淀区", qualificationType: "施工总承包", qualificationGrade: "特级", certificateNo: "A10002", validTo: "2026-11-09", legalPerson: "刘涛", validityStatus: "有效" },
-      { name: "首都安装技术有限公司", district: "丰台区", qualificationType: "专业承包", qualificationGrade: "一级", certificateNo: "B23018", validTo: "2026-07-26", legalPerson: "王雪", validityStatus: "即将到期" },
-      { name: "京南基础工程集团有限公司", district: "通州区", qualificationType: "施工总承包", qualificationGrade: "一级", certificateNo: "A10886", validTo: "2028-01-15", legalPerson: "陈峰", validityStatus: "有效" },
-      { name: "华宸幕墙装饰股份有限公司", district: "大兴区", qualificationType: "专业承包", qualificationGrade: "二级", certificateNo: "B23452", validTo: "2026-06-12", legalPerson: "孙洁", validityStatus: "即将到期" },
-      { name: "京西监理咨询有限公司", district: "石景山区", qualificationType: "工程监理", qualificationGrade: "甲级", certificateNo: "J90016", validTo: "2027-08-20", legalPerson: "周凯", validityStatus: "有效" },
-      { name: "中安质量检测有限公司", district: "昌平区", qualificationType: "质量检测", qualificationGrade: "一级", certificateNo: "C32004", validTo: "2025-12-30", legalPerson: "何洋", validityStatus: "已过期" },
-      { name: "北方路桥工程有限公司", district: "海淀区", qualificationType: "施工总承包", qualificationGrade: "一级", certificateNo: "A14608", validTo: "2026-10-09", legalPerson: "李欣", validityStatus: "有效" },
-      { name: "瑞成消防工程有限公司", district: "朝阳区", qualificationType: "专业承包", qualificationGrade: "二级", certificateNo: "B20176", validTo: "2026-08-03", legalPerson: "赵宁", validityStatus: "即将到期" },
-      { name: "京北市政建设有限公司", district: "昌平区", qualificationType: "施工总承包", qualificationGrade: "二级", certificateNo: "A18832", validTo: "2027-02-14", legalPerson: "韩亮", validityStatus: "有效" },
-      { name: "安诚安全管理服务有限公司", district: "通州区", qualificationType: "安全生产许可", qualificationGrade: "标准", certificateNo: "AQ51007", validTo: "2026-09-05", legalPerson: "许婧", validityStatus: "有效" },
-      { name: "京东项目管理监理有限公司", district: "顺义区", qualificationType: "工程监理", qualificationGrade: "乙级", certificateNo: "J90084", validTo: "2026-05-28", legalPerson: "顾然", validityStatus: "即将到期" }
+      {
+        name: "\u5317\u4eac\u57ce\u5efa\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        district: "\u671d\u9633\u533a",
+        legalPerson: "\u5f20\u6210",
+        certificates: [
+          {
+            certificateType: "\u76d1\u7406\u8bc1\u4e66",
+            certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "E1123456",
+            certificateLegalPerson: "\u5f20\u6210",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2027-04-18", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2027-11-30", validityStatus: "\u6709\u6548" }
+            ]
+          },
+          {
+            certificateType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "D1987654",
+            certificateLegalPerson: "\u674e\u6210\u6d77",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2028-03-15", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2027-09-08", validityStatus: "\u6709\u6548" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u4e2d\u5317\u5de5\u7a0b\u76d1\u7406\u54a8\u8be2\u6709\u9650\u516c\u53f8",
+        district: "\u6d77\u6dc0\u533a",
+        legalPerson: "\u5218\u6d9b",
+        certificates: [
+          {
+            certificateType: "\u76d1\u7406\u8bc1\u4e66",
+            certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "E2654321",
+            certificateLegalPerson: "\u5218\u6d9b",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-11-09", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-12-20", validityStatus: "\u6709\u6548" }
+            ]
+          },
+          {
+            certificateType: "\u5b89\u5168\u8bc1\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u65bd\u5de5\u4f01\u4e1a\u5b89\u5168\u751f\u4ea7\u8bb8\u53ef\u8bc1",
+            certificateNo: "\uff08\u4eac\uff09JZ\u5b89\u5168\u8bc1\u5b57\u3010202\u3011012345",
+            certificateLegalPerson: "\u5218\u6d9b",
+            validityMode: "certificate",
+            certificateValidTo: "2027-06-30",
+            validityStatus: "\u6709\u6548",
+            qualifications: [
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7" },
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u9996\u90fd\u9879\u76ee\u7ba1\u7406\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        district: "\u4e30\u53f0\u533a",
+        legalPerson: "\u738b\u96ea",
+        certificates: [
+          {
+            certificateType: "\u76d1\u7406\u8bc1\u4e66",
+            certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "E1765432",
+            certificateLegalPerson: "\u8d75\u5fd7\u8fdc",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-07-26", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-08-15", validityStatus: "\u5373\u5c06\u5230\u671f" }
+            ]
+          },
+          {
+            certificateType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "D24567",
+            certificateLegalPerson: "\u738b\u96ea",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2026-09-20", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2026-10-12", validityStatus: "\u5373\u5c06\u5230\u671f" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u4eac\u5357\u5efa\u8bbe\u76d1\u7406\u96c6\u56e2\u6709\u9650\u516c\u53f8",
+        district: "\u901a\u5dde\u533a",
+        legalPerson: "\u9648\u5cf0",
+        certificates: [
+          {
+            certificateType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "D376542",
+            certificateLegalPerson: "\u9648\u5cf0",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2028-01-15", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2027-05-20", validityStatus: "\u6709\u6548" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u534e\u5b8f\u5efa\u8bbe\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        district: "\u5927\u5174\u533a",
+        legalPerson: "\u5b59\u6d01",
+        certificates: [
+          {
+            certificateType: "\u76d1\u7406\u8bc1\u4e66",
+            certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "E1988888",
+            certificateLegalPerson: "\u5b59\u6d01",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-06-12", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-06-30", validityStatus: "\u5373\u5c06\u5230\u671f" }
+            ]
+          },
+          {
+            certificateType: "\u5b89\u5168\u8bc1\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u65bd\u5de5\u4f01\u4e1a\u5b89\u5168\u751f\u4ea7\u8bb8\u53ef\u8bc1",
+            certificateNo: "\uff08\u4eac\uff09JZ\u5b89\u5168\u8bc1\u5b57\u3010202\u3011098765",
+            certificateLegalPerson: "\u5434\u5fd7\u519b",
+            validityMode: "certificate",
+            certificateValidTo: "2026-06-18",
+            validityStatus: "\u5373\u5c06\u5230\u671f",
+            qualifications: [
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7" },
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u4eac\u897f\u5de5\u7a0b\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        district: "\u77f3\u666f\u5c71\u533a",
+        legalPerson: "\u5468\u51ef",
+        certificates: [
+          {
+            certificateType: "\u76d1\u7406\u8bc1\u4e66",
+            certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "E1456789",
+            certificateLegalPerson: "\u5468\u51ef",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2027-08-20", validityStatus: "\u6709\u6548" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "\u4e2d\u5b89\u9879\u76ee\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        district: "\u660c\u5e73\u533a",
+        legalPerson: "\u4f55\u6d0b",
+        certificates: [
+          {
+            certificateType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66",
+            certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
+            certificateNo: "D2456789",
+            certificateLegalPerson: "\u4f55\u6d0b",
+            validityMode: "qualification",
+            qualifications: [
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2025-12-30", validityStatus: "\u5df2\u8fc7\u671f" }
+            ]
+          }
+        ]
+      }
     ];
 
     const issueStageMeta = [
-      { key: "accepted", label: "受理", className: "segment-accept", note: "进入受理环节的事项数量" },
-      { key: "reviewed", label: "审核", className: "segment-review", note: "进入审核环节的事项数量" },
-      { key: "decided", label: "决定", className: "segment-decision", note: "进入决定环节的事项数量" },
-      { key: "bureau", label: "专业局审批", className: "segment-bureau", note: "进入专业局审批环节的事项数量" }
+      { key: "accepted", label: "\u53d7\u7406", className: "segment-accept", note: "\u8fdb\u5165\u53d7\u7406\u73af\u8282\u7684\u4e8b\u9879\u6570\u91cf" },
+      { key: "reviewed", label: "\u5ba1\u6838", className: "segment-review", note: "\u8fdb\u5165\u5ba1\u6838\u73af\u8282\u7684\u4e8b\u9879\u6570\u91cf" },
+      { key: "decided", label: "\u51b3\u5b9a", className: "segment-decision", note: "\u8fdb\u5165\u51b3\u5b9a\u73af\u8282\u7684\u4e8b\u9879\u6570\u91cf" },
+      { key: "bureau", label: "\u4e13\u4e1a\u5c40\u5ba1\u6279", className: "segment-bureau", note: "\u8fdb\u5165\u4e13\u4e1a\u5c40\u5ba1\u6279\u73af\u8282\u7684\u4e8b\u9879\u6570\u91cf" }
     ];
 
     const elements = {
-      issueFilterForm: document.getElementById("issueFilterForm"),
-      issueStartDate: document.getElementById("issueStartDate"),
-      issueEndDate: document.getElementById("issueEndDate"),
-      issueMatter: document.getElementById("issueMatter"),
-      issueRegion: document.getElementById("issueRegion"),
-      issueResetBtn: document.getElementById("issueResetBtn"),
-      issueMetricGrid: document.getElementById("issueMetricGrid"),
-      issueMatterList: document.getElementById("issueMatterList"),
-      issueLegendList: document.getElementById("issueLegendList"),
-      issueTableBody: document.getElementById("issueTableBody"),
-      issueRangeNote: document.getElementById("issueRangeNote"),
       enterpriseFilterForm: document.getElementById("enterpriseFilterForm"),
       enterpriseResetBtn: document.getElementById("enterpriseResetBtn"),
+      enterpriseExportBtn: document.getElementById("enterpriseExportBtn"),
       district: document.getElementById("district"),
       qualificationType: document.getElementById("qualificationType"),
       qualificationGrade: document.getElementById("qualificationGrade"),
-      enterpriseMetricGrid: document.getElementById("enterpriseMetricGrid"),
-      enterpriseTableBody: document.getElementById("enterpriseTableBody"),
-      districtList: document.getElementById("districtList")
+      certificateTypeTrigger: document.getElementById("certificateTypeTrigger"),
+      certificateTypePanel: document.getElementById("certificateTypePanel"),
+      enterpriseTableBody: document.getElementById("enterpriseTableBody")
     };
+
+    function setText(id, value) {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    }
+
+    function fillTexts() {
+      document.title = textMap.pageTitle;
+      Object.entries(textMap).forEach(([key, value]) => {
+        const element = document.getElementById(key);
+        if (element) element.textContent = value;
+      });
+
+      document.getElementById("enterpriseName").placeholder = "\u8f93\u5165\u4f01\u4e1a\u540d\u79f0\u5173\u952e\u5b57";
+      document.getElementById("certificateNo").placeholder = "\u8f93\u5165\u8bc1\u4e66\u7f16\u53f7";
+      elements.certificateTypeTrigger.textContent = textMap.certificateTypePlaceholder;
+      const heroChips = document.getElementById("heroChips");
+      heroChips.innerHTML = "";
+    }
 
     function fillOptions(select, values) {
       const options = values.map((value) => `<option value="${value}">${value}</option>`).join("");
       select.insertAdjacentHTML("beforeend", options);
+    }
+
+    function fillCertificateTypeOptions(values) {
+      elements.certificateTypePanel.innerHTML = values.map((value) => `
+        <label class="multi-select-option">
+          <input type="checkbox" name="certificateType" value="${value}">
+          <span>${value}</span>
+        </label>
+      `).join("");
+      updateCertificateTypeTriggerText();
+    }
+
+    function getSelectedCertificateTypes() {
+      return Array.from(elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]:checked')).map((input) => input.value);
+    }
+
+    function updateCertificateTypeTriggerText() {
+      const selected = getSelectedCertificateTypes();
+      if (!selected.length) {
+        elements.certificateTypeTrigger.textContent = textMap.certificateTypePlaceholder;
+        elements.certificateTypeTrigger.title = textMap.certificateTypePlaceholder;
+        return;
+      }
+
+      const triggerText = selected.length <= 2 ? selected.join("、") : `\u5df2\u9009 ${selected.length} \u9879`;
+      elements.certificateTypeTrigger.textContent = triggerText;
+      elements.certificateTypeTrigger.title = selected.join("、");
     }
 
     function toDate(value) {
@@ -1087,36 +1463,9 @@
       return [...map.values()].sort((a, b) => (b.accepted + b.reviewed + b.decided + b.bureau) - (a.accepted + a.reviewed + a.decided + a.bureau));
     }
 
-    function renderIssueMetrics(records, aggregated) {
-      const totalItems = records.length;
-      const totals = aggregated.reduce((accumulator, item) => {
-        accumulator.accepted += item.accepted;
-        accumulator.reviewed += item.reviewed;
-        accumulator.decided += item.decided;
-        accumulator.bureau += item.bureau;
-        return accumulator;
-      }, { accepted: 0, reviewed: 0, decided: 0, bureau: 0 });
-
-      const metricCards = [
-        { label: "纳入统计条目", value: totalItems, note: "按办结时间命中的统计记录" },
-        { label: "受理", value: totals.accepted, note: "受理阶段累计数量" },
-        { label: "审核", value: totals.reviewed, note: "审核阶段累计数量" },
-        { label: "决定", value: totals.decided, note: "决定阶段累计数量" },
-        { label: "专业局审批", value: totals.bureau, note: "专业局审批阶段累计数量" }
-      ];
-
-      elements.issueMetricGrid.innerHTML = metricCards.map((item) => `
-        <article class="metric-card">
-          <span>${item.label}</span>
-          <strong>${formatNumber(item.value)}</strong>
-          <em>${item.note}</em>
-        </article>
-      `).join("");
-    }
-
     function renderIssueMatterList(aggregated) {
       if (!aggregated.length) {
-        elements.issueMatterList.innerHTML = '<div class="empty-state">当前时间区间没有匹配到事项数据。</div>';
+        elements.issueMatterList.innerHTML = `<div class="empty-state">${textMap.noIssueData}</div>`;
         return;
       }
 
@@ -1135,7 +1484,7 @@
           <article class="matter-card">
             <div class="matter-top">
               <strong>${item.matter}</strong>
-              <span class="matter-total">阶段总量 ${formatNumber(total)}</span>
+              <span class="matter-total">${textMap.stageTotalPrefix} ${formatNumber(total)}</span>
             </div>
             <div class="stack-track">${segments}</div>
             <div class="stage-inline">${pills}</div>
@@ -1168,7 +1517,7 @@
 
     function renderIssueTable(aggregated) {
       if (!aggregated.length) {
-        elements.issueTableBody.innerHTML = buildEmptyRow(8, "当前条件下没有事项办理统计结果。");
+        elements.issueTableBody.innerHTML = buildEmptyRow(8, textMap.noIssueTableData);
         return;
       }
 
@@ -1191,18 +1540,17 @@
 
     function renderIssueRangeNote(records) {
       if (!records.length) {
-        elements.issueRangeNote.textContent = "当前无统计结果";
+        elements.issueRangeNote.textContent = textMap.rangeEmpty;
         return;
       }
 
       const sortedDates = records.map((item) => item.finishedDate).sort();
-      elements.issueRangeNote.textContent = `${sortedDates[0]} 至 ${sortedDates[sortedDates.length - 1]}`;
+      elements.issueRangeNote.textContent = `${sortedDates[0]} \u81f3 ${sortedDates[sortedDates.length - 1]}`;
     }
 
     function renderIssueSection() {
       const filtered = filterIssueRecords();
       const aggregated = aggregateIssueRecords(filtered);
-      renderIssueMetrics(filtered, aggregated);
       renderIssueMatterList(aggregated);
       renderIssueLegend(aggregated);
       renderIssueTable(aggregated);
@@ -1216,6 +1564,7 @@
         district: formData.get("district"),
         qualificationType: formData.get("qualificationType"),
         qualificationGrade: formData.get("qualificationGrade"),
+        certificateTypes: getSelectedCertificateTypes(),
         certificateNo: (formData.get("certificateNo") || "").trim().toLowerCase(),
         validFrom: formData.get("validFrom"),
         validTo: formData.get("validTo"),
@@ -1223,17 +1572,43 @@
       };
     }
 
+    function flattenEnterpriseDirectory() {
+      return enterpriseDirectory.flatMap((enterprise) =>
+        enterprise.certificates.flatMap((certificate) =>
+          certificate.qualifications.map((qualification) => ({
+            name: enterprise.name,
+            district: enterprise.district,
+            legalPerson: enterprise.legalPerson,
+            certificateLegalPerson: certificate.certificateLegalPerson || enterprise.legalPerson,
+            certificateType: certificate.certificateType,
+            certificateName: certificate.certificateName,
+            certificateNo: certificate.certificateNo,
+            validityMode: certificate.validityMode,
+            certificateValidTo: certificate.certificateValidTo || "",
+            qualificationType: qualification.qualificationType,
+            qualificationName: qualification.qualificationName,
+            qualificationGrade: qualification.qualificationGrade,
+            qualificationValidTo: qualification.qualificationValidTo || "",
+            effectiveValidTo: certificate.validityMode === "certificate" ? (certificate.certificateValidTo || "") : (qualification.qualificationValidTo || ""),
+            validityStatus: qualification.validityStatus || certificate.validityStatus || ""
+          }))
+        )
+      );
+    }
+
     function filterEnterpriseDirectory() {
       const filters = getEnterpriseFilters();
       const validFrom = toDate(filters.validFrom);
       const validTo = toDate(filters.validTo);
+      const flattened = flattenEnterpriseDirectory();
 
-      return enterpriseDirectory.filter((item) => {
-        const currentValidTo = toDate(item.validTo);
+      return flattened.filter((item) => {
+        const currentValidTo = toDate(item.effectiveValidTo);
         if (filters.enterpriseName && !item.name.toLowerCase().includes(filters.enterpriseName)) return false;
         if (filters.district && item.district !== filters.district) return false;
         if (filters.qualificationType && item.qualificationType !== filters.qualificationType) return false;
         if (filters.qualificationGrade && item.qualificationGrade !== filters.qualificationGrade) return false;
+        if (filters.certificateTypes.length && !filters.certificateTypes.includes(item.certificateType)) return false;
         if (filters.certificateNo && !item.certificateNo.toLowerCase().includes(filters.certificateNo)) return false;
         if (filters.validityStatus && item.validityStatus !== filters.validityStatus) return false;
         if (validFrom && currentValidTo < validFrom) return false;
@@ -1242,105 +1617,210 @@
       });
     }
 
-    function renderEnterpriseMetrics(records) {
-      const expiringSoon = records.filter((item) => item.validityStatus === "即将到期").length;
-      const validCount = records.filter((item) => item.validityStatus === "有效").length;
-      const expiredCount = records.filter((item) => item.validityStatus === "已过期").length;
-      const districtSet = new Set(records.map((item) => item.district));
-      const firstDistrict = [...districtSet][0] || "--";
-
-      const metricCards = [
-        { label: "查询结果企业数", value: records.length, note: "当前筛选条件命中企业" },
-        { label: "有效证书企业", value: validCount, note: "证书状态为有效" },
-        { label: "即将到期企业", value: expiringSoon, note: "可作为到期预警名单" },
-        { label: "已过期企业", value: expiredCount, note: "需重点核查更新情况" },
-        { label: "覆盖区县数", value: districtSet.size, note: `当前首个区县：${firstDistrict}` }
-      ];
-
-      elements.enterpriseMetricGrid.innerHTML = metricCards.map((item) => `
-        <article class="metric-card">
-          <span>${item.label}</span>
-          <strong>${formatNumber(item.value)}</strong>
-          <em>${item.note}</em>
-        </article>
-      `).join("");
-    }
-
     function renderEnterpriseTable(records) {
       if (!records.length) {
-        elements.enterpriseTableBody.innerHTML = buildEmptyRow(8, "当前条件下没有匹配到企业名录。");
+        elements.enterpriseTableBody.innerHTML = buildEmptyRow(8, textMap.noEnterpriseData);
         return;
       }
 
-      elements.enterpriseTableBody.innerHTML = records.map((item) => `
-        <tr>
-          <td>${item.name}</td>
-          <td>${item.district}</td>
-          <td>${item.qualificationType}</td>
-          <td>${item.qualificationGrade}</td>
-          <td>${item.certificateNo}</td>
-          <td>${item.validTo}</td>
-          <td>${item.legalPerson}</td>
-          <td>${item.validityStatus}</td>
-        </tr>
-      `).join("");
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const getStatusClass = (status) => {
+        if (status === "\u5373\u5c06\u5230\u671f") return "status-badge status-soon";
+        if (status === "\u5df2\u8fc7\u671f") return "status-badge status-expired";
+        return "status-badge status-valid";
+      };
+
+      const grouped = [];
+
+      records.forEach((item) => {
+        let enterpriseGroup = grouped.find((group) => group.name === item.name);
+        if (!enterpriseGroup) {
+          enterpriseGroup = {
+            name: item.name,
+            district: item.district,
+            legalPerson: item.legalPerson,
+            certificates: []
+          };
+          grouped.push(enterpriseGroup);
+        }
+
+        let certificateGroup = enterpriseGroup.certificates.find((certificate) => certificate.certificateNo === item.certificateNo);
+        if (!certificateGroup) {
+          certificateGroup = {
+            certificateType: item.certificateType,
+            certificateName: item.certificateName,
+            certificateNo: item.certificateNo,
+            certificateLegalPerson: item.certificateLegalPerson,
+            validityMode: item.validityMode,
+            certificateValidTo: item.certificateValidTo,
+            qualifications: []
+          };
+          enterpriseGroup.certificates.push(certificateGroup);
+        }
+
+        certificateGroup.qualifications.push({
+          qualificationName: item.qualificationName,
+          qualificationType: item.qualificationType,
+          qualificationGrade: item.qualificationGrade,
+          qualificationValidTo: item.qualificationValidTo,
+          effectiveValidTo: item.effectiveValidTo,
+          certificateLegalPerson: item.certificateLegalPerson,
+          validityStatus: item.validityStatus
+        });
+      });
+
+      const rows = [];
+
+      grouped.forEach((enterpriseGroup, enterpriseIndex) => {
+        const enterpriseRowspan = enterpriseGroup.certificates.reduce((sum, certificate) => sum + certificate.qualifications.length, 0);
+        let enterprisePrinted = false;
+        const hasSafetyCertificate = enterpriseGroup.certificates.some((certificate) => certificate.certificateType === "\u5b89\u5168\u8bc1\u8bc1\u4e66");
+        const hasConstructionCertificate = enterpriseGroup.certificates.some((certificate) => certificate.certificateType === "\u5efa\u7b51\u4e1a\u8bc1\u4e66");
+        const safetyBlocked = hasSafetyCertificate && !hasConstructionCertificate;
+        const hasLegalPersonMismatch = enterpriseGroup.certificates.some((certificate) => certificate.certificateLegalPerson !== enterpriseGroup.legalPerson);
+
+        enterpriseGroup.certificates.forEach((certificateGroup) => {
+          const certificateRowspan = certificateGroup.qualifications.length;
+          let certificatePrinted = false;
+          const legalPersonMismatch = certificateGroup.certificateLegalPerson !== enterpriseGroup.legalPerson;
+
+          certificateGroup.qualifications.forEach((qualification) => {
+            const cells = [];
+            const effectiveValidToDate = toDate(qualification.effectiveValidTo);
+            const isExpiredDate = effectiveValidToDate && effectiveValidToDate < today;
+            const validityDateClass = isExpiredDate ? "is-expired-date" : "";
+
+            if (!enterprisePrinted) {
+              cells.push(`
+                <td class="group-cell" rowspan="${enterpriseRowspan}">${enterpriseIndex + 1}</td>
+                <td class="group-cell" rowspan="${enterpriseRowspan}">
+                  <div class="enterprise-group">
+                    <strong>${enterpriseGroup.name}</strong>
+                    ${(hasLegalPersonMismatch || safetyBlocked) ? `
+                      <div class="enterprise-note-list">
+                        ${hasLegalPersonMismatch ? `<span class="certificate-risk-note">\u8bc1\u4e66\u6cd5\u4eba\u4e0d\u4e00\u81f4\u3002</span>` : ""}
+                        ${safetyBlocked ? `<span class="certificate-risk-note">\u4ec5\u6709\u5b89\u5168\u8bc1\uff0c\u65e0\u5efa\u7b51\u4e1a\u8bc1\u4e66\u3002</span>` : ""}
+                      </div>
+                    ` : ""}
+                  </div>
+                </td>
+                <td class="group-cell" rowspan="${enterpriseRowspan}">${enterpriseGroup.district}</td>
+              `);
+              enterprisePrinted = true;
+            }
+
+            if (!certificatePrinted) {
+              cells.push(`
+                <td class="group-cell certificate-cell" rowspan="${certificateRowspan}">
+                  <div class="certificate-stack">
+                    <strong>${certificateGroup.certificateNo}</strong>
+                  </div>
+                </td>
+              `);
+              certificatePrinted = true;
+            }
+
+            cells.push(`
+              <td>
+                <div class="qualification-stack">
+                  <strong>${qualification.qualificationName}${qualification.qualificationGrade}</strong>
+                </div>
+              </td>
+              <td>
+                <div class="validity-stack">
+                  <strong class="${validityDateClass}">${qualification.effectiveValidTo || "\u2014"}</strong>
+                </div>
+              </td>
+              <td>
+                <span class="legal-person-chip${legalPersonMismatch ? " legal-person-mismatch" : ""}">${certificateGroup.certificateLegalPerson}</span>
+              </td>
+              <td><span class="${getStatusClass(qualification.validityStatus)}">${qualification.validityStatus}</span></td>
+            `);
+
+            rows.push(`<tr>${cells.join("")}</tr>`);
+          });
+        });
+      });
+
+      elements.enterpriseTableBody.innerHTML = rows.join("");
     }
 
-    function renderDistrictList(records) {
-      if (!records.length) {
-        elements.districtList.innerHTML = '<div class="empty-state">暂无区县分布结果。</div>';
-        return;
-      }
+    function buildEnterpriseExportRows(records) {
+      const enterpriseIndexMap = new Map();
+      let currentIndex = 0;
 
-      const districtMap = records.reduce((accumulator, item) => {
-        accumulator.set(item.district, (accumulator.get(item.district) || 0) + 1);
-        return accumulator;
-      }, new Map());
+      return records.map((item) => {
+        if (!enterpriseIndexMap.has(item.name)) {
+          currentIndex += 1;
+          enterpriseIndexMap.set(item.name, currentIndex);
+        }
 
-      const ranking = [...districtMap.entries()]
-        .map(([district, count]) => ({ district, count }))
-        .sort((a, b) => b.count - a.count);
+        return [
+          enterpriseIndexMap.get(item.name),
+          item.name,
+          item.district,
+          item.certificateNo,
+          item.qualificationType,
+          `${item.qualificationName}${item.qualificationGrade}`,
+          item.effectiveValidTo || "",
+          item.certificateLegalPerson,
+          item.validityStatus
+        ];
+      });
+    }
 
-      elements.districtList.innerHTML = ranking.map((item) => `
-        <article class="district-item">
-          <div>
-            <strong>${item.district}</strong>
-            <span>当前查询结果中的企业数量</span>
-          </div>
-          <em>${formatNumber(item.count)} 家</em>
-        </article>
-      `).join("");
+    function exportEnterpriseRecords() {
+      const records = filterEnterpriseDirectory();
+      if (!records.length) return;
+
+      const headers = [
+        textMap.enterpriseHeadIndex,
+        textMap.enterpriseHeadName,
+        textMap.enterpriseHeadDistrict,
+        textMap.enterpriseHeadCertificateNo,
+        textMap.labelQualificationType,
+        textMap.enterpriseHeadQualificationSeries,
+        textMap.enterpriseHeadValidityDate,
+        textMap.enterpriseHeadLegalPerson,
+        textMap.enterpriseHeadStatus
+      ];
+
+      const rows = buildEnterpriseExportRows(records);
+      const csv = [headers, ...rows].map((row) =>
+        row.map((value) => {
+          const normalized = `${value ?? ""}`.replace(/"/g, '""');
+          return `"${normalized}"`;
+        }).join(",")
+      ).join("\r\n");
+
+      const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const date = new Date();
+      const pad = (value) => `${value}`.padStart(2, "0");
+      const fileName = `${textMap.exportFilePrefix}_${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}.csv`;
+
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
     }
 
     function renderEnterpriseSection() {
       const filtered = filterEnterpriseDirectory();
-      renderEnterpriseMetrics(filtered);
       renderEnterpriseTable(filtered);
-      renderDistrictList(filtered);
     }
 
     function initializeFilters() {
-      fillOptions(elements.issueMatter, [...new Set(issueRecords.map((item) => item.matter))]);
-      fillOptions(elements.issueRegion, [...new Set(issueRecords.map((item) => item.region))]);
-      fillOptions(elements.district, [...new Set(enterpriseDirectory.map((item) => item.district))]);
-      fillOptions(elements.qualificationType, [...new Set(enterpriseDirectory.map((item) => item.qualificationType))]);
-      fillOptions(elements.qualificationGrade, [...new Set(enterpriseDirectory.map((item) => item.qualificationGrade))]);
-
-      elements.issueStartDate.value = "2026-05-01";
-      elements.issueEndDate.value = "2026-05-31";
+      const flattened = flattenEnterpriseDirectory();
+      fillOptions(elements.district, [...new Set(flattened.map((item) => item.district))]);
+      fillOptions(elements.qualificationType, [...new Set(flattened.map((item) => item.qualificationType))]);
+      fillOptions(elements.qualificationGrade, [...new Set(flattened.map((item) => item.qualificationGrade))]);
+      fillCertificateTypeOptions([...new Set(flattened.map((item) => item.certificateType))]);
     }
-
-    elements.issueFilterForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      renderIssueSection();
-    });
-
-    elements.issueResetBtn.addEventListener("click", () => {
-      elements.issueFilterForm.reset();
-      elements.issueStartDate.value = "2026-05-01";
-      elements.issueEndDate.value = "2026-05-31";
-      renderIssueSection();
-    });
 
     elements.enterpriseFilterForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -1349,12 +1829,41 @@
 
     elements.enterpriseResetBtn.addEventListener("click", () => {
       elements.enterpriseFilterForm.reset();
+      elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]').forEach((input) => {
+        input.checked = false;
+      });
+      elements.certificateTypePanel.classList.remove("is-open");
+      updateCertificateTypeTriggerText();
       renderEnterpriseSection();
     });
 
+    elements.enterpriseExportBtn.addEventListener("click", () => {
+      exportEnterpriseRecords();
+    });
+
+    elements.certificateTypeTrigger.addEventListener("click", () => {
+      elements.certificateTypePanel.classList.toggle("is-open");
+    });
+
+    elements.certificateTypePanel.addEventListener("change", (event) => {
+      if (event.target instanceof HTMLInputElement) {
+        updateCertificateTypeTriggerText();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      const wrap = elements.certificateTypeTrigger.closest(".multi-select-wrap");
+      if (wrap && !wrap.contains(target)) {
+        elements.certificateTypePanel.classList.remove("is-open");
+      }
+    });
+
+    fillTexts();
     initializeFilters();
-    renderIssueSection();
     renderEnterpriseSection();
   </script>
 </body>
 </html>
+
