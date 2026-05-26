@@ -148,6 +148,7 @@
     }
 
     .hero-tag:empty,
+    .section-tag:empty,
     .hero-main p:empty,
     .hero-chips:empty {
       display: none;
@@ -653,6 +654,38 @@
       background: rgba(255, 255, 255, 0.72);
     }
 
+    .table-pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .page-indicator {
+      color: var(--muted);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .page-btn {
+      min-width: 88px;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .page-btn:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
     table {
       width: 100%;
       min-width: 1360px;
@@ -689,10 +722,21 @@
       vertical-align: middle;
     }
 
+    .group-cell-center {
+      text-align: center;
+    }
+
     .enterprise-group {
       display: grid;
       gap: 2px;
       justify-content: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    #enterpriseHeadName,
+    .enterprise-name-cell {
+      text-align: center;
     }
 
     .enterprise-note-list {
@@ -932,16 +976,6 @@
     </header>
 
     <section class="section-panel fade-up">
-      <div class="section-head">
-        <div>
-          <span class="section-tag" id="enterpriseSectionTag"></span>
-          <h2>
-            <span id="enterpriseSectionTitle"></span>
-            <span class="section-inline-desc" id="enterpriseSectionInlineDesc"></span>
-          </h2>
-        </div>
-      </div>
-
       <form id="enterpriseFilterForm">
         <div class="filter-grid filter-grid-directory">
           <div class="field field-compact" style="grid-column: span 3;">
@@ -1016,6 +1050,8 @@
                 <tr>
                   <th id="enterpriseHeadIndex"></th>
                   <th id="enterpriseHeadName"></th>
+                  <th id="enterpriseHeadBusinessStatus"></th>
+                  <th id="enterpriseHeadBusinessLegalPerson"></th>
                   <th id="enterpriseHeadDistrict"></th>
                   <th id="enterpriseHeadCertificateNo"></th>
                   <th id="enterpriseHeadQualificationSeries"></th>
@@ -1027,6 +1063,11 @@
               <tbody id="enterpriseTableBody"></tbody>
             </table>
           </div>
+          <div class="table-pagination" id="enterprisePagination">
+            <span class="page-indicator" id="enterprisePageIndicator"></span>
+            <button class="page-btn" type="button" id="enterprisePrevBtn"></button>
+            <button class="page-btn" type="button" id="enterpriseNextBtn"></button>
+          </div>
         </article>
       </div>
 
@@ -1037,9 +1078,9 @@
   <script>
     const textMap = {
       pageTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
-      heroTag: "企业名录",
+      heroTag: "",
       heroTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
-      heroDesc: "",
+      heroDesc: "\u805a\u7126\u4f01\u4e1a\u540d\u5f55\u67e5\u8be2\u4e0e\u8bc1\u4e66\u8d44\u8d28\u5173\u7cfb\u5c55\u793a\uff0c\u652f\u6301\u6309\u6ce8\u518c\u5730\u533a\u53bf\u3001\u8d44\u8d28\u7c7b\u522b\u3001\u8d44\u8d28\u7b49\u7ea7\u3001\u8bc1\u4e66\u7c7b\u578b\u548c\u6709\u6548\u671f\u7b49\u6761\u4ef6\u8fdb\u884c\u7ec4\u5408\u67e5\u8be2\u3002",
       heroOverviewTag: "",
       heroOverviewTitle: "",
       heroOverviewDesc: "",
@@ -1047,7 +1088,7 @@
       heroStatus1Desc: "",
       heroStatus2Title: "",
       heroStatus2Desc: "",
-      issueSectionTag: "Part 01",
+      issueSectionTag: "",
       issueSectionTitle: "\u76d1\u7406\u4f01\u4e1a\u4e8b\u9879\u529e\u7406\u60c5\u51b5\u5206\u6790",
       issueSectionDesc: "\u6309\u7167\u529e\u7ed3\u65f6\u95f4\u7b5b\u9009\u7edf\u8ba1\u533a\u95f4\uff0c\u6c47\u603b\u5404\u4e2a\u76d1\u7406\u4f01\u4e1a\u4e8b\u9879\u5728\u53d7\u7406\u3001\u5ba1\u6838\u3001\u51b3\u5b9a\u3001\u4e13\u4e1a\u5c40\u5ba1\u6279\u56db\u4e2a\u73af\u8282\u7684\u529e\u7406\u60c5\u51b5\u3002",
       labelIssueStartDate: "\u529e\u7ed3\u5f00\u59cb\u65f6\u95f4",
@@ -1072,9 +1113,9 @@
       issueHeadBureau: "\u4e13\u4e1a\u5c40\u5ba1\u6279",
       issueHeadTotal: "\u9636\u6bb5\u603b\u91cf",
       issueHeadDate: "\u6700\u65b0\u529e\u7ed3\u65f6\u95f4",
-      enterpriseSectionTag: "Part 01",
-      enterpriseSectionTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
-      enterpriseSectionInlineDesc: "\u805a\u7126\u4f01\u4e1a\u540d\u5f55\u67e5\u8be2\u4e0e\u8bc1\u4e66\u8d44\u8d28\u5173\u7cfb\u5c55\u793a\uff0c\u652f\u6301\u6309\u6ce8\u518c\u5730\u533a\u53bf\u3001\u8d44\u8d28\u7c7b\u522b\u3001\u8d44\u8d28\u7b49\u7ea7\u3001\u8bc1\u4e66\u7c7b\u578b\u548c\u6709\u6548\u671f\u7b49\u6761\u4ef6\u8fdb\u884c\u7ec4\u5408\u67e5\u8be2\u3002",
+      enterpriseSectionTag: "",
+      enterpriseSectionTitle: "",
+      enterpriseSectionInlineDesc: "",
       labelEnterpriseName: "\u4f01\u4e1a\u540d\u79f0",
       labelDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
       labelQualificationType: "\u8d44\u8d28\u7c7b\u522b",
@@ -1095,10 +1136,15 @@
       enterpriseResetBtn: "\u91cd\u7f6e\u6761\u4ef6",
       enterpriseSearchBtn: "\u6267\u884c\u67e5\u8be2",
       enterpriseExportBtn: "\u5bfc\u51fa\u7ed3\u679c",
+      enterprisePrevBtn: "\u4e0a\u4e00\u9875",
+      enterpriseNextBtn: "\u4e0b\u4e00\u9875",
+      enterprisePageText: "\u7b2c {current} / {total} \u9875\uff0c\u5171 {count} \u5bb6\u4f01\u4e1a",
       enterpriseTableTitle: "\u5efa\u7b51\u884c\u4e1a\u4f01\u4e1a\u540d\u5f55",
       enterpriseTableDesc: "\u6309\u201c\u4f01\u4e1a - \u8bc1\u4e66 - \u8d44\u8d28\u201d\u5173\u7cfb\u5c55\u793a\u6570\u636e\u3002",
       enterpriseHeadIndex: "\u5e8f\u53f7",
       enterpriseHeadName: "\u4f01\u4e1a\u540d\u79f0",
+      enterpriseHeadBusinessStatus: "\u5de5\u5546\u4f01\u4e1a\u72b6\u6001",
+      enterpriseHeadBusinessLegalPerson: "\u5de5\u5546\u6cd5\u4eba",
       enterpriseHeadDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
       enterpriseHeadCertificateNo: "\u8bc1\u4e66\u7f16\u53f7",
       enterpriseHeadQualificationSeries: "\u8d44\u8d28\u5e8f\u5217",
@@ -1156,6 +1202,7 @@
     const enterpriseDirectory = [
       {
         name: "\u5317\u4eac\u57ce\u5efa\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u671d\u9633\u533a",
         legalPerson: "\u5f20\u6210",
         certificates: [
@@ -1185,6 +1232,7 @@
       },
       {
         name: "\u4e2d\u5317\u5de5\u7a0b\u76d1\u7406\u54a8\u8be2\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u6d77\u6dc0\u533a",
         legalPerson: "\u5218\u6d9b",
         certificates: [
@@ -1216,6 +1264,7 @@
       },
       {
         name: "\u9996\u90fd\u9879\u76ee\u7ba1\u7406\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u4e30\u53f0\u533a",
         legalPerson: "\u738b\u96ea",
         certificates: [
@@ -1245,6 +1294,7 @@
       },
       {
         name: "\u4eac\u5357\u5efa\u8bbe\u76d1\u7406\u96c6\u56e2\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u901a\u5dde\u533a",
         legalPerson: "\u9648\u5cf0",
         certificates: [
@@ -1263,6 +1313,7 @@
       },
       {
         name: "\u534e\u5b8f\u5efa\u8bbe\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u5927\u5174\u533a",
         legalPerson: "\u5b59\u6d01",
         certificates: [
@@ -1294,6 +1345,7 @@
       },
       {
         name: "\u4eac\u897f\u5de5\u7a0b\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5b58\u7eed",
         district: "\u77f3\u666f\u5c71\u533a",
         legalPerson: "\u5468\u51ef",
         certificates: [
@@ -1311,6 +1363,7 @@
       },
       {
         name: "\u4e2d\u5b89\u9879\u76ee\u76d1\u7406\u6709\u9650\u516c\u53f8",
+        businessStatus: "\u5f00\u4e1a",
         district: "\u660c\u5e73\u533a",
         legalPerson: "\u4f55\u6d0b",
         certificates: [
@@ -1339,12 +1392,20 @@
       enterpriseFilterForm: document.getElementById("enterpriseFilterForm"),
       enterpriseResetBtn: document.getElementById("enterpriseResetBtn"),
       enterpriseExportBtn: document.getElementById("enterpriseExportBtn"),
+      enterprisePrevBtn: document.getElementById("enterprisePrevBtn"),
+      enterpriseNextBtn: document.getElementById("enterpriseNextBtn"),
+      enterprisePageIndicator: document.getElementById("enterprisePageIndicator"),
       district: document.getElementById("district"),
       qualificationType: document.getElementById("qualificationType"),
       qualificationGrade: document.getElementById("qualificationGrade"),
       certificateTypeTrigger: document.getElementById("certificateTypeTrigger"),
       certificateTypePanel: document.getElementById("certificateTypePanel"),
       enterpriseTableBody: document.getElementById("enterpriseTableBody")
+    };
+
+    const paginationState = {
+      enterprisePage: 1,
+      enterprisePageSize: 4
     };
 
     function setText(id, value) {
@@ -1362,8 +1423,12 @@
       document.getElementById("enterpriseName").placeholder = "\u8f93\u5165\u4f01\u4e1a\u540d\u79f0\u5173\u952e\u5b57";
       document.getElementById("certificateNo").placeholder = "\u8f93\u5165\u8bc1\u4e66\u7f16\u53f7";
       elements.certificateTypeTrigger.textContent = textMap.certificateTypePlaceholder;
-      const heroChips = document.getElementById("heroChips");
-      heroChips.innerHTML = "";
+    const heroChips = document.getElementById("heroChips");
+    heroChips.innerHTML = `
+      <span class="hero-chip">名录查询口径：基础信息 + 证书 + 资质</span>
+      <span class="hero-chip">证书类型支持多选</span>
+      <span class="hero-chip">过期时间自动标红</span>
+    `;
     }
 
     function fillOptions(select, values) {
@@ -1408,6 +1473,22 @@
 
     function buildEmptyRow(colspan, text) {
       return `<tr><td colspan="${colspan}"><div class="empty-state">${text}</div></td></tr>`;
+    }
+
+    function updateEnterprisePagination(totalEnterprises) {
+      const totalPages = Math.max(1, Math.ceil(totalEnterprises / paginationState.enterprisePageSize));
+      if (paginationState.enterprisePage > totalPages) {
+        paginationState.enterprisePage = totalPages;
+      }
+
+      elements.enterprisePageIndicator.textContent = textMap.enterprisePageText
+        .replace("{current}", `${paginationState.enterprisePage}`)
+        .replace("{total}", `${totalPages}`)
+        .replace("{count}", `${totalEnterprises}`);
+      elements.enterprisePrevBtn.textContent = textMap.enterprisePrevBtn;
+      elements.enterpriseNextBtn.textContent = textMap.enterpriseNextBtn;
+      elements.enterprisePrevBtn.disabled = paginationState.enterprisePage <= 1;
+      elements.enterpriseNextBtn.disabled = paginationState.enterprisePage >= totalPages;
     }
 
     function getIssueFilters() {
@@ -1577,6 +1658,7 @@
         enterprise.certificates.flatMap((certificate) =>
           certificate.qualifications.map((qualification) => ({
             name: enterprise.name,
+            businessStatus: enterprise.businessStatus,
             district: enterprise.district,
             legalPerson: enterprise.legalPerson,
             certificateLegalPerson: certificate.certificateLegalPerson || enterprise.legalPerson,
@@ -1619,7 +1701,8 @@
 
     function renderEnterpriseTable(records) {
       if (!records.length) {
-        elements.enterpriseTableBody.innerHTML = buildEmptyRow(8, textMap.noEnterpriseData);
+        elements.enterpriseTableBody.innerHTML = buildEmptyRow(10, textMap.noEnterpriseData);
+        updateEnterprisePagination(0);
         return;
       }
 
@@ -1639,6 +1722,7 @@
         if (!enterpriseGroup) {
           enterpriseGroup = {
             name: item.name,
+            businessStatus: item.businessStatus,
             district: item.district,
             legalPerson: item.legalPerson,
             certificates: []
@@ -1671,9 +1755,17 @@
         });
       });
 
+      const totalEnterprises = grouped.length;
+      const totalPages = Math.max(1, Math.ceil(totalEnterprises / paginationState.enterprisePageSize));
+      if (paginationState.enterprisePage > totalPages) {
+        paginationState.enterprisePage = totalPages;
+      }
+      const startIndex = (paginationState.enterprisePage - 1) * paginationState.enterprisePageSize;
+      const pagedGroups = grouped.slice(startIndex, startIndex + paginationState.enterprisePageSize);
       const rows = [];
 
-      grouped.forEach((enterpriseGroup, enterpriseIndex) => {
+      pagedGroups.forEach((enterpriseGroup, pageIndex) => {
+        const enterpriseIndex = startIndex + pageIndex;
         const enterpriseRowspan = enterpriseGroup.certificates.reduce((sum, certificate) => sum + certificate.qualifications.length, 0);
         let enterprisePrinted = false;
         const hasSafetyCertificate = enterpriseGroup.certificates.some((certificate) => certificate.certificateType === "\u5b89\u5168\u8bc1\u8bc1\u4e66");
@@ -1695,7 +1787,7 @@
             if (!enterprisePrinted) {
               cells.push(`
                 <td class="group-cell" rowspan="${enterpriseRowspan}">${enterpriseIndex + 1}</td>
-                <td class="group-cell" rowspan="${enterpriseRowspan}">
+                <td class="group-cell enterprise-name-cell" rowspan="${enterpriseRowspan}">
                   <div class="enterprise-group">
                     <strong>${enterpriseGroup.name}</strong>
                     ${(hasLegalPersonMismatch || safetyBlocked) ? `
@@ -1706,7 +1798,9 @@
                     ` : ""}
                   </div>
                 </td>
-                <td class="group-cell" rowspan="${enterpriseRowspan}">${enterpriseGroup.district}</td>
+                <td class="group-cell group-cell-center" rowspan="${enterpriseRowspan}">${enterpriseGroup.businessStatus || "\u2014"}</td>
+                <td class="group-cell" rowspan="${enterpriseRowspan}">${enterpriseGroup.legalPerson || "\u2014"}</td>
+                <td class="group-cell group-cell-center" rowspan="${enterpriseRowspan}">${enterpriseGroup.district}</td>
               `);
               enterprisePrinted = true;
             }
@@ -1745,6 +1839,7 @@
       });
 
       elements.enterpriseTableBody.innerHTML = rows.join("");
+      updateEnterprisePagination(totalEnterprises);
     }
 
     function buildEnterpriseExportRows(records) {
@@ -1760,6 +1855,8 @@
         return [
           enterpriseIndexMap.get(item.name),
           item.name,
+          item.businessStatus || "",
+          item.legalPerson || "",
           item.district,
           item.certificateNo,
           item.qualificationType,
@@ -1778,6 +1875,8 @@
       const headers = [
         textMap.enterpriseHeadIndex,
         textMap.enterpriseHeadName,
+        textMap.enterpriseHeadBusinessStatus,
+        textMap.enterpriseHeadBusinessLegalPerson,
         textMap.enterpriseHeadDistrict,
         textMap.enterpriseHeadCertificateNo,
         textMap.labelQualificationType,
@@ -1824,6 +1923,7 @@
 
     elements.enterpriseFilterForm.addEventListener("submit", (event) => {
       event.preventDefault();
+      paginationState.enterprisePage = 1;
       renderEnterpriseSection();
     });
 
@@ -1834,11 +1934,23 @@
       });
       elements.certificateTypePanel.classList.remove("is-open");
       updateCertificateTypeTriggerText();
+      paginationState.enterprisePage = 1;
       renderEnterpriseSection();
     });
 
     elements.enterpriseExportBtn.addEventListener("click", () => {
       exportEnterpriseRecords();
+    });
+
+    elements.enterprisePrevBtn.addEventListener("click", () => {
+      if (paginationState.enterprisePage <= 1) return;
+      paginationState.enterprisePage -= 1;
+      renderEnterpriseSection();
+    });
+
+    elements.enterpriseNextBtn.addEventListener("click", () => {
+      paginationState.enterprisePage += 1;
+      renderEnterpriseSection();
     });
 
     elements.certificateTypeTrigger.addEventListener("click", () => {
