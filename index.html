@@ -187,6 +187,18 @@
       font-size: 0.74rem;
     }
 
+    a.hero-chip {
+      color: #f4fbff;
+      text-decoration: none;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    a.hero-chip:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
     .hero-side {
       display: grid;
       gap: 8px;
@@ -372,6 +384,31 @@
     .multi-select-panel.is-open {
       display: grid;
       gap: 8px;
+    }
+
+    .multi-select-search {
+      width: 100%;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      background: rgba(247, 250, 252, 0.94);
+      color: var(--text);
+      outline: none;
+    }
+
+    .multi-select-options {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .multi-select-empty {
+      display: none;
+      padding: 4px 6px 0;
+      color: var(--muted);
+      font-size: 0.76rem;
     }
 
     .multi-select-option {
@@ -775,6 +812,45 @@
       text-align: center;
     }
 
+    #enterpriseHeadCertificateMark,
+    .certificate-mark-cell {
+      text-align: center;
+    }
+
+    .certificate-mark-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 68px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .certificate-mark-normal {
+      background: rgba(30, 155, 130, 0.14);
+      color: #1b7f69;
+    }
+
+    .certificate-mark-abnormal,
+    .certificate-mark-suspended {
+      background: rgba(223, 106, 73, 0.14);
+      color: #be4f31;
+    }
+
+    .certificate-mark-other {
+      background: rgba(22, 133, 184, 0.14);
+      color: #12668d;
+    }
+
+    .certificate-mark-differential {
+      background: rgba(241, 154, 52, 0.16);
+      color: #b66d12;
+    }
+
     .validity-stack {
       display: grid;
       gap: 4px;
@@ -989,10 +1065,11 @@
             </select>
           </div>
           <div class="field field-compact" style="grid-column: span 2;">
-            <label for="qualificationType" id="labelQualificationType"></label>
-            <select id="qualificationType" name="qualificationType">
-              <option value="" id="qualificationTypeAllOption"></option>
-            </select>
+            <label id="labelQualificationType"></label>
+            <div class="multi-select-wrap">
+              <button class="multi-select-trigger" type="button" id="qualificationSeriesTrigger"></button>
+              <div class="multi-select-panel" id="qualificationSeriesPanel"></div>
+            </div>
           </div>
           <div class="field field-compact" style="grid-column: span 2;">
             <label for="qualificationGrade" id="labelQualificationGrade"></label>
@@ -1010,6 +1087,26 @@
           <div class="field field-compact" style="grid-column: span 2;">
             <label for="certificateNo" id="labelCertificateNo"></label>
             <input id="certificateNo" name="certificateNo" type="text">
+          </div>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="certificateMark" id="labelCertificateMark"></label>
+            <select id="certificateMark" name="certificateMark">
+              <option value="" id="certificateMarkAllOption"></option>
+            </select>
+          </div>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="authorityCategory" id="labelAuthorityCategory"></label>
+            <select id="authorityCategory" name="authorityCategory">
+              <option value="" id="authorityCategoryAllOption"></option>
+              <option value="央企市属" id="authorityCategoryCentralOption"></option>
+              <option value="区县建委" id="authorityCategoryDistrictOption"></option>
+            </select>
+          </div>
+          <div class="field field-compact" style="grid-column: span 2;">
+            <label for="authorityDepartment" id="labelAuthorityDepartment"></label>
+            <select id="authorityDepartment" name="authorityDepartment">
+              <option value="" id="authorityDepartmentAllOption"></option>
+            </select>
           </div>
           <div class="field field-compact" style="grid-column: span 2;">
             <label for="validFrom" id="labelValidFrom"></label>
@@ -1054,6 +1151,8 @@
                   <th id="enterpriseHeadBusinessLegalPerson"></th>
                   <th id="enterpriseHeadDistrict"></th>
                   <th id="enterpriseHeadCertificateNo"></th>
+                  <th id="enterpriseHeadCertificateMark"></th>
+                  <th id="enterpriseHeadAuthorityDepartment"></th>
                   <th id="enterpriseHeadQualificationSeries"></th>
                   <th id="enterpriseHeadValidityDate"></th>
                   <th id="enterpriseHeadLegalPerson"></th>
@@ -1118,17 +1217,25 @@
       enterpriseSectionInlineDesc: "",
       labelEnterpriseName: "\u4f01\u4e1a\u540d\u79f0",
       labelDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
-      labelQualificationType: "\u8d44\u8d28\u7c7b\u522b",
+      labelQualificationType: "\u8d44\u8d28\u5e8f\u5217",
       labelQualificationGrade: "\u8d44\u8d28\u7b49\u7ea7",
       labelCertificateType: "\u8bc1\u4e66\u7c7b\u578b",
       labelCertificateNo: "\u8bc1\u4e66\u7f16\u53f7",
+      labelCertificateMark: "\u8bc1\u4e66\u6807\u8bb0",
+      labelAuthorityCategory: "\u6743\u5c5e\u5206\u7c7b",
+      labelAuthorityDepartment: "\u8d44\u8d28\u7ba1\u7406\u6743\u5c5e\u90e8\u95e8",
       certificateTypePlaceholder: "\u5168\u90e8\u8bc1\u4e66\u7c7b\u578b",
       labelValidFrom: "\u6709\u6548\u671f\u8d77",
       labelValidTo: "\u6709\u6548\u671f\u6b62",
       labelValidityStatus: "\u6709\u6548\u72b6\u6001",
       districtAllOption: "\u5168\u90e8\u533a\u53bf",
-      qualificationTypeAllOption: "\u5168\u90e8\u7c7b\u522b",
+      qualificationTypeAllOption: "\u5168\u90e8\u8d44\u8d28\u5e8f\u5217",
       qualificationGradeAllOption: "\u5168\u90e8\u7b49\u7ea7",
+      certificateMarkAllOption: "\u5168\u90e8\u8bc1\u4e66\u6807\u8bb0",
+      authorityCategoryAllOption: "\u5168\u90e8\u5206\u7c7b",
+      authorityCategoryCentralOption: "\u592e\u4f01\u5e02\u5c5e",
+      authorityCategoryDistrictOption: "\u533a\u53bf\u5efa\u59d4",
+      authorityDepartmentAllOption: "\u5168\u90e8\u6743\u5c5e\u90e8\u95e8",
       validityStatusAllOption: "\u5168\u90e8\u72b6\u6001",
       validityStatusValidOption: "\u6709\u6548",
       validityStatusSoonOption: "\u5373\u5c06\u5230\u671f",
@@ -1147,6 +1254,8 @@
       enterpriseHeadBusinessLegalPerson: "\u5de5\u5546\u6cd5\u4eba",
       enterpriseHeadDistrict: "\u6ce8\u518c\u5730\u533a\u53bf",
       enterpriseHeadCertificateNo: "\u8bc1\u4e66\u7f16\u53f7",
+      enterpriseHeadCertificateMark: "\u8bc1\u4e66\u6807\u8bb0",
+      enterpriseHeadAuthorityDepartment: "\u8d44\u8d28\u7ba1\u7406\u6743\u5c5e\u90e8\u95e8",
       enterpriseHeadQualificationSeries: "\u8d44\u8d28\u5e8f\u5217",
       enterpriseHeadValidityDate: "\u8bc1\u4e66/\u8d44\u8d28\u6709\u6548\u671f\u6b62",
       enterpriseHeadLegalPerson: "\u8bc1\u4e66\u6cd5\u4eba",
@@ -1211,10 +1320,11 @@
             certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "E1123456",
             certificateLegalPerson: "\u5f20\u6210",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2027-04-18", validityStatus: "\u6709\u6548" },
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2027-11-30", validityStatus: "\u6709\u6548" }
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", authorityDepartment: "\u97e9\u5efa\u96c6\u56e2", qualificationValidTo: "2027-04-18", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", authorityDepartment: "\u5e02\u653f\u8def\u6865\u96c6\u56e2", qualificationValidTo: "2027-11-30", validityStatus: "\u6709\u6548" }
             ]
           },
           {
@@ -1222,10 +1332,11 @@
             certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "D1987654",
             certificateLegalPerson: "\u674e\u6210\u6d77",
+            certificateMark: "\u5f02\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2028-03-15", validityStatus: "\u6709\u6548" },
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2027-09-08", validityStatus: "\u6709\u6548" }
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", authorityDepartment: "\u4e2d\u94c1\u5341\u516d\u5c40\u96c6\u56e2", qualificationValidTo: "2028-03-15", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u5efa\u5de5\u96c6\u56e2", qualificationValidTo: "2027-09-08", validityStatus: "\u6709\u6548" }
             ]
           }
         ]
@@ -1241,10 +1352,11 @@
             certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "E2654321",
             certificateLegalPerson: "\u5218\u6d9b",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-11-09", validityStatus: "\u6709\u6548" },
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-12-20", validityStatus: "\u6709\u6548" }
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", authorityDepartment: "\u57ce\u5efa\u96c6\u56e2", qualificationValidTo: "2026-11-09", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", authorityDepartment: "\u4e2d\u5efa\u4e00\u5c40", qualificationValidTo: "2026-12-20", validityStatus: "\u6709\u6548" }
             ]
           },
           {
@@ -1252,12 +1364,13 @@
             certificateName: "\u5efa\u7b51\u65bd\u5de5\u4f01\u4e1a\u5b89\u5168\u751f\u4ea7\u8bb8\u53ef\u8bc1",
             certificateNo: "\uff08\u4eac\uff09JZ\u5b89\u5168\u8bc1\u5b57\u3010202\u3011012345",
             certificateLegalPerson: "\u5218\u6d9b",
+            certificateMark: "\u5176\u4ed6",
             validityMode: "certificate",
             certificateValidTo: "2027-06-30",
             validityStatus: "\u6709\u6548",
             qualifications: [
-              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7" },
-              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7" }
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", authorityDepartment: "\u5e02\u653f\u96c6\u56e2" },
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u4f4f\u603b\u96c6\u56e2" }
             ]
           }
         ]
@@ -1273,10 +1386,11 @@
             certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "E1765432",
             certificateLegalPerson: "\u8d75\u5fd7\u8fdc",
+            certificateMark: "\u5f02\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-07-26", validityStatus: "\u5373\u5c06\u5230\u671f" },
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-08-15", validityStatus: "\u5373\u5c06\u5230\u671f" }
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", authorityDepartment: "\u5e02\u5efa\u59d4", qualificationValidTo: "2026-07-26", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", authorityDepartment: "\u65b0\u5174\u5efa\u8bbe\u96c6\u56e2", qualificationValidTo: "2026-08-15", validityStatus: "\u5373\u5c06\u5230\u671f" }
             ]
           },
           {
@@ -1284,10 +1398,11 @@
             certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "D24567",
             certificateLegalPerson: "\u738b\u96ea",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2026-09-20", validityStatus: "\u5373\u5c06\u5230\u671f" },
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2026-10-12", validityStatus: "\u5373\u5c06\u5230\u671f" }
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", authorityDepartment: "\u57ce\u4e61\u96c6\u56e2", qualificationValidTo: "2026-09-20", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u5e02\u6c34\u5229\u5c40", qualificationValidTo: "2026-10-12", validityStatus: "\u5373\u5c06\u5230\u671f" }
             ]
           }
         ]
@@ -1303,10 +1418,11 @@
             certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "D376542",
             certificateLegalPerson: "\u9648\u5cf0",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", qualificationValidTo: "2028-01-15", validityStatus: "\u6709\u6548" },
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2027-05-20", validityStatus: "\u6709\u6548" }
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", authorityDepartment: "\u4e2d\u5efa\u4e8c\u5c40", qualificationValidTo: "2028-01-15", validityStatus: "\u6709\u6548" },
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u4e2d\u5173\u6751\u5efa\u8bbe", qualificationValidTo: "2027-05-20", validityStatus: "\u6709\u6548" }
             ]
           }
         ]
@@ -1322,10 +1438,11 @@
             certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "E1988888",
             certificateLegalPerson: "\u5b59\u6d01",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", qualificationValidTo: "2026-06-12", validityStatus: "\u5373\u5c06\u5230\u671f" },
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2026-06-30", validityStatus: "\u5373\u5c06\u5230\u671f" }
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u623f\u5c4b\u5efa\u7b51", qualificationGrade: "\u7532\u7ea7", authorityDepartment: "\u5e02\u4f9b\u7535\u5c40", qualificationValidTo: "2026-06-12", validityStatus: "\u5373\u5c06\u5230\u671f" },
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", authorityDepartment: "\u9996\u94a2\u603b\u516c\u53f8", qualificationValidTo: "2026-06-30", validityStatus: "\u5373\u5c06\u5230\u671f" }
             ]
           },
           {
@@ -1333,12 +1450,13 @@
             certificateName: "\u5efa\u7b51\u65bd\u5de5\u4f01\u4e1a\u5b89\u5168\u751f\u4ea7\u8bb8\u53ef\u8bc1",
             certificateNo: "\uff08\u4eac\uff09JZ\u5b89\u5168\u8bc1\u5b57\u3010202\u3011098765",
             certificateLegalPerson: "\u5434\u5fd7\u519b",
+            certificateMark: "\u6682\u6263",
             validityMode: "certificate",
             certificateValidTo: "2026-06-18",
             validityStatus: "\u5373\u5c06\u5230\u671f",
             qualifications: [
-              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7" },
-              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7" }
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u7535\u5b50\u4e0e\u667a\u80fd\u5316\u65bd\u5de5\u603b\u5305", qualificationGrade: "\u8d30\u7ea7", authorityDepartment: "\u97e9\u5efa\u96c6\u56e2" },
+              { qualificationType: "\u5b89\u5168\u8bc1\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u5e02\u653f\u8def\u6865\u96c6\u56e2" }
             ]
           }
         ]
@@ -1354,9 +1472,10 @@
             certificateName: "\u5de5\u7a0b\u76d1\u7406\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "E1456789",
             certificateLegalPerson: "\u5468\u51ef",
+            certificateMark: "\u6b63\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", qualificationValidTo: "2027-08-20", validityStatus: "\u6709\u6548" }
+              { qualificationType: "\u76d1\u7406\u8bc1\u4e66", qualificationName: "\u5e02\u653f\u516c\u7528", qualificationGrade: "\u4e59\u7ea7", authorityDepartment: "\u4e2d\u94c1\u5341\u516d\u5c40\u96c6\u56e2", qualificationValidTo: "2027-08-20", validityStatus: "\u6709\u6548" }
             ]
           }
         ]
@@ -1372,9 +1491,10 @@
             certificateName: "\u5efa\u7b51\u4e1a\u4f01\u4e1a\u8d44\u8d28\u8bc1\u4e66",
             certificateNo: "D2456789",
             certificateLegalPerson: "\u4f55\u6d0b",
+            certificateMark: "\u5f02\u5e38",
             validityMode: "qualification",
             qualifications: [
-              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", qualificationValidTo: "2025-12-30", validityStatus: "\u5df2\u8fc7\u671f" }
+              { qualificationType: "\u5efa\u7b51\u4e1a\u8bc1\u4e66", qualificationName: "\u516c\u8def\u4e13\u4e1a\u627f\u5305", qualificationGrade: "\u4e09\u7ea7", authorityDepartment: "\u5efa\u5de5\u96c6\u56e2", qualificationValidTo: "2025-12-30", validityStatus: "\u5df2\u8fc7\u671f" }
             ]
           }
         ]
@@ -1396,8 +1516,12 @@
       enterpriseNextBtn: document.getElementById("enterpriseNextBtn"),
       enterprisePageIndicator: document.getElementById("enterprisePageIndicator"),
       district: document.getElementById("district"),
-      qualificationType: document.getElementById("qualificationType"),
+      qualificationSeriesTrigger: document.getElementById("qualificationSeriesTrigger"),
+      qualificationSeriesPanel: document.getElementById("qualificationSeriesPanel"),
       qualificationGrade: document.getElementById("qualificationGrade"),
+      certificateMark: document.getElementById("certificateMark"),
+      authorityCategory: document.getElementById("authorityCategory"),
+      authorityDepartment: document.getElementById("authorityDepartment"),
       certificateTypeTrigger: document.getElementById("certificateTypeTrigger"),
       certificateTypePanel: document.getElementById("certificateTypePanel"),
       enterpriseTableBody: document.getElementById("enterpriseTableBody")
@@ -1406,6 +1530,46 @@
     const paginationState = {
       enterprisePage: 1,
       enterprisePageSize: 4
+    };
+
+    const authorityDepartmentGroups = {
+      "\u592e\u4f01\u5e02\u5c5e": [
+        "\u97e9\u5efa\u96c6\u56e2",
+        "\u5e02\u653f\u8def\u6865\u96c6\u56e2",
+        "\u4e2d\u94c1\u5341\u516d\u5c40\u96c6\u56e2",
+        "\u5efa\u5de5\u96c6\u56e2",
+        "\u57ce\u5efa\u96c6\u56e2",
+        "\u4e2d\u5efa\u4e00\u5c40",
+        "\u5e02\u653f\u96c6\u56e2",
+        "\u4f4f\u603b\u96c6\u56e2",
+        "\u5e02\u5efa\u59d4",
+        "\u65b0\u5174\u5efa\u8bbe\u96c6\u56e2",
+        "\u57ce\u4e61\u96c6\u56e2",
+        "\u5e02\u6c34\u5229\u5c40",
+        "\u4e2d\u5efa\u4e8c\u5c40",
+        "\u4e2d\u5173\u6751\u5efa\u8bbe",
+        "\u5e02\u4f9b\u7535\u5c40",
+        "\u9996\u94a2\u603b\u516c\u53f8"
+      ],
+      "\u533a\u53bf\u5efa\u59d4": [
+        "\u4e1c\u57ce\u533a\u4f4f\u5efa\u59d4",
+        "\u897f\u57ce\u533a\u4f4f\u5efa\u59d4",
+        "\u671d\u9633\u533a\u4f4f\u5efa\u59d4",
+        "\u6d77\u6dc0\u533a\u4f4f\u5efa\u59d4",
+        "\u4e30\u53f0\u533a\u4f4f\u5efa\u59d4",
+        "\u77f3\u666f\u5c71\u533a\u4f4f\u5efa\u59d4",
+        "\u95e8\u5934\u6c9f\u533a\u4f4f\u5efa\u59d4",
+        "\u623f\u5c71\u533a\u4f4f\u5efa\u59d4",
+        "\u901a\u5dde\u533a\u4f4f\u5efa\u59d4",
+        "\u987a\u4e49\u533a\u4f4f\u5efa\u59d4",
+        "\u660c\u5e73\u533a\u4f4f\u5efa\u59d4",
+        "\u5927\u5174\u533a\u4f4f\u5efa\u59d4",
+        "\u6000\u67d4\u533a\u4f4f\u5efa\u59d4",
+        "\u5e73\u8c37\u533a\u4f4f\u5efa\u59d4",
+        "\u5bc6\u4e91\u533a\u4f4f\u5efa\u59d4",
+        "\u5ef6\u5e86\u533a\u4f4f\u5efa\u59d4",
+        "\u5317\u4eac\u7ecf\u6d4e\u6280\u672f\u5f00\u53d1\u533a\u5efa\u8bbe\u5c40"
+      ]
     };
 
     function setText(id, value) {
@@ -1422,12 +1586,14 @@
 
       document.getElementById("enterpriseName").placeholder = "\u8f93\u5165\u4f01\u4e1a\u540d\u79f0\u5173\u952e\u5b57";
       document.getElementById("certificateNo").placeholder = "\u8f93\u5165\u8bc1\u4e66\u7f16\u53f7";
+      elements.qualificationSeriesTrigger.textContent = textMap.qualificationTypeAllOption;
       elements.certificateTypeTrigger.textContent = textMap.certificateTypePlaceholder;
     const heroChips = document.getElementById("heroChips");
     heroChips.innerHTML = `
       <span class="hero-chip">名录查询口径：基础信息 + 证书 + 资质</span>
       <span class="hero-chip">证书类型支持多选</span>
       <span class="hero-chip">过期时间自动标红</span>
+      <a class="hero-chip" href="matter-analysis.html">事项环节分析</a>
     `;
     }
 
@@ -1446,8 +1612,36 @@
       updateCertificateTypeTriggerText();
     }
 
+    function fillQualificationSeriesOptions(values) {
+      elements.qualificationSeriesPanel.innerHTML = `
+        <input class="multi-select-search" id="qualificationSeriesSearch" type="text" placeholder="输入关键字筛选资质序列">
+        <div class="multi-select-options" id="qualificationSeriesOptions">
+          ${values.map((value) => `
+            <label class="multi-select-option">
+              <input type="checkbox" name="qualificationSeries" value="${value}">
+              <span>${value}</span>
+            </label>
+          `).join("")}
+        </div>
+        <div class="multi-select-empty" id="qualificationSeriesEmpty">\u6ca1\u6709\u5339\u914d\u7684\u8d44\u8d28\u5e8f\u5217</div>
+      `;
+      const searchInput = document.getElementById("qualificationSeriesSearch");
+      if (searchInput) {
+        searchInput.addEventListener("input", (event) => {
+          if (event.target instanceof HTMLInputElement) {
+            filterQualificationSeriesOptions(event.target.value);
+          }
+        });
+      }
+      updateQualificationSeriesTriggerText();
+    }
+
     function getSelectedCertificateTypes() {
       return Array.from(elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]:checked')).map((input) => input.value);
+    }
+
+    function getSelectedQualificationSeries() {
+      return Array.from(elements.qualificationSeriesPanel.querySelectorAll('input[name="qualificationSeries"]:checked')).map((input) => input.value);
     }
 
     function updateCertificateTypeTriggerText() {
@@ -1461,6 +1655,68 @@
       const triggerText = selected.length <= 2 ? selected.join("、") : `\u5df2\u9009 ${selected.length} \u9879`;
       elements.certificateTypeTrigger.textContent = triggerText;
       elements.certificateTypeTrigger.title = selected.join("、");
+    }
+
+    function updateQualificationSeriesTriggerText() {
+      const selected = getSelectedQualificationSeries();
+      if (!selected.length) {
+        elements.qualificationSeriesTrigger.textContent = textMap.qualificationTypeAllOption;
+        elements.qualificationSeriesTrigger.title = textMap.qualificationTypeAllOption;
+        return;
+      }
+
+      const triggerText = selected.length <= 2 ? selected.join("、") : `\u5df2\u9009 ${selected.length} \u9879`;
+      elements.qualificationSeriesTrigger.textContent = triggerText;
+      elements.qualificationSeriesTrigger.title = selected.join("、");
+    }
+
+    function normalizeQualificationSeries(name) {
+      if ((name || "").includes("\u623f\u5c4b\u5efa\u7b51")) return "\u5efa\u7b51\u5de5\u7a0b";
+      if ((name || "").includes("\u5e02\u653f\u516c\u7528")) return "\u5e02\u653f\u5de5\u7a0b";
+      if ((name || "").includes("\u7535\u5b50") || (name || "").includes("\u667a\u80fd\u5316")) return "\u7535\u5b50\u667a\u80fd\u5316";
+      if ((name || "").includes("\u516c\u8def")) return "\u516c\u8def\u5de5\u7a0b";
+      return name || "";
+    }
+
+    function normalizeQualificationGrade(grade) {
+      if (grade === "\u4e09\u7ea7") return "\u53c1\u7ea7";
+      return grade || "";
+    }
+
+    function getAuthorityCategory(department) {
+      if (authorityDepartmentGroups["\u592e\u4f01\u5e02\u5c5e"].includes(department)) return "\u592e\u4f01\u5e02\u5c5e";
+      if (authorityDepartmentGroups["\u533a\u53bf\u5efa\u59d4"].includes(department)) return "\u533a\u53bf\u5efa\u59d4";
+      return "";
+    }
+
+    function updateAuthorityDepartmentOptions(category, preserveValue = false) {
+      const currentValue = preserveValue ? elements.authorityDepartment.value : "";
+      elements.authorityDepartment.innerHTML = `<option value="">${textMap.authorityDepartmentAllOption}</option>`;
+      const values = category
+        ? authorityDepartmentGroups[category]
+        : [...authorityDepartmentGroups["\u592e\u4f01\u5e02\u5c5e"], ...authorityDepartmentGroups["\u533a\u53bf\u5efa\u59d4"]];
+      fillOptions(elements.authorityDepartment, values);
+      if (preserveValue && values.includes(currentValue)) {
+        elements.authorityDepartment.value = currentValue;
+      }
+    }
+
+    function filterQualificationSeriesOptions(keyword) {
+      const normalizedKeyword = (keyword || "").trim().toLowerCase();
+      const options = Array.from(elements.qualificationSeriesPanel.querySelectorAll(".multi-select-option"));
+      let matchedCount = 0;
+
+      options.forEach((option) => {
+        const text = option.textContent.toLowerCase();
+        const visible = !normalizedKeyword || text.includes(normalizedKeyword);
+        option.style.display = visible ? "grid" : "none";
+        if (visible) matchedCount += 1;
+      });
+
+      const emptyState = document.getElementById("qualificationSeriesEmpty");
+      if (emptyState) {
+        emptyState.style.display = matchedCount ? "none" : "block";
+      }
     }
 
     function toDate(value) {
@@ -1643,10 +1899,13 @@
       return {
         enterpriseName: (formData.get("enterpriseName") || "").trim().toLowerCase(),
         district: formData.get("district"),
-        qualificationType: formData.get("qualificationType"),
+        qualificationSeries: getSelectedQualificationSeries(),
         qualificationGrade: formData.get("qualificationGrade"),
         certificateTypes: getSelectedCertificateTypes(),
         certificateNo: (formData.get("certificateNo") || "").trim().toLowerCase(),
+        certificateMark: formData.get("certificateMark"),
+        authorityCategory: formData.get("authorityCategory"),
+        authorityDepartment: formData.get("authorityDepartment"),
         validFrom: formData.get("validFrom"),
         validTo: formData.get("validTo"),
         validityStatus: formData.get("validityStatus")
@@ -1665,11 +1924,13 @@
             certificateType: certificate.certificateType,
             certificateName: certificate.certificateName,
             certificateNo: certificate.certificateNo,
+            certificateMark: certificate.certificateMark || "",
             validityMode: certificate.validityMode,
             certificateValidTo: certificate.certificateValidTo || "",
             qualificationType: qualification.qualificationType,
-            qualificationName: qualification.qualificationName,
-            qualificationGrade: qualification.qualificationGrade,
+            qualificationName: normalizeQualificationSeries(qualification.qualificationName),
+            qualificationGrade: normalizeQualificationGrade(qualification.qualificationGrade),
+            authorityDepartment: qualification.authorityDepartment || "",
             qualificationValidTo: qualification.qualificationValidTo || "",
             effectiveValidTo: certificate.validityMode === "certificate" ? (certificate.certificateValidTo || "") : (qualification.qualificationValidTo || ""),
             validityStatus: qualification.validityStatus || certificate.validityStatus || ""
@@ -1688,10 +1949,13 @@
         const currentValidTo = toDate(item.effectiveValidTo);
         if (filters.enterpriseName && !item.name.toLowerCase().includes(filters.enterpriseName)) return false;
         if (filters.district && item.district !== filters.district) return false;
-        if (filters.qualificationType && item.qualificationType !== filters.qualificationType) return false;
+        if (filters.qualificationSeries.length && !filters.qualificationSeries.includes(item.qualificationName)) return false;
         if (filters.qualificationGrade && item.qualificationGrade !== filters.qualificationGrade) return false;
         if (filters.certificateTypes.length && !filters.certificateTypes.includes(item.certificateType)) return false;
         if (filters.certificateNo && !item.certificateNo.toLowerCase().includes(filters.certificateNo)) return false;
+        if (filters.certificateMark && item.certificateMark !== filters.certificateMark) return false;
+        if (filters.authorityCategory && getAuthorityCategory(item.authorityDepartment) !== filters.authorityCategory) return false;
+        if (filters.authorityDepartment && item.authorityDepartment !== filters.authorityDepartment) return false;
         if (filters.validityStatus && item.validityStatus !== filters.validityStatus) return false;
         if (validFrom && currentValidTo < validFrom) return false;
         if (validTo && currentValidTo > validTo) return false;
@@ -1701,7 +1965,7 @@
 
     function renderEnterpriseTable(records) {
       if (!records.length) {
-        elements.enterpriseTableBody.innerHTML = buildEmptyRow(10, textMap.noEnterpriseData);
+        elements.enterpriseTableBody.innerHTML = buildEmptyRow(12, textMap.noEnterpriseData);
         updateEnterprisePagination(0);
         return;
       }
@@ -1713,6 +1977,14 @@
         if (status === "\u5373\u5c06\u5230\u671f") return "status-badge status-soon";
         if (status === "\u5df2\u8fc7\u671f") return "status-badge status-expired";
         return "status-badge status-valid";
+      };
+
+      const getCertificateMarkClass = (mark) => {
+        if (mark === "\u5f02\u5e38") return "certificate-mark-badge certificate-mark-abnormal";
+        if (mark === "\u6682\u6263") return "certificate-mark-badge certificate-mark-suspended";
+        if (mark === "\u5dee\u522b\u76d1\u7ba1") return "certificate-mark-badge certificate-mark-differential";
+        if (mark === "\u5176\u4ed6") return "certificate-mark-badge certificate-mark-other";
+        return "certificate-mark-badge certificate-mark-normal";
       };
 
       const grouped = [];
@@ -1736,6 +2008,7 @@
             certificateType: item.certificateType,
             certificateName: item.certificateName,
             certificateNo: item.certificateNo,
+            certificateMark: item.certificateMark,
             certificateLegalPerson: item.certificateLegalPerson,
             validityMode: item.validityMode,
             certificateValidTo: item.certificateValidTo,
@@ -1748,6 +2021,7 @@
           qualificationName: item.qualificationName,
           qualificationType: item.qualificationType,
           qualificationGrade: item.qualificationGrade,
+          authorityDepartment: item.authorityDepartment,
           qualificationValidTo: item.qualificationValidTo,
           effectiveValidTo: item.effectiveValidTo,
           certificateLegalPerson: item.certificateLegalPerson,
@@ -1812,11 +2086,19 @@
                     <strong>${certificateGroup.certificateNo}</strong>
                   </div>
                 </td>
+                <td class="group-cell certificate-mark-cell" rowspan="${certificateRowspan}">
+                  <span class="${getCertificateMarkClass(certificateGroup.certificateMark)}">${certificateGroup.certificateMark || "\u2014"}</span>
+                </td>
               `);
               certificatePrinted = true;
             }
 
             cells.push(`
+              <td>
+                <div class="qualification-stack">
+                  <strong>${qualification.authorityDepartment || "\u2014"}</strong>
+                </div>
+              </td>
               <td>
                 <div class="qualification-stack">
                   <strong>${qualification.qualificationName}${qualification.qualificationGrade}</strong>
@@ -1859,6 +2141,8 @@
           item.legalPerson || "",
           item.district,
           item.certificateNo,
+          item.certificateMark || "",
+          item.authorityDepartment || "",
           item.qualificationType,
           `${item.qualificationName}${item.qualificationGrade}`,
           item.effectiveValidTo || "",
@@ -1879,6 +2163,8 @@
         textMap.enterpriseHeadBusinessLegalPerson,
         textMap.enterpriseHeadDistrict,
         textMap.enterpriseHeadCertificateNo,
+        textMap.enterpriseHeadCertificateMark,
+        textMap.enterpriseHeadAuthorityDepartment,
         textMap.labelQualificationType,
         textMap.enterpriseHeadQualificationSeries,
         textMap.enterpriseHeadValidityDate,
@@ -1916,8 +2202,10 @@
     function initializeFilters() {
       const flattened = flattenEnterpriseDirectory();
       fillOptions(elements.district, [...new Set(flattened.map((item) => item.district))]);
-      fillOptions(elements.qualificationType, [...new Set(flattened.map((item) => item.qualificationType))]);
-      fillOptions(elements.qualificationGrade, [...new Set(flattened.map((item) => item.qualificationGrade))]);
+      fillQualificationSeriesOptions(["建筑工程", "市政工程", "电子智能化", "公路工程"]);
+      fillOptions(elements.qualificationGrade, ["甲级", "乙级", "丙级", "壹级", "贰级", "叁级", "不分等级"]);
+      fillOptions(elements.certificateMark, ["正常", "异常", "暂扣", "其他", "差别监管"]);
+      updateAuthorityDepartmentOptions("", false);
       fillCertificateTypeOptions([...new Set(flattened.map((item) => item.certificateType))]);
     }
 
@@ -1929,11 +2217,22 @@
 
     elements.enterpriseResetBtn.addEventListener("click", () => {
       elements.enterpriseFilterForm.reset();
+      elements.qualificationSeriesPanel.querySelectorAll('input[name="qualificationSeries"]').forEach((input) => {
+        input.checked = false;
+      });
       elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]').forEach((input) => {
         input.checked = false;
       });
+      elements.qualificationSeriesPanel.classList.remove("is-open");
       elements.certificateTypePanel.classList.remove("is-open");
+      const qualificationSeriesSearch = document.getElementById("qualificationSeriesSearch");
+      if (qualificationSeriesSearch instanceof HTMLInputElement) {
+        qualificationSeriesSearch.value = "";
+      }
+      filterQualificationSeriesOptions("");
+      updateQualificationSeriesTriggerText();
       updateCertificateTypeTriggerText();
+      updateAuthorityDepartmentOptions("", false);
       paginationState.enterprisePage = 1;
       renderEnterpriseSection();
     });
@@ -1953,6 +2252,26 @@
       renderEnterpriseSection();
     });
 
+    elements.authorityCategory.addEventListener("change", () => {
+      updateAuthorityDepartmentOptions(elements.authorityCategory.value, false);
+    });
+
+    elements.qualificationSeriesTrigger.addEventListener("click", () => {
+      elements.qualificationSeriesPanel.classList.toggle("is-open");
+      if (elements.qualificationSeriesPanel.classList.contains("is-open")) {
+        const qualificationSeriesSearch = document.getElementById("qualificationSeriesSearch");
+        if (qualificationSeriesSearch instanceof HTMLInputElement) {
+          qualificationSeriesSearch.focus();
+        }
+      }
+    });
+
+    elements.qualificationSeriesPanel.addEventListener("change", (event) => {
+      if (event.target instanceof HTMLInputElement) {
+        updateQualificationSeriesTriggerText();
+      }
+    });
+
     elements.certificateTypeTrigger.addEventListener("click", () => {
       elements.certificateTypePanel.classList.toggle("is-open");
     });
@@ -1966,6 +2285,10 @@
     document.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Node)) return;
+      const qualificationWrap = elements.qualificationSeriesTrigger.closest(".multi-select-wrap");
+      if (qualificationWrap && !qualificationWrap.contains(target)) {
+        elements.qualificationSeriesPanel.classList.remove("is-open");
+      }
       const wrap = elements.certificateTypeTrigger.closest(".multi-select-wrap");
       if (wrap && !wrap.contains(target)) {
         elements.certificateTypePanel.classList.remove("is-open");
