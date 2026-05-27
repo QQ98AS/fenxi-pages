@@ -497,7 +497,7 @@
   <div class="page-shell">
     <header class="hero">
       <h1>建筑行业事项环节分析</h1>
-      <p>按办结时间汇总建筑行业事项在受理、审核、决定、专业局审批四个环节的办理量，支持按事项与区域组合筛选，并导出当前统计结果，用于快速识别高频事项、关键区域和负荷最重的处理环节。</p>
+      <p>按办结时间汇总建筑行业事项在受理、审核、决定、专业局审批四个环节的办理量，支持按事项与审批机构组合筛选，并导出当前统计结果，用于快速识别高频事项、重点审批机构和负荷最重的处理环节。</p>
       <div class="hero-chips">
         <span class="hero-chip">办结时间筛选</span>
         <span class="hero-chip">结果导出</span>
@@ -520,20 +520,6 @@
             <input id="issueEndDate" name="issueEndDate" type="date">
           </div>
           <div class="field" style="grid-column: span 1;">
-            <label for="issueDimension">分析维度</label>
-            <select id="issueDimension" name="issueDimension">
-              <option value="case">按办件</option>
-              <option value="district">按区县</option>
-              <option value="sector">按板块</option>
-            </select>
-          </div>
-          <div class="field" style="grid-column: span 2;">
-            <label for="issueRegion">办理区域</label>
-            <select id="issueRegion" name="issueRegion">
-              <option value="">全部区域</option>
-            </select>
-          </div>
-          <div class="field" style="grid-column: span 1;">
             <label for="issueSector">板块</label>
             <select id="issueSector" name="issueSector">
               <option value="">全部板块</option>
@@ -548,6 +534,12 @@
               <input id="issueMatter" name="issueMatter" type="text" placeholder="输入关键字后选择事项">
               <div class="suggestion-panel" id="issueMatterSuggestion" hidden></div>
             </div>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="issueRegion">审批机构</label>
+            <select id="issueRegion" name="issueRegion">
+              <option value="">全部审批机构</option>
+            </select>
           </div>
           <div class="field-actions" style="grid-column: span 3;">
             <button class="btn-primary" type="submit">执行统计</button>
@@ -572,6 +564,7 @@
             <tr>
               <th>序号</th>
               <th id="dimensionHeader">分析对象</th>
+              <th id="matterHeader" style="display: none;">事项名称</th>
               <th>受理待办/已办</th>
               <th>审核待办/已办</th>
               <th id="inspectionHeader">现场检查待办/已办</th>
@@ -693,16 +686,18 @@
       issueResetBtn: document.getElementById("issueResetBtn"),
       issueMatter: document.getElementById("issueMatter"),
       issueMatterSuggestion: document.getElementById("issueMatterSuggestion"),
-      issueDimension: document.getElementById("issueDimension"),
       issueRegion: document.getElementById("issueRegion"),
       issueSector: document.getElementById("issueSector"),
       tableDescription: document.getElementById("tableDescription"),
       dimensionHeader: document.getElementById("dimensionHeader"),
+      matterHeader: document.getElementById("matterHeader"),
       inspectionHeader: document.getElementById("inspectionHeader"),
       bureauHeader: document.getElementById("bureauHeader"),
       issueTableBody: document.getElementById("issueTableBody"),
       rangeNote: document.getElementById("rangeNote")
     };
+
+    const DEFAULT_DIMENSION = "sector";
 
     function toDate(value) {
       return value ? new Date(`${value}T00:00:00`) : null;
@@ -794,16 +789,25 @@
     const matterOptions = [...new Set(issueRecords.map((record) => record.matter))]
       .sort((a, b) => a.localeCompare(b, "zh-CN"));
 
-    function getMatterSuggestionList(keyword) {
+    function getMatterOptionsBySector(sector) {
+      if (!sector) {
+        return matterOptions;
+      }
+
+      return matterOptions.filter((matter) => getSector({ matter }) === sector);
+    }
+
+    function getMatterSuggestionList(keyword, sector = elements.issueSector.value) {
       const normalizedKeyword = normalizeText(keyword);
+      const scopedOptions = getMatterOptionsBySector(sector);
       const matched = normalizedKeyword
-        ? matterOptions.filter((item) => normalizeText(item).includes(normalizedKeyword))
-        : matterOptions;
+        ? scopedOptions.filter((item) => normalizeText(item).includes(normalizedKeyword))
+        : scopedOptions;
       return matched.slice(0, 12);
     }
 
-    function renderMatterSuggestions(keyword = "") {
-      const matched = getMatterSuggestionList(keyword);
+    function renderMatterSuggestions(keyword = "", sector = elements.issueSector.value) {
+      const matched = getMatterSuggestionList(keyword, sector);
 
       if (!matched.length) {
         elements.issueMatterSuggestion.innerHTML = `<div class="suggestion-empty">没有匹配事项</div>`;
@@ -842,6 +846,14 @@
         elements.issueMatter.value = target.dataset.value;
         closeMatterSuggestions();
       });
+
+      elements.issueSector.addEventListener("change", () => {
+        const availableOptions = getMatterOptionsBySector(elements.issueSector.value);
+        if (elements.issueMatter.value && !availableOptions.includes(elements.issueMatter.value)) {
+          elements.issueMatter.value = "";
+        }
+        renderMatterSuggestions(elements.issueMatter.value, elements.issueSector.value);
+      });
     }
 
     function matchesMatterFilter(recordMatter, filterMatter) {
@@ -872,7 +884,7 @@
     function getDimensionMeta(dimension) {
       const metaMap = {
         case: { label: "按办件", header: "事项名称" },
-        district: { label: "按区县", header: "区县名称" },
+        district: { label: "按审批机构", header: "审批机构" },
         sector: { label: "按板块", header: "板块 / 事项" }
       };
       return metaMap[dimension] || metaMap.case;
@@ -892,7 +904,6 @@
         startDate: formData.get("issueStartDate"),
         endDate: formData.get("issueEndDate"),
         matter: (formData.get("issueMatter") || "").trim(),
-        dimension: formData.get("issueDimension") || "case",
         region: formData.get("issueRegion"),
         sector: formData.get("issueSector")
       };
@@ -1123,10 +1134,12 @@
     function exportIssueResults() {
       const filters = getFilters();
       const filtered = filterIssueRecords();
-      const aggregated = aggregateIssueRecords(filtered, filters.dimension);
+      const aggregated = aggregateIssueRecords(filtered, DEFAULT_DIMENSION);
       const showInspectionColumn = shouldShowInspectionColumn(filters);
       const showBureauColumn = shouldShowBureauColumn(filters);
-      const header = ["序号", getDimensionMeta(filters.dimension).header, "受理待办/已办", "审核待办/已办"];
+      const header = DEFAULT_DIMENSION === "sector"
+        ? ["序号", "板块", "事项名称", "受理待办/已办", "审核待办/已办"]
+        : ["序号", getDimensionMeta(DEFAULT_DIMENSION).header, "受理待办/已办", "审核待办/已办"];
 
       if (showInspectionColumn) {
         header.push("现场检查待办/已办");
@@ -1141,12 +1154,20 @@
       header.push("环节总量待办/已办");
 
       const rows = aggregated.map((item, index) => {
-        const row = [
-          index + 1,
-          item.displayName,
-          `${item.acceptedPending}/${item.acceptedDone}`,
-          `${item.reviewedPending}/${item.reviewedDone}`
-        ];
+        const row = DEFAULT_DIMENSION === "sector"
+          ? [
+              index + 1,
+              item.sector,
+              item.matter,
+              `${item.acceptedPending}/${item.acceptedDone}`,
+              `${item.reviewedPending}/${item.reviewedDone}`
+            ]
+          : [
+              index + 1,
+              item.displayName,
+              `${item.acceptedPending}/${item.acceptedDone}`,
+              `${item.reviewedPending}/${item.reviewedDone}`
+            ];
 
         if (showInspectionColumn) {
           row.push(supportsInspection(item) ? `${item.inspectionPending}/${item.inspectionDone}` : "不适用");
@@ -1184,12 +1205,7 @@
       const inspectionText = showInspectionColumn
         ? "现场检查列仅对安全生产许可证相关事项展示有效数据。"
         : "当前板块不涉及现场检查，表格已隐藏该列。";
-
-      const description = filters.dimension === "district"
-        ? `按区县汇总展示本区全部板块、全部事项在各环节的待办/已办数量。${inspectionText}`
-        : filters.dimension === "sector"
-          ? `按板块展示当前范围内各事项的环节汇总；${filters.sector ? `当前已限定为“${filters.sector}”板块。` : "当前未限定板块，将按事项所属板块分别汇总。"}${inspectionText}`
-          : `按事项汇总展示各环节待办/已办数量，可结合区县、事项关键字筛选查看具体办理情况。${inspectionText}`;
+      const description = `按板块展示当前范围内各事项的环节汇总；${filters.sector ? `当前已限定为“${filters.sector}”板块。` : "当前未限定板块，将按事项所属板块分别汇总。"}${inspectionText}`;
 
       elements.tableDescription.textContent = description;
     }
@@ -1198,12 +1214,14 @@
       const filters = getFilters();
       const showInspectionColumn = shouldShowInspectionColumn(filters);
       const showBureauColumn = shouldShowBureauColumn(filters);
-      elements.dimensionHeader.textContent = getDimensionMeta(dimension).header;
+      const isSectorDimension = dimension === "sector";
+      elements.dimensionHeader.textContent = isSectorDimension ? "板块" : getDimensionMeta(dimension).header;
+      elements.matterHeader.style.display = isSectorDimension ? "" : "none";
       elements.inspectionHeader.style.display = showInspectionColumn ? "" : "none";
       elements.bureauHeader.style.display = showBureauColumn ? "" : "none";
 
       if (!aggregated.length) {
-        const colspan = 6 + (showInspectionColumn ? 1 : 0) + (showBureauColumn ? 1 : 0);
+        const colspan = 6 + (isSectorDimension ? 1 : 0) + (showInspectionColumn ? 1 : 0) + (showBureauColumn ? 1 : 0);
         elements.issueTableBody.innerHTML = buildEmptyRow(colspan, "当前条件下没有事项办理统计结果。");
         return;
       }
@@ -1218,13 +1236,23 @@
               ${formatStagePair(item.bureauPending, item.bureauDone)}
             </td>` : "";
 
-        return `
-          <tr>
-            <td class="center-cell">${index + 1}</td>
+        const objectCells = isSectorDimension
+          ? `
+            <td>${item.sector}</td>
+            <td>
+              ${item.matter}
+              <span class="cell-sub">按环节总量排序第 ${index + 1} 位</span>
+            </td>`
+          : `
             <td>
               ${item.displayName}
               <span class="cell-sub">按环节总量排序第 ${index + 1} 位</span>
-            </td>
+            </td>`;
+
+        return `
+          <tr>
+            <td class="center-cell">${index + 1}</td>
+            ${objectCells}
             <td class="center-cell">
               ${formatStagePair(item.acceptedPending, item.acceptedDone)}
             </td>
@@ -1318,12 +1346,12 @@
     function renderPage() {
       const filters = getFilters();
       const filtered = filterIssueRecords();
-      const aggregated = aggregateIssueRecords(filtered, filters.dimension);
+      const aggregated = aggregateIssueRecords(filtered, DEFAULT_DIMENSION);
       const regionSummary = aggregateRegionRecords(filtered);
 
       renderTableDescription(filters);
-      renderIssueTable(aggregated, filters.dimension);
-      renderRangeNote(filtered, aggregated, regionSummary, filters.dimension);
+      renderIssueTable(aggregated, DEFAULT_DIMENSION);
+      renderRangeNote(filtered, aggregated, regionSummary, DEFAULT_DIMENSION);
     }
 
     function init() {
