@@ -519,13 +519,6 @@
             <label for="issueEndDate">办结结束时间</label>
             <input id="issueEndDate" name="issueEndDate" type="date">
           </div>
-          <div class="field" style="grid-column: span 3;">
-            <label for="issueMatter">事项名称</label>
-            <div class="search-select">
-              <input id="issueMatter" name="issueMatter" type="text" placeholder="输入关键字后选择事项">
-              <div class="suggestion-panel" id="issueMatterSuggestion" hidden></div>
-            </div>
-          </div>
           <div class="field" style="grid-column: span 1;">
             <label for="issueDimension">分析维度</label>
             <select id="issueDimension" name="issueDimension">
@@ -548,6 +541,13 @@
               <option value="安全证板块">安全证</option>
               <option value="监理板块">监理</option>
             </select>
+          </div>
+          <div class="field" style="grid-column: span 3;">
+            <label for="issueMatter">事项名称</label>
+            <div class="search-select">
+              <input id="issueMatter" name="issueMatter" type="text" placeholder="输入关键字后选择事项">
+              <div class="suggestion-panel" id="issueMatterSuggestion" hidden></div>
+            </div>
           </div>
           <div class="field-actions" style="grid-column: span 3;">
             <button class="btn-primary" type="submit">执行统计</button>
@@ -576,7 +576,7 @@
               <th>审核待办/已办</th>
               <th id="inspectionHeader">现场检查待办/已办</th>
               <th>决定待办/已办</th>
-              <th>专业局审批待办/已办</th>
+              <th id="bureauHeader">专业局审批待办/已办</th>
               <th>环节总量待办/已办</th>
             </tr>
           </thead>
@@ -699,6 +699,7 @@
       tableDescription: document.getElementById("tableDescription"),
       dimensionHeader: document.getElementById("dimensionHeader"),
       inspectionHeader: document.getElementById("inspectionHeader"),
+      bureauHeader: document.getElementById("bureauHeader"),
       issueTableBody: document.getElementById("issueTableBody"),
       rangeNote: document.getElementById("rangeNote")
     };
@@ -749,6 +750,18 @@
 
     function getTotal(item) {
       return getAcceptedTotal(item) + getReviewedTotal(item) + getInspectionTotal(item) + getDecidedTotal(item) + getBureauTotal(item);
+    }
+
+    function getStagePendingTotal(item) {
+      return (item.acceptedPending || 0) + (item.reviewedPending || 0) + (item.inspectionPending || 0) + (item.decidedPending || 0);
+    }
+
+    function getStageDoneTotal(item) {
+      return (item.acceptedDone || 0) + (item.reviewedDone || 0) + (item.inspectionDone || 0) + (item.decidedDone || 0);
+    }
+
+    function getStageTotal(item) {
+      return getAcceptedTotal(item) + getReviewedTotal(item) + getInspectionTotal(item) + getDecidedTotal(item);
     }
 
     function supportsInspection(item) {
@@ -869,6 +882,10 @@
       return !["建筑板块", "监理板块"].includes(filters.sector);
     }
 
+    function shouldShowBureauColumn(filters) {
+      return !["监理板块", "安全证板块"].includes(filters.sector);
+    }
+
     function getFilters() {
       const formData = new FormData(elements.issueFilterForm);
       return {
@@ -904,7 +921,7 @@
 
     function compareBySort() {
       return (a, b) => {
-        return getTotal(b) - getTotal(a) || b.recordCount - a.recordCount;
+        return getStageTotal(b) - getStageTotal(a) || b.recordCount - a.recordCount;
       };
     }
 
@@ -1043,7 +1060,7 @@
         }
 
         const bucket = grouped.get(record.region);
-        const total = getTotal(record);
+        const total = getStageTotal(record);
         bucket.recordCount += 1;
         bucket.acceptedPending += record.acceptedPending;
         bucket.acceptedDone += record.acceptedDone;
@@ -1066,7 +1083,7 @@
           const topMatterEntry = [...item.matterTotals.entries()].sort((a, b) => b[1] - a[1])[0];
           return {
             ...item,
-            total: getTotal(item),
+            total: getStageTotal(item),
             topMatter: topMatterEntry ? topMatterEntry[0] : "-"
           };
         })
@@ -1108,13 +1125,20 @@
       const filtered = filterIssueRecords();
       const aggregated = aggregateIssueRecords(filtered, filters.dimension);
       const showInspectionColumn = shouldShowInspectionColumn(filters);
+      const showBureauColumn = shouldShowBureauColumn(filters);
       const header = ["序号", getDimensionMeta(filters.dimension).header, "受理待办/已办", "审核待办/已办"];
 
       if (showInspectionColumn) {
         header.push("现场检查待办/已办");
       }
 
-      header.push("决定待办/已办", "专业局审批待办/已办", "环节总量待办/已办");
+      header.push("决定待办/已办");
+
+      if (showBureauColumn) {
+        header.push("专业局审批待办/已办");
+      }
+
+      header.push("环节总量待办/已办");
 
       const rows = aggregated.map((item, index) => {
         const row = [
@@ -1128,11 +1152,13 @@
           row.push(supportsInspection(item) ? `${item.inspectionPending}/${item.inspectionDone}` : "不适用");
         }
 
-        row.push(
-          `${item.decidedPending}/${item.decidedDone}`,
-          `${item.bureauPending}/${item.bureauDone}`,
-          `${getPendingTotal(item)}/${getDoneTotal(item)}`
-        );
+        row.push(`${item.decidedPending}/${item.decidedDone}`);
+
+        if (showBureauColumn) {
+          row.push(`${item.bureauPending}/${item.bureauDone}`);
+        }
+
+        row.push(`${getStagePendingTotal(item)}/${getStageDoneTotal(item)}`);
 
         return row;
       });
@@ -1171,11 +1197,14 @@
     function renderIssueTable(aggregated, dimension) {
       const filters = getFilters();
       const showInspectionColumn = shouldShowInspectionColumn(filters);
+      const showBureauColumn = shouldShowBureauColumn(filters);
       elements.dimensionHeader.textContent = getDimensionMeta(dimension).header;
       elements.inspectionHeader.style.display = showInspectionColumn ? "" : "none";
+      elements.bureauHeader.style.display = showBureauColumn ? "" : "none";
 
       if (!aggregated.length) {
-        elements.issueTableBody.innerHTML = buildEmptyRow(showInspectionColumn ? 8 : 7, "当前条件下没有事项办理统计结果。");
+        const colspan = 6 + (showInspectionColumn ? 1 : 0) + (showBureauColumn ? 1 : 0);
+        elements.issueTableBody.innerHTML = buildEmptyRow(colspan, "当前条件下没有事项办理统计结果。");
         return;
       }
 
@@ -1183,6 +1212,10 @@
         const inspectionCell = showInspectionColumn ? `
             <td class="center-cell">
               ${formatStagePair(item.inspectionPending, item.inspectionDone, supportsInspection(item))}
+            </td>` : "";
+        const bureauCell = showBureauColumn ? `
+            <td class="center-cell">
+              ${formatStagePair(item.bureauPending, item.bureauDone)}
             </td>` : "";
 
         return `
@@ -1202,11 +1235,9 @@
             <td class="center-cell">
               ${formatStagePair(item.decidedPending, item.decidedDone)}
             </td>
+            ${bureauCell}
             <td class="center-cell">
-              ${formatStagePair(item.bureauPending, item.bureauDone)}
-            </td>
-            <td class="center-cell">
-              ${formatStagePair(getPendingTotal(item), getDoneTotal(item), true, "总待办/总已办")}
+              ${formatStagePair(getStagePendingTotal(item), getStageDoneTotal(item), true, "总待办/总已办")}
             </td>
           </tr>
         `;
@@ -1242,6 +1273,10 @@
             <td class="center-cell">
               ${formatStagePair(totals.inspectionPending, totals.inspectionDone)}
             </td>` : "";
+        const totalBureauCell = showBureauColumn ? `
+            <td class="center-cell">
+              ${formatStagePair(totals.bureauPending, totals.bureauDone)}
+            </td>` : "";
 
         rows.push(`
           <tr>
@@ -1260,13 +1295,11 @@
             <td class="center-cell">
               ${formatStagePair(totals.decidedPending, totals.decidedDone)}
             </td>
-            <td class="center-cell">
-              ${formatStagePair(totals.bureauPending, totals.bureauDone)}
-            </td>
+            ${totalBureauCell}
             <td class="center-cell">
               ${formatStagePair(
-                totals.acceptedPending + totals.reviewedPending + totals.inspectionPending + totals.decidedPending + totals.bureauPending,
-                totals.acceptedDone + totals.reviewedDone + totals.inspectionDone + totals.decidedDone + totals.bureauDone,
+                totals.acceptedPending + totals.reviewedPending + totals.inspectionPending + totals.decidedPending,
+                totals.acceptedDone + totals.reviewedDone + totals.inspectionDone + totals.decidedDone,
                 true,
                 "总待办/总已办"
               )}
