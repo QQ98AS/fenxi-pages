@@ -1072,10 +1072,11 @@
             </div>
           </div>
           <div class="field field-compact" style="grid-column: span 2;">
-            <label for="qualificationGrade" id="labelQualificationGrade"></label>
-            <select id="qualificationGrade" name="qualificationGrade">
-              <option value="" id="qualificationGradeAllOption"></option>
-            </select>
+            <label id="labelQualificationGrade"></label>
+            <div class="multi-select-wrap">
+              <button class="multi-select-trigger" type="button" id="qualificationGradeTrigger"></button>
+              <div class="multi-select-panel" id="qualificationGradePanel"></div>
+            </div>
           </div>
           <div class="field field-compact" style="grid-column: span 3;">
             <label id="labelCertificateType"></label>
@@ -1518,7 +1519,8 @@
       district: document.getElementById("district"),
       qualificationSeriesTrigger: document.getElementById("qualificationSeriesTrigger"),
       qualificationSeriesPanel: document.getElementById("qualificationSeriesPanel"),
-      qualificationGrade: document.getElementById("qualificationGrade"),
+      qualificationGradeTrigger: document.getElementById("qualificationGradeTrigger"),
+      qualificationGradePanel: document.getElementById("qualificationGradePanel"),
       certificateMark: document.getElementById("certificateMark"),
       authorityCategory: document.getElementById("authorityCategory"),
       authorityDepartment: document.getElementById("authorityDepartment"),
@@ -1587,6 +1589,7 @@
       document.getElementById("enterpriseName").placeholder = "\u8f93\u5165\u4f01\u4e1a\u540d\u79f0\u5173\u952e\u5b57";
       document.getElementById("certificateNo").placeholder = "\u8f93\u5165\u8bc1\u4e66\u7f16\u53f7";
       elements.qualificationSeriesTrigger.textContent = textMap.qualificationTypeAllOption;
+      elements.qualificationGradeTrigger.textContent = textMap.qualificationGradeAllOption;
       elements.certificateTypeTrigger.textContent = textMap.certificateTypePlaceholder;
     const heroChips = document.getElementById("heroChips");
     heroChips.innerHTML = `
@@ -1636,12 +1639,26 @@
       updateQualificationSeriesTriggerText();
     }
 
+    function fillQualificationGradeOptions(values) {
+      elements.qualificationGradePanel.innerHTML = values.map((value) => `
+        <label class="multi-select-option">
+          <input type="checkbox" name="qualificationGrade" value="${value}">
+          <span>${value}</span>
+        </label>
+      `).join("");
+      updateQualificationGradeTriggerText();
+    }
+
     function getSelectedCertificateTypes() {
       return Array.from(elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]:checked')).map((input) => input.value);
     }
 
     function getSelectedQualificationSeries() {
       return Array.from(elements.qualificationSeriesPanel.querySelectorAll('input[name="qualificationSeries"]:checked')).map((input) => input.value);
+    }
+
+    function getSelectedQualificationGrades() {
+      return Array.from(elements.qualificationGradePanel.querySelectorAll('input[name="qualificationGrade"]:checked')).map((input) => input.value);
     }
 
     function updateCertificateTypeTriggerText() {
@@ -1668,6 +1685,19 @@
       const triggerText = selected.length <= 2 ? selected.join("、") : `\u5df2\u9009 ${selected.length} \u9879`;
       elements.qualificationSeriesTrigger.textContent = triggerText;
       elements.qualificationSeriesTrigger.title = selected.join("、");
+    }
+
+    function updateQualificationGradeTriggerText() {
+      const selected = getSelectedQualificationGrades();
+      if (!selected.length) {
+        elements.qualificationGradeTrigger.textContent = textMap.qualificationGradeAllOption;
+        elements.qualificationGradeTrigger.title = textMap.qualificationGradeAllOption;
+        return;
+      }
+
+      const triggerText = selected.length <= 2 ? selected.join("、") : `\u5df2\u9009 ${selected.length} \u9879`;
+      elements.qualificationGradeTrigger.textContent = triggerText;
+      elements.qualificationGradeTrigger.title = selected.join("、");
     }
 
     function normalizeQualificationSeries(name) {
@@ -1900,7 +1930,7 @@
         enterpriseName: (formData.get("enterpriseName") || "").trim().toLowerCase(),
         district: formData.get("district"),
         qualificationSeries: getSelectedQualificationSeries(),
-        qualificationGrade: formData.get("qualificationGrade"),
+        qualificationGrades: getSelectedQualificationGrades(),
         certificateTypes: getSelectedCertificateTypes(),
         certificateNo: (formData.get("certificateNo") || "").trim().toLowerCase(),
         certificateMark: formData.get("certificateMark"),
@@ -1950,7 +1980,7 @@
         if (filters.enterpriseName && !item.name.toLowerCase().includes(filters.enterpriseName)) return false;
         if (filters.district && item.district !== filters.district) return false;
         if (filters.qualificationSeries.length && !filters.qualificationSeries.includes(item.qualificationName)) return false;
-        if (filters.qualificationGrade && item.qualificationGrade !== filters.qualificationGrade) return false;
+        if (filters.qualificationGrades.length && !filters.qualificationGrades.includes(item.qualificationGrade)) return false;
         if (filters.certificateTypes.length && !filters.certificateTypes.includes(item.certificateType)) return false;
         if (filters.certificateNo && !item.certificateNo.toLowerCase().includes(filters.certificateNo)) return false;
         if (filters.certificateMark && item.certificateMark !== filters.certificateMark) return false;
@@ -2203,7 +2233,7 @@
       const flattened = flattenEnterpriseDirectory();
       fillOptions(elements.district, [...new Set(flattened.map((item) => item.district))]);
       fillQualificationSeriesOptions(["建筑工程", "市政工程", "电子智能化", "公路工程"]);
-      fillOptions(elements.qualificationGrade, ["甲级", "乙级", "丙级", "壹级", "贰级", "叁级", "不分等级"]);
+      fillQualificationGradeOptions(["甲级", "乙级", "丙级", "壹级", "贰级", "叁级", "不分等级"]);
       fillOptions(elements.certificateMark, ["正常", "异常", "暂扣", "其他", "差别监管"]);
       updateAuthorityDepartmentOptions("", false);
       fillCertificateTypeOptions([...new Set(flattened.map((item) => item.certificateType))]);
@@ -2220,10 +2250,14 @@
       elements.qualificationSeriesPanel.querySelectorAll('input[name="qualificationSeries"]').forEach((input) => {
         input.checked = false;
       });
+      elements.qualificationGradePanel.querySelectorAll('input[name="qualificationGrade"]').forEach((input) => {
+        input.checked = false;
+      });
       elements.certificateTypePanel.querySelectorAll('input[name="certificateType"]').forEach((input) => {
         input.checked = false;
       });
       elements.qualificationSeriesPanel.classList.remove("is-open");
+      elements.qualificationGradePanel.classList.remove("is-open");
       elements.certificateTypePanel.classList.remove("is-open");
       const qualificationSeriesSearch = document.getElementById("qualificationSeriesSearch");
       if (qualificationSeriesSearch instanceof HTMLInputElement) {
@@ -2231,6 +2265,7 @@
       }
       filterQualificationSeriesOptions("");
       updateQualificationSeriesTriggerText();
+      updateQualificationGradeTriggerText();
       updateCertificateTypeTriggerText();
       updateAuthorityDepartmentOptions("", false);
       paginationState.enterprisePage = 1;
@@ -2272,6 +2307,16 @@
       }
     });
 
+    elements.qualificationGradeTrigger.addEventListener("click", () => {
+      elements.qualificationGradePanel.classList.toggle("is-open");
+    });
+
+    elements.qualificationGradePanel.addEventListener("change", (event) => {
+      if (event.target instanceof HTMLInputElement) {
+        updateQualificationGradeTriggerText();
+      }
+    });
+
     elements.certificateTypeTrigger.addEventListener("click", () => {
       elements.certificateTypePanel.classList.toggle("is-open");
     });
@@ -2288,6 +2333,10 @@
       const qualificationWrap = elements.qualificationSeriesTrigger.closest(".multi-select-wrap");
       if (qualificationWrap && !qualificationWrap.contains(target)) {
         elements.qualificationSeriesPanel.classList.remove("is-open");
+      }
+      const qualificationGradeWrap = elements.qualificationGradeTrigger.closest(".multi-select-wrap");
+      if (qualificationGradeWrap && !qualificationGradeWrap.contains(target)) {
+        elements.qualificationGradePanel.classList.remove("is-open");
       }
       const wrap = elements.certificateTypeTrigger.closest(".multi-select-wrap");
       if (wrap && !wrap.contains(target)) {
