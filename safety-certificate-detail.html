@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>安全证办事明细</title>
+  <style>
+    :root {
+      --panel: rgba(255, 255, 255, 0.9);
+      --line: rgba(25, 58, 87, 0.1);
+      --text: #1b3147;
+      --muted: #667a8f;
+      --primary: #1685b8;
+      --teal: #1e9b82;
+      --amber: #f19a34;
+      --danger: #df6a49;
+      --shadow: 0 22px 54px rgba(15, 35, 55, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(22, 133, 184, 0.16), transparent 24%),
+        radial-gradient(circle at 100% 16%, rgba(241, 154, 52, 0.12), transparent 20%),
+        linear-gradient(180deg, #f7fafc 0%, #edf2f6 44%, #e7edf3 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(12, 35, 58, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(12, 35, 58, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .page-shell {
+      width: min(1540px, calc(100vw - 28px));
+      margin: 14px auto;
+      padding: 14px;
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 249, 252, 0.94)),
+        rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      inset: -90px auto auto -80px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(22, 133, 184, 0.16), transparent 72%);
+      pointer-events: none;
+    }
+
+    .hero,
+    .section-panel,
+    .panel-card {
+      position: relative;
+      z-index: 1;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero,
+    .section-panel {
+      border-radius: var(--radius-xl);
+      padding: 14px;
+    }
+
+    .hero {
+      margin-bottom: 10px;
+      background:
+        linear-gradient(135deg, rgba(14, 50, 78, 0.98), rgba(10, 113, 151, 0.92) 56%, rgba(18, 148, 126, 0.84));
+      color: #eef8ff;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -90px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #e2f7ff;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(1.48rem, 2.8vw, 2.3rem);
+      line-height: 1.08;
+      letter-spacing: 0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(232, 245, 255, 0.86);
+      font-size: 0.85rem;
+      line-height: 1.58;
+    }
+
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .hero-chip,
+    .hero-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.12);
+      color: #f4fbff;
+      font-size: 0.74rem;
+      text-decoration: none;
+    }
+
+    .hero-link {
+      background: rgba(255, 255, 255, 0.18);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .hero-link:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .section-panel {
+      margin-bottom: 10px;
+      overflow: visible;
+      z-index: 4;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+    }
+
+    .field-actions {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      min-width: 100px;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #1da2dd, #147ca7);
+      box-shadow: 0 12px 20px rgba(22, 133, 184, 0.18);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(25, 58, 87, 0.18);
+    }
+
+    .search-select {
+      position: relative;
+      z-index: 6;
+    }
+
+    .suggestion-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      max-height: 280px;
+      overflow: auto;
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 16px 28px rgba(15, 35, 55, 0.12);
+    }
+
+    .suggestion-panel[hidden] {
+      display: none;
+    }
+
+    .suggestion-item,
+    .suggestion-empty {
+      width: 100%;
+      min-height: 36px;
+      padding: 8px 10px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .suggestion-item:hover {
+      background: rgba(22, 133, 184, 0.08);
+    }
+
+    .suggestion-empty {
+      color: var(--muted);
+      cursor: default;
+    }
+
+    .panel-card {
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .panel-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .panel-card h3 {
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .panel-card p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 18px;
+      border: 1px solid rgba(25, 58, 87, 0.08);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    table {
+      width: 100%;
+      min-width: 1900px;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 0.8rem;
+      color: #34536d;
+      background: rgba(238, 245, 249, 0.98);
+      border-bottom: 1px solid rgba(25, 58, 87, 0.1);
+      white-space: nowrap;
+    }
+
+    thead tr:first-child th {
+      top: 0;
+    }
+
+    thead tr:nth-child(2) th {
+      top: 45px;
+      z-index: 2;
+      background: rgba(246, 250, 252, 0.98);
+    }
+
+    tbody td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(25, 58, 87, 0.08);
+      font-size: 0.8rem;
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(22, 133, 184, 0.04);
+    }
+
+    .center-cell {
+      text-align: center;
+    }
+
+    .cell-sub {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-done {
+      background: rgba(30, 155, 130, 0.12);
+      color: var(--teal);
+    }
+
+    .status-processing {
+      background: rgba(22, 133, 184, 0.12);
+      color: var(--primary);
+    }
+
+    .status-warning {
+      background: rgba(241, 154, 52, 0.14);
+      color: #c97814;
+    }
+
+    .status-danger {
+      background: rgba(223, 106, 73, 0.14);
+      color: var(--danger);
+    }
+
+    .empty-state {
+      padding: 28px 18px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 960px) {
+      .filter-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      .field-actions {
+        grid-column: span 6 !important;
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        width: min(100vw - 16px, 100%);
+        margin: 8px auto;
+        padding: 10px;
+        border-radius: 22px;
+      }
+
+      .hero,
+      .section-panel {
+        padding: 12px;
+      }
+
+      .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .field,
+      .field-actions {
+        grid-column: span 2 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <span class="hero-tag">Safety Detail</span>
+      <h1>安全证办事明细</h1>
+      <p>按企业维度展示安全生产许可证事项的办件明细，覆盖受理、审核、现场检查、决定四个环节的审批人、审批时间与审批结果，支持按企业、事项、审批机构和状态筛选并导出当前结果。</p>
+      <div class="hero-chips">
+        <span class="hero-chip">企业办件明细</span>
+        <span class="hero-chip">环节审批轨迹</span>
+        <span class="hero-chip">当前结果导出</span>
+      </div>
+      <div class="hero-chips">
+        <a class="hero-link" href="index.html">返回分析首页</a>
+        <a class="hero-link" href="matter-analysis.html">返回事项分析</a>
+      </div>
+    </header>
+
+    <section class="section-panel">
+      <form id="detailFilterForm">
+        <div class="filter-grid">
+          <div class="field" style="grid-column: span 2;">
+            <label for="startDate">申报开始时间</label>
+            <input id="startDate" name="startDate" type="date">
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="endDate">申报结束时间</label>
+            <input id="endDate" name="endDate" type="date">
+          </div>
+          <div class="field" style="grid-column: span 3;">
+            <label for="companyName">企业名称</label>
+            <div class="search-select">
+              <input id="companyName" name="companyName" type="text" placeholder="输入企业关键字后选择">
+              <div class="suggestion-panel" id="companySuggestion" hidden></div>
+            </div>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="matterName">事项名称</label>
+            <select id="matterName" name="matterName">
+              <option value="">全部事项</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="agencyName">审批机构</label>
+            <select id="agencyName" name="agencyName">
+              <option value="">全部审批机构</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: span 1;">
+            <label for="statusName">办理状态</label>
+            <select id="statusName" name="statusName">
+              <option value="">全部状态</option>
+            </select>
+          </div>
+          <div class="field-actions" style="grid-column: span 4;">
+            <button class="btn-primary" type="submit">执行统计</button>
+            <button class="btn-secondary" type="button" id="exportBtn">导出结果</button>
+            <button class="btn-secondary" type="button" id="resetBtn">重置条件</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel-card">
+      <div class="panel-card-head">
+        <div>
+          <h3>安全证企业办件明细</h3>
+          <p>表格按企业逐条展示安全生产许可证事项的审批轨迹。每个环节均包含审批人、审批时间与审批结果，适合导出后继续按企业、事项或审批机构筛选。</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">序号</th>
+              <th rowspan="2">企业名称</th>
+              <th rowspan="2">事项名称</th>
+              <th rowspan="2">审批机构</th>
+              <th rowspan="2">申报时间</th>
+              <th colspan="3">受理</th>
+              <th colspan="3">审核</th>
+              <th colspan="3">现场检查</th>
+              <th colspan="3">决定</th>
+              <th rowspan="2">当前状态</th>
+            </tr>
+            <tr>
+              <th>审批人</th>
+              <th>审批时间</th>
+              <th>审批结果</th>
+              <th>审批人</th>
+              <th>审批时间</th>
+              <th>审批结果</th>
+              <th>审批人</th>
+              <th>审批时间</th>
+              <th>审批结果</th>
+              <th>审批人</th>
+              <th>审批时间</th>
+              <th>审批结果</th>
+            </tr>
+          </thead>
+          <tbody id="detailTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const detailRecords = [
+      {
+        company: "北京中安建工集团有限公司",
+        matter: "建筑施工企业安全生产许可证首次申请",
+        agency: "市住房城乡建设委",
+        submitDate: "2026-05-05",
+        accepted: { approver: "张楠", time: "2026-05-06 09:18", result: "受理通过" },
+        reviewed: { approver: "韩宇", time: "2026-05-08 14:20", result: "审核通过" },
+        inspection: { approver: "李卓", time: "2026-05-10 10:05", result: "现场检查通过" },
+        decision: { approver: "王捷", time: "2026-05-12 16:32", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京城建安泰工程有限公司",
+        matter: "建筑施工企业安全生产许可证延期需审查",
+        agency: "朝阳区住房城乡建设委",
+        submitDate: "2026-05-07",
+        accepted: { approver: "陈溪", time: "2026-05-07 11:14", result: "受理通过" },
+        reviewed: { approver: "宋辉", time: "2026-05-09 15:46", result: "审核通过" },
+        inspection: { approver: "罗琪", time: "2026-05-14 09:50", result: "现场检查中" },
+        decision: { approver: "", time: "", result: "" },
+        status: "现场检查中"
+      },
+      {
+        company: "北京国盛机电安装有限公司",
+        matter: "建筑施工企业安全生产许可证变更",
+        agency: "海淀区住房城乡建设委",
+        submitDate: "2026-05-08",
+        accepted: { approver: "周倩", time: "2026-05-08 13:21", result: "受理通过" },
+        reviewed: { approver: "高源", time: "2026-05-10 17:03", result: "审核退回补正" },
+        inspection: { approver: "", time: "", result: "" },
+        decision: { approver: "", time: "", result: "" },
+        status: "补正中"
+      },
+      {
+        company: "北京华安路桥建设有限公司",
+        matter: "建筑施工企业安全生产许可证延期不审查",
+        agency: "丰台区住房城乡建设委",
+        submitDate: "2026-05-09",
+        accepted: { approver: "吴双", time: "2026-05-10 09:36", result: "受理通过" },
+        reviewed: { approver: "赵霖", time: "2026-05-11 11:42", result: "审核通过" },
+        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        decision: { approver: "许航", time: "2026-05-13 15:48", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京东岳建筑工程有限公司",
+        matter: "建筑施工企业安全生产许可证重新核定",
+        agency: "通州区住房城乡建设委",
+        submitDate: "2026-05-11",
+        accepted: { approver: "谢雨", time: "2026-05-12 10:15", result: "受理通过" },
+        reviewed: { approver: "蒋晨", time: "2026-05-15 14:27", result: "审核通过" },
+        inspection: { approver: "李卓", time: "2026-05-18 13:05", result: "现场检查通过" },
+        decision: { approver: "王捷", time: "2026-05-20 10:41", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京首安消防工程有限公司",
+        matter: "建筑施工企业安全生产许可证首次申请",
+        agency: "西城区住房城乡建设委",
+        submitDate: "2026-05-12",
+        accepted: { approver: "张楠", time: "2026-05-12 15:09", result: "受理通过" },
+        reviewed: { approver: "韩宇", time: "2026-05-14 10:22", result: "审核通过" },
+        inspection: { approver: "罗琪", time: "2026-05-19 11:30", result: "现场检查整改后复核" },
+        decision: { approver: "", time: "", result: "" },
+        status: "决定中"
+      },
+      {
+        company: "北京天衡装饰工程有限公司",
+        matter: "建筑施工企业安全生产许可证经济类型变更",
+        agency: "大兴区住房城乡建设委",
+        submitDate: "2026-05-13",
+        accepted: { approver: "陈溪", time: "2026-05-13 16:11", result: "受理通过" },
+        reviewed: { approver: "高源", time: "2026-05-16 09:55", result: "审核通过" },
+        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        decision: { approver: "许航", time: "2026-05-18 14:16", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京远达市政工程有限公司",
+        matter: "建筑施工企业安全生产许可证变更",
+        agency: "昌平区住房城乡建设委",
+        submitDate: "2026-05-15",
+        accepted: { approver: "周倩", time: "2026-05-16 10:08", result: "受理通过" },
+        reviewed: { approver: "宋辉", time: "2026-05-18 15:12", result: "审核通过" },
+        inspection: { approver: "李卓", time: "2026-05-21 09:44", result: "现场检查未通过" },
+        decision: { approver: "王捷", time: "2026-05-23 17:20", result: "不予许可" },
+        status: "已退回"
+      },
+      {
+        company: "北京恒信钢结构有限公司",
+        matter: "建筑施工企业安全生产许可证延期需审查",
+        agency: "石景山区住房城乡建设委",
+        submitDate: "2026-05-16",
+        accepted: { approver: "吴双", time: "2026-05-17 09:42", result: "受理通过" },
+        reviewed: { approver: "赵霖", time: "2026-05-19 13:18", result: "审核中" },
+        inspection: { approver: "", time: "", result: "" },
+        decision: { approver: "", time: "", result: "" },
+        status: "审核中"
+      },
+      {
+        company: "北京中联基础工程有限公司",
+        matter: "建筑施工企业安全生产许可证首次申请",
+        agency: "顺义区住房城乡建设委",
+        submitDate: "2026-05-18",
+        accepted: { approver: "谢雨", time: "2026-05-19 10:33", result: "受理通过" },
+        reviewed: { approver: "韩宇", time: "2026-05-21 14:05", result: "审核通过" },
+        inspection: { approver: "罗琪", time: "2026-05-24 16:21", result: "现场检查通过" },
+        decision: { approver: "许航", time: "2026-05-27 10:58", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京智诚安装集团有限公司",
+        matter: "建筑施工企业安全生产许可证重新核定",
+        agency: "东城区住房城乡建设委",
+        submitDate: "2026-05-19",
+        accepted: { approver: "张楠", time: "2026-05-20 11:16", result: "受理通过" },
+        reviewed: { approver: "蒋晨", time: "2026-05-22 16:24", result: "审核通过" },
+        inspection: { approver: "李卓", time: "2026-05-26 10:17", result: "现场检查通过" },
+        decision: { approver: "", time: "", result: "" },
+        status: "决定中"
+      },
+      {
+        company: "北京建信劳务有限公司",
+        matter: "建筑施工企业安全生产许可证延期不审查",
+        agency: "朝阳区住房城乡建设委",
+        submitDate: "2026-05-21",
+        accepted: { approver: "陈溪", time: "2026-05-21 14:45", result: "受理通过" },
+        reviewed: { approver: "高源", time: "2026-05-22 17:09", result: "审核通过" },
+        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        decision: { approver: "王捷", time: "2026-05-23 11:12", result: "准予许可" },
+        status: "已办结"
+      }
+    ];
+
+    const stageKeys = ["accepted", "reviewed", "inspection", "decision"];
+
+    const elements = {
+      detailFilterForm: document.getElementById("detailFilterForm"),
+      startDate: document.getElementById("startDate"),
+      endDate: document.getElementById("endDate"),
+      companyName: document.getElementById("companyName"),
+      companySuggestion: document.getElementById("companySuggestion"),
+      matterName: document.getElementById("matterName"),
+      agencyName: document.getElementById("agencyName"),
+      statusName: document.getElementById("statusName"),
+      exportBtn: document.getElementById("exportBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      detailTableBody: document.getElementById("detailTableBody")
+    };
+
+    const companyOptions = [...new Set(detailRecords.map((item) => item.company))]
+      .sort((a, b) => a.localeCompare(b, "zh-CN"));
+
+    function normalizeText(value) {
+      return String(value || "")
+        .trim()
+        .replace(/\s+/g, "")
+        .toLowerCase();
+    }
+
+    function normalizeDateKey(value) {
+      return String(value || "").trim();
+    }
+
+    function fillOptions(select, values) {
+      const options = values
+        .sort((a, b) => a.localeCompare(b, "zh-CN"))
+        .map((value) => `<option value="${value}">${value}</option>`)
+        .join("");
+      select.insertAdjacentHTML("beforeend", options);
+    }
+
+    function getFilters() {
+      const formData = new FormData(elements.detailFilterForm);
+      return {
+        startDate: normalizeDateKey(formData.get("startDate")),
+        endDate: normalizeDateKey(formData.get("endDate")),
+        company: String(formData.get("companyName") || "").trim(),
+        matter: formData.get("matterName"),
+        agency: formData.get("agencyName"),
+        status: formData.get("statusName")
+      };
+    }
+
+    function matchesCompanyFilter(company, filterCompany) {
+      if (!filterCompany) return true;
+      const current = normalizeText(company);
+      const target = normalizeText(filterCompany);
+      return current === target || current.includes(target);
+    }
+
+    function filterRecords() {
+      const filters = getFilters();
+      let startDate = filters.startDate;
+      let endDate = filters.endDate;
+
+      if (startDate && endDate && startDate > endDate) {
+        [startDate, endDate] = [endDate, startDate];
+      }
+
+      return detailRecords.filter((record) => {
+        const currentDate = normalizeDateKey(record.submitDate);
+        if (startDate && currentDate < startDate) return false;
+        if (endDate && currentDate > endDate) return false;
+        if (!matchesCompanyFilter(record.company, filters.company)) return false;
+        if (filters.matter && record.matter !== filters.matter) return false;
+        if (filters.agency && record.agency !== filters.agency) return false;
+        if (filters.status && record.status !== filters.status) return false;
+        return true;
+      });
+    }
+
+    function getCompanySuggestionList(keyword) {
+      const normalizedKeyword = normalizeText(keyword);
+      const matched = normalizedKeyword
+        ? companyOptions.filter((item) => normalizeText(item).includes(normalizedKeyword))
+        : companyOptions;
+      return matched.slice(0, 12);
+    }
+
+    function renderCompanySuggestions(keyword = "") {
+      const matched = getCompanySuggestionList(keyword);
+
+      if (!matched.length) {
+        elements.companySuggestion.innerHTML = `<div class="suggestion-empty">没有匹配企业</div>`;
+        elements.companySuggestion.hidden = false;
+        return;
+      }
+
+      elements.companySuggestion.innerHTML = matched
+        .map((item) => `<button class="suggestion-item" type="button" data-value="${item}">${item}</button>`)
+        .join("");
+      elements.companySuggestion.hidden = false;
+    }
+
+    function closeCompanySuggestions() {
+      elements.companySuggestion.hidden = true;
+    }
+
+    function formatStageCell(value) {
+      return value ? value : `<span class="cell-sub">-</span>`;
+    }
+
+    function formatStatusClass(status) {
+      if (status === "已办结") return "status-done";
+      if (status === "补正中" || status === "决定中") return "status-warning";
+      if (status === "已退回") return "status-danger";
+      return "status-processing";
+    }
+
+    function buildEmptyRow() {
+      return `<tr><td colspan="18"><div class="empty-state">当前条件下没有安全证办事明细。</div></td></tr>`;
+    }
+
+    function renderTable(records) {
+      if (!records.length) {
+        elements.detailTableBody.innerHTML = buildEmptyRow();
+        return;
+      }
+
+      elements.detailTableBody.innerHTML = records.map((record, index) => `
+        <tr>
+          <td class="center-cell">${index + 1}</td>
+          <td>
+            ${record.company}
+            <span class="cell-sub">${record.agency}</span>
+          </td>
+          <td>${record.matter}</td>
+          <td>${record.agency}</td>
+          <td class="center-cell">${record.submitDate}</td>
+          <td class="center-cell">${formatStageCell(record.accepted.approver)}</td>
+          <td class="center-cell">${formatStageCell(record.accepted.time)}</td>
+          <td class="center-cell">${formatStageCell(record.accepted.result)}</td>
+          <td class="center-cell">${formatStageCell(record.reviewed.approver)}</td>
+          <td class="center-cell">${formatStageCell(record.reviewed.time)}</td>
+          <td class="center-cell">${formatStageCell(record.reviewed.result)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.approver)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.time)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.result)}</td>
+          <td class="center-cell">${formatStageCell(record.decision.approver)}</td>
+          <td class="center-cell">${formatStageCell(record.decision.time)}</td>
+          <td class="center-cell">${formatStageCell(record.decision.result)}</td>
+          <td class="center-cell"><span class="status-pill ${formatStatusClass(record.status)}">${record.status}</span></td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeCsv(value) {
+      const text = String(value ?? "");
+      return `"${text.replace(/"/g, "\"\"")}"`;
+    }
+
+    function exportResults() {
+      const rows = filterRecords();
+      const header = [
+        "序号", "企业名称", "事项名称", "审批机构", "申报时间",
+        "受理审批人", "受理审批时间", "受理审批结果",
+        "审核审批人", "审核审批时间", "审核审批结果",
+        "现场检查审批人", "现场检查审批时间", "现场检查审批结果",
+        "决定审批人", "决定审批时间", "决定审批结果", "当前状态"
+      ];
+
+      const body = rows.map((item, index) => [
+        index + 1,
+        item.company,
+        item.matter,
+        item.agency,
+        item.submitDate,
+        item.accepted.approver,
+        item.accepted.time,
+        item.accepted.result,
+        item.reviewed.approver,
+        item.reviewed.time,
+        item.reviewed.result,
+        item.inspection.approver,
+        item.inspection.time,
+        item.inspection.result,
+        item.decision.approver,
+        item.decision.time,
+        item.decision.result,
+        item.status
+      ]);
+
+      const csvContent = [header, ...body]
+        .map((row) => row.map((cell) => escapeCsv(cell)).join(","))
+        .join("\r\n");
+
+      const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      const today = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `安全证办事明细-${today}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function renderPage() {
+      renderTable(filterRecords());
+    }
+
+    function initCompanyAutocomplete() {
+      elements.companyName.addEventListener("focus", () => {
+        renderCompanySuggestions(elements.companyName.value);
+      });
+
+      elements.companyName.addEventListener("input", () => {
+        renderCompanySuggestions(elements.companyName.value);
+      });
+
+      elements.companyName.addEventListener("blur", () => {
+        window.setTimeout(() => {
+          closeCompanySuggestions();
+        }, 120);
+      });
+
+      elements.companySuggestion.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-value]");
+        if (!target) return;
+        elements.companyName.value = target.dataset.value;
+        closeCompanySuggestions();
+      });
+    }
+
+    function init() {
+      fillOptions(elements.matterName, [...new Set(detailRecords.map((item) => item.matter))]);
+      fillOptions(elements.agencyName, [...new Set(detailRecords.map((item) => item.agency))]);
+      fillOptions(elements.statusName, [...new Set(detailRecords.map((item) => item.status))]);
+      initCompanyAutocomplete();
+
+      elements.detailFilterForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        renderPage();
+      });
+
+      elements.resetBtn.addEventListener("click", () => {
+        elements.detailFilterForm.reset();
+        renderPage();
+      });
+
+      elements.exportBtn.addEventListener("click", () => {
+        exportResults();
+      });
+
+      renderPage();
+    }
+
+    init();
+  </script>
+</body>
+</html>
