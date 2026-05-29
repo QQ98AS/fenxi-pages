@@ -332,9 +332,10 @@
       padding: 12px 10px;
       text-align: left;
       font-size: 0.8rem;
-      color: #34536d;
-      background: rgba(238, 245, 249, 0.98);
-      border-bottom: 1px solid rgba(25, 58, 87, 0.1);
+      color: #18384e;
+      background: linear-gradient(180deg, rgba(214, 228, 238, 0.99), rgba(227, 237, 244, 0.99));
+      border-bottom: 1px solid rgba(25, 58, 87, 0.14);
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.45);
       white-space: nowrap;
     }
 
@@ -345,12 +346,15 @@
 
     thead tr:first-child th {
       top: 0;
+      background: linear-gradient(180deg, rgba(202, 220, 232, 0.99), rgba(217, 231, 240, 0.99));
+      color: #143248;
     }
 
     thead tr:nth-child(2) th {
       top: 44px;
       z-index: 2;
-      background: rgba(246, 250, 252, 0.98);
+      background: linear-gradient(180deg, rgba(236, 243, 247, 0.99), rgba(244, 248, 251, 0.99));
+      color: #355065;
     }
 
     thead tr:first-child th:nth-child(7),
@@ -380,6 +384,11 @@
       border-bottom: 1px solid rgba(25, 58, 87, 0.08);
       font-size: 0.8rem;
       vertical-align: top;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    tbody tr:nth-child(even) td {
+      background: rgba(247, 250, 252, 0.92);
     }
 
     tbody td:nth-child(6),
@@ -399,8 +408,8 @@
       border-right: 1px solid rgba(25, 58, 87, 0.08);
     }
 
-    tbody tr:hover {
-      background: rgba(22, 133, 184, 0.04);
+    tbody tr:hover td {
+      background: rgba(255, 244, 224, 0.96);
     }
 
     .center-cell {
@@ -538,7 +547,7 @@
     <header class="hero">
       <span class="hero-tag">Safety Detail</span>
       <h1>安全证办事明细</h1>
-      <p>按企业维度展示安全生产许可证事项的办件明细，覆盖受理、审核、现场检查、决定四个环节的审批人、审批时间与审批结果，支持按企业、事项、审批机构和状态筛选并导出当前结果。</p>
+      <p>按企业维度展示安全生产许可证事项的办件明细，覆盖受理、审核、现场检查、决定四个环节的办理轨迹，支持按企业、事项、状态、受理人、审核人、决定人、核查人筛选并导出当前结果。</p>
       <div class="hero-chips">
         <span class="hero-chip">企业办件明细</span>
         <span class="hero-chip">环节审批轨迹</span>
@@ -663,6 +672,35 @@
         reviewed: { approver: "韩宇", time: "2026-05-08 14:20", result: "审核通过" },
         inspection: { approver: "李卓", time: "2026-05-10 10:05", result: "通过" },
         decision: { approver: "王捷", time: "2026-05-12 16:32", result: "准予许可" },
+        status: "已办结"
+      },
+      {
+        company: "北京中安建工集团有限公司",
+        matter: "建筑施工企业安全生产许可证变更",
+        agency: "市住房城乡建设委",
+        submitDate: "2026-05-14",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-18 09:26", result: "补正通知发出", note: "补充企业名称变更证明材料" },
+          { time: "2026-05-19 15:41", result: "补正材料提交", note: "已补充营业执照及变更说明" }
+        ],
+        accepted: { approver: "张楠", time: "2026-05-15 10:12", result: "受理通过" },
+        reviewed: { approver: "高源", time: "2026-05-17 14:38", result: "审核退回补正" },
+        inspection: { approver: "", time: "", result: "不涉及" },
+        decision: { approver: "", time: "", result: "" },
+        status: "补正中"
+      },
+      {
+        company: "北京中安建工集团有限公司",
+        matter: "建筑施工企业安全生产许可证延期需审查",
+        agency: "市住房城乡建设委",
+        submitDate: "2026-05-22",
+        evaluationResult: "合格",
+        rectifications: [],
+        accepted: { approver: "陈溪", time: "2026-05-23 09:48", result: "受理通过" },
+        reviewed: { approver: "韩宇", time: "2026-05-24 13:26", result: "审核通过" },
+        inspection: { approver: "罗琪", time: "2026-05-26 10:18", result: "通过" },
+        decision: { approver: "许航", time: "2026-05-28 16:06", result: "准予许可" },
         status: "已办结"
       },
       {
@@ -892,8 +930,7 @@
         endDate: normalizeDateKey(formData.get("endDate")),
         company: String(formData.get("companyName") || "").trim(),
         matter: String(formData.get("matterName") || "").trim(),
-        status: formData.get("statusName")
-        ,
+        status: formData.get("statusName"),
         acceptedUser: String(formData.get("acceptedUser") || "").trim(),
         reviewedUser: String(formData.get("reviewedUser") || "").trim(),
         decisionUser: String(formData.get("decisionUser") || "").trim(),
@@ -1082,10 +1119,10 @@
       const rows = filterRecords();
       const header = [
         "序号", "企业名称", "事项名称", "事项编号", "最后提交时间",
-        "受理审批人", "受理审批时间", "受理审批结果",
-        "审核审批人", "审核审批时间", "审核审批结果",
-        "决定审批人", "决定审批时间", "决定审批结果",
-        "现场检查审批人", "现场检查审批时间", "现场检查审批结果",
+        "受理人", "受理时间", "受理结果",
+        "审核人", "审核时间", "审核结果",
+        "决定人", "决定时间", "决定结果",
+        "核查人", "核查时间", "核查结果",
         "考评结果",
         "材料补正",
         "当前状态"
