@@ -313,6 +313,7 @@
 
     .table-wrap {
       overflow: auto;
+      max-height: calc(100vh - 320px);
       border-radius: 18px;
       border: 1px solid rgba(25, 58, 87, 0.08);
       background: rgba(255, 255, 255, 0.72);
@@ -337,14 +338,41 @@
       white-space: nowrap;
     }
 
+    thead .stage-head,
+    thead .stage-subhead {
+      text-align: center;
+    }
+
     thead tr:first-child th {
       top: 0;
     }
 
     thead tr:nth-child(2) th {
-      top: 45px;
+      top: 44px;
       z-index: 2;
       background: rgba(246, 250, 252, 0.98);
+    }
+
+    thead tr:first-child th:nth-child(7),
+    thead tr:first-child th:nth-child(8),
+    thead tr:first-child th:nth-child(9),
+    thead tr:first-child th:nth-child(10),
+    thead tr:first-child th:nth-child(11) {
+      border-left: 1px solid rgba(25, 58, 87, 0.12);
+    }
+
+    thead tr:nth-child(2) th:nth-child(1),
+    thead tr:nth-child(2) th:nth-child(4),
+    thead tr:nth-child(2) th:nth-child(7),
+    thead tr:nth-child(2) th:nth-child(10) {
+      border-left: 1px solid rgba(25, 58, 87, 0.12);
+    }
+
+    thead tr:nth-child(2) th:nth-child(3),
+    thead tr:nth-child(2) th:nth-child(6),
+    thead tr:nth-child(2) th:nth-child(9),
+    thead tr:nth-child(2) th:nth-child(12) {
+      border-right: 1px solid rgba(25, 58, 87, 0.12);
     }
 
     tbody td {
@@ -352,6 +380,23 @@
       border-bottom: 1px solid rgba(25, 58, 87, 0.08);
       font-size: 0.8rem;
       vertical-align: top;
+    }
+
+    tbody td:nth-child(6),
+    tbody td:nth-child(9),
+    tbody td:nth-child(12),
+    tbody td:nth-child(15),
+    tbody td:nth-child(18),
+    tbody td:nth-child(19),
+    tbody td:nth-child(20) {
+      border-left: 1px solid rgba(25, 58, 87, 0.08);
+    }
+
+    tbody td:nth-child(8),
+    tbody td:nth-child(11),
+    tbody td:nth-child(14),
+    tbody td:nth-child(17) {
+      border-right: 1px solid rgba(25, 58, 87, 0.08);
     }
 
     tbody tr:hover {
@@ -367,6 +412,23 @@
       margin-top: 4px;
       color: var(--muted);
       font-size: 0.72rem;
+    }
+
+    .rectify-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .rectify-item {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(22, 133, 184, 0.06);
+      line-height: 1.5;
+    }
+
+    .rectify-item strong {
+      color: var(--primary);
+      font-size: 0.74rem;
     }
 
     .status-pill {
@@ -403,6 +465,37 @@
       padding: 28px 18px;
       color: var(--muted);
       text-align: center;
+    }
+
+    .table-pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .page-indicator {
+      color: var(--muted);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .page-btn {
+      min-width: 88px;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .page-btn:disabled {
+      cursor: default;
+      opacity: 0.45;
     }
 
     @media (max-width: 960px) {
@@ -461,11 +554,11 @@
       <form id="detailFilterForm">
         <div class="filter-grid">
           <div class="field" style="grid-column: span 2;">
-            <label for="startDate">申报开始时间</label>
+            <label for="startDate">决定开始时间</label>
             <input id="startDate" name="startDate" type="date">
           </div>
           <div class="field" style="grid-column: span 2;">
-            <label for="endDate">申报结束时间</label>
+            <label for="endDate">决定结束时间</label>
             <input id="endDate" name="endDate" type="date">
           </div>
           <div class="field" style="grid-column: span 3;">
@@ -477,21 +570,32 @@
           </div>
           <div class="field" style="grid-column: span 2;">
             <label for="matterName">事项名称</label>
-            <select id="matterName" name="matterName">
-              <option value="">全部事项</option>
-            </select>
-          </div>
-          <div class="field" style="grid-column: span 2;">
-            <label for="agencyName">审批机构</label>
-            <select id="agencyName" name="agencyName">
-              <option value="">全部审批机构</option>
-            </select>
+            <div class="search-select">
+              <input id="matterName" name="matterName" type="text" placeholder="输入事项关键字后选择">
+              <div class="suggestion-panel" id="matterSuggestion" hidden></div>
+            </div>
           </div>
           <div class="field" style="grid-column: span 1;">
             <label for="statusName">办理状态</label>
             <select id="statusName" name="statusName">
               <option value="">全部状态</option>
             </select>
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="acceptedUser">受理人</label>
+            <input id="acceptedUser" name="acceptedUser" type="text" placeholder="输入受理人">
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="reviewedUser">审核人</label>
+            <input id="reviewedUser" name="reviewedUser" type="text" placeholder="输入审核人">
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="decisionUser">决定人</label>
+            <input id="decisionUser" name="decisionUser" type="text" placeholder="输入决定人">
+          </div>
+          <div class="field" style="grid-column: span 2;">
+            <label for="inspectionUser">核查人</label>
+            <input id="inspectionUser" name="inspectionUser" type="text" placeholder="输入核查人">
           </div>
           <div class="field-actions" style="grid-column: span 4;">
             <button class="btn-primary" type="submit">执行统计</button>
@@ -503,12 +607,6 @@
     </section>
 
     <section class="panel-card">
-      <div class="panel-card-head">
-        <div>
-          <h3>安全证企业办件明细</h3>
-          <p>表格按企业逐条展示安全生产许可证事项的审批轨迹。每个环节均包含审批人、审批时间与审批结果，适合导出后继续按企业、事项或审批机构筛选。</p>
-        </div>
-      </div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -516,31 +614,38 @@
               <th rowspan="2">序号</th>
               <th rowspan="2">企业名称</th>
               <th rowspan="2">事项名称</th>
-              <th rowspan="2">审批机构</th>
-              <th rowspan="2">申报时间</th>
-              <th colspan="3">受理</th>
-              <th colspan="3">审核</th>
-              <th colspan="3">现场检查</th>
-              <th colspan="3">决定</th>
+              <th rowspan="2">事项编号</th>
+              <th rowspan="2">最后提交时间</th>
+              <th colspan="3" class="stage-head">受理</th>
+              <th colspan="3" class="stage-head">审核</th>
+              <th colspan="3" class="stage-head">决定</th>
+              <th colspan="3" class="stage-head">现场检查</th>
+              <th rowspan="2">考评结果</th>
+              <th rowspan="2">材料补正</th>
               <th rowspan="2">当前状态</th>
             </tr>
             <tr>
-              <th>审批人</th>
-              <th>审批时间</th>
-              <th>审批结果</th>
-              <th>审批人</th>
-              <th>审批时间</th>
-              <th>审批结果</th>
-              <th>审批人</th>
-              <th>审批时间</th>
-              <th>审批结果</th>
-              <th>审批人</th>
-              <th>审批时间</th>
-              <th>审批结果</th>
+              <th class="stage-subhead">受理人</th>
+              <th class="stage-subhead">受理时间</th>
+              <th class="stage-subhead">受理结果</th>
+              <th class="stage-subhead">审批人</th>
+              <th class="stage-subhead">审批时间</th>
+              <th class="stage-subhead">审批结果</th>
+              <th class="stage-subhead">决定人</th>
+              <th class="stage-subhead">决定时间</th>
+              <th class="stage-subhead">决定结果</th>
+              <th class="stage-subhead">核查人</th>
+              <th class="stage-subhead">核查时间</th>
+              <th class="stage-subhead">核查结果</th>
             </tr>
           </thead>
           <tbody id="detailTableBody"></tbody>
         </table>
+      </div>
+      <div class="table-pagination">
+        <span class="page-indicator" id="pageIndicator">第 1 / 1 页</span>
+        <button class="page-btn" type="button" id="prevPageBtn">上一页</button>
+        <button class="page-btn" type="button" id="nextPageBtn">下一页</button>
       </div>
     </section>
   </div>
@@ -552,9 +657,11 @@
         matter: "建筑施工企业安全生产许可证首次申请",
         agency: "市住房城乡建设委",
         submitDate: "2026-05-05",
+        evaluationResult: "合格",
+        rectifications: [],
         accepted: { approver: "张楠", time: "2026-05-06 09:18", result: "受理通过" },
         reviewed: { approver: "韩宇", time: "2026-05-08 14:20", result: "审核通过" },
-        inspection: { approver: "李卓", time: "2026-05-10 10:05", result: "现场检查通过" },
+        inspection: { approver: "李卓", time: "2026-05-10 10:05", result: "通过" },
         decision: { approver: "王捷", time: "2026-05-12 16:32", result: "准予许可" },
         status: "已办结"
       },
@@ -563,9 +670,14 @@
         matter: "建筑施工企业安全生产许可证延期需审查",
         agency: "朝阳区住房城乡建设委",
         submitDate: "2026-05-07",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-11 10:26", result: "补正通知发出", note: "补充项目负责人任命文件" },
+          { time: "2026-05-13 17:08", result: "补正材料提交", note: "已补充任命文件及签章页" }
+        ],
         accepted: { approver: "陈溪", time: "2026-05-07 11:14", result: "受理通过" },
         reviewed: { approver: "宋辉", time: "2026-05-09 15:46", result: "审核通过" },
-        inspection: { approver: "罗琪", time: "2026-05-14 09:50", result: "现场检查中" },
+        inspection: { approver: "罗琪", time: "2026-05-14 09:50", result: "未通过" },
         decision: { approver: "", time: "", result: "" },
         status: "现场检查中"
       },
@@ -574,6 +686,12 @@
         matter: "建筑施工企业安全生产许可证变更",
         agency: "海淀区住房城乡建设委",
         submitDate: "2026-05-08",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-12 09:35", result: "补正通知发出", note: "缺少法定代表人变更证明" },
+          { time: "2026-05-14 15:12", result: "补正材料提交", note: "已补营业执照与变更说明" },
+          { time: "2026-05-15 11:22", result: "补正再次通知", note: "补充原许可证扫描件" }
+        ],
         accepted: { approver: "周倩", time: "2026-05-08 13:21", result: "受理通过" },
         reviewed: { approver: "高源", time: "2026-05-10 17:03", result: "审核退回补正" },
         inspection: { approver: "", time: "", result: "" },
@@ -585,9 +703,11 @@
         matter: "建筑施工企业安全生产许可证延期不审查",
         agency: "丰台区住房城乡建设委",
         submitDate: "2026-05-09",
+        evaluationResult: "合格",
+        rectifications: [],
         accepted: { approver: "吴双", time: "2026-05-10 09:36", result: "受理通过" },
         reviewed: { approver: "赵霖", time: "2026-05-11 11:42", result: "审核通过" },
-        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        inspection: { approver: "", time: "", result: "不涉及" },
         decision: { approver: "许航", time: "2026-05-13 15:48", result: "准予许可" },
         status: "已办结"
       },
@@ -596,9 +716,13 @@
         matter: "建筑施工企业安全生产许可证重新核定",
         agency: "通州区住房城乡建设委",
         submitDate: "2026-05-11",
+        evaluationResult: "合格",
+        rectifications: [
+          { time: "2026-05-16 16:40", result: "补正材料提交", note: "补充安全管理制度目录" }
+        ],
         accepted: { approver: "谢雨", time: "2026-05-12 10:15", result: "受理通过" },
         reviewed: { approver: "蒋晨", time: "2026-05-15 14:27", result: "审核通过" },
-        inspection: { approver: "李卓", time: "2026-05-18 13:05", result: "现场检查通过" },
+        inspection: { approver: "李卓", time: "2026-05-18 13:05", result: "通过" },
         decision: { approver: "王捷", time: "2026-05-20 10:41", result: "准予许可" },
         status: "已办结"
       },
@@ -607,9 +731,13 @@
         matter: "建筑施工企业安全生产许可证首次申请",
         agency: "西城区住房城乡建设委",
         submitDate: "2026-05-12",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-16 10:18", result: "补正通知发出", note: "补充现场检查整改说明" }
+        ],
         accepted: { approver: "张楠", time: "2026-05-12 15:09", result: "受理通过" },
         reviewed: { approver: "韩宇", time: "2026-05-14 10:22", result: "审核通过" },
-        inspection: { approver: "罗琪", time: "2026-05-19 11:30", result: "现场检查整改后复核" },
+        inspection: { approver: "罗琪", time: "2026-05-19 11:30", result: "未通过" },
         decision: { approver: "", time: "", result: "" },
         status: "决定中"
       },
@@ -618,9 +746,11 @@
         matter: "建筑施工企业安全生产许可证经济类型变更",
         agency: "大兴区住房城乡建设委",
         submitDate: "2026-05-13",
+        evaluationResult: "合格",
+        rectifications: [],
         accepted: { approver: "陈溪", time: "2026-05-13 16:11", result: "受理通过" },
         reviewed: { approver: "高源", time: "2026-05-16 09:55", result: "审核通过" },
-        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        inspection: { approver: "", time: "", result: "不涉及" },
         decision: { approver: "许航", time: "2026-05-18 14:16", result: "准予许可" },
         status: "已办结"
       },
@@ -629,9 +759,13 @@
         matter: "建筑施工企业安全生产许可证变更",
         agency: "昌平区住房城乡建设委",
         submitDate: "2026-05-15",
+        evaluationResult: "不合格",
+        rectifications: [
+          { time: "2026-05-20 14:05", result: "补正材料提交", note: "补充整改复核承诺书" }
+        ],
         accepted: { approver: "周倩", time: "2026-05-16 10:08", result: "受理通过" },
         reviewed: { approver: "宋辉", time: "2026-05-18 15:12", result: "审核通过" },
-        inspection: { approver: "李卓", time: "2026-05-21 09:44", result: "现场检查未通过" },
+        inspection: { approver: "李卓", time: "2026-05-21 09:44", result: "未通过" },
         decision: { approver: "王捷", time: "2026-05-23 17:20", result: "不予许可" },
         status: "已退回"
       },
@@ -640,6 +774,10 @@
         matter: "建筑施工企业安全生产许可证延期需审查",
         agency: "石景山区住房城乡建设委",
         submitDate: "2026-05-16",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-21 09:11", result: "补正通知发出", note: "补充项目安全员社保证明" }
+        ],
         accepted: { approver: "吴双", time: "2026-05-17 09:42", result: "受理通过" },
         reviewed: { approver: "赵霖", time: "2026-05-19 13:18", result: "审核中" },
         inspection: { approver: "", time: "", result: "" },
@@ -651,9 +789,11 @@
         matter: "建筑施工企业安全生产许可证首次申请",
         agency: "顺义区住房城乡建设委",
         submitDate: "2026-05-18",
+        evaluationResult: "合格",
+        rectifications: [],
         accepted: { approver: "谢雨", time: "2026-05-19 10:33", result: "受理通过" },
         reviewed: { approver: "韩宇", time: "2026-05-21 14:05", result: "审核通过" },
-        inspection: { approver: "罗琪", time: "2026-05-24 16:21", result: "现场检查通过" },
+        inspection: { approver: "罗琪", time: "2026-05-24 16:21", result: "通过" },
         decision: { approver: "许航", time: "2026-05-27 10:58", result: "准予许可" },
         status: "已办结"
       },
@@ -662,9 +802,13 @@
         matter: "建筑施工企业安全生产许可证重新核定",
         agency: "东城区住房城乡建设委",
         submitDate: "2026-05-19",
+        evaluationResult: "无考评",
+        rectifications: [
+          { time: "2026-05-23 09:42", result: "补正材料提交", note: "补充人员培训台账" }
+        ],
         accepted: { approver: "张楠", time: "2026-05-20 11:16", result: "受理通过" },
         reviewed: { approver: "蒋晨", time: "2026-05-22 16:24", result: "审核通过" },
-        inspection: { approver: "李卓", time: "2026-05-26 10:17", result: "现场检查通过" },
+        inspection: { approver: "李卓", time: "2026-05-26 10:17", result: "通过" },
         decision: { approver: "", time: "", result: "" },
         status: "决定中"
       },
@@ -673,9 +817,11 @@
         matter: "建筑施工企业安全生产许可证延期不审查",
         agency: "朝阳区住房城乡建设委",
         submitDate: "2026-05-21",
+        evaluationResult: "合格",
+        rectifications: [],
         accepted: { approver: "陈溪", time: "2026-05-21 14:45", result: "受理通过" },
         reviewed: { approver: "高源", time: "2026-05-22 17:09", result: "审核通过" },
-        inspection: { approver: "", time: "", result: "不涉及现场检查" },
+        inspection: { approver: "", time: "", result: "不涉及" },
         decision: { approver: "王捷", time: "2026-05-23 11:12", result: "准予许可" },
         status: "已办结"
       }
@@ -690,15 +836,35 @@
       companyName: document.getElementById("companyName"),
       companySuggestion: document.getElementById("companySuggestion"),
       matterName: document.getElementById("matterName"),
-      agencyName: document.getElementById("agencyName"),
+      matterSuggestion: document.getElementById("matterSuggestion"),
       statusName: document.getElementById("statusName"),
+      acceptedUser: document.getElementById("acceptedUser"),
+      reviewedUser: document.getElementById("reviewedUser"),
+      decisionUser: document.getElementById("decisionUser"),
+      inspectionUser: document.getElementById("inspectionUser"),
       exportBtn: document.getElementById("exportBtn"),
       resetBtn: document.getElementById("resetBtn"),
-      detailTableBody: document.getElementById("detailTableBody")
+      detailTableBody: document.getElementById("detailTableBody"),
+      pageIndicator: document.getElementById("pageIndicator"),
+      prevPageBtn: document.getElementById("prevPageBtn"),
+      nextPageBtn: document.getElementById("nextPageBtn")
     };
 
     const companyOptions = [...new Set(detailRecords.map((item) => item.company))]
       .sort((a, b) => a.localeCompare(b, "zh-CN"));
+    const matterOptions = [...new Set(detailRecords.map((item) => item.matter))]
+      .sort((a, b) => a.localeCompare(b, "zh-CN"));
+    const matterCodeMap = {
+      "建筑施工企业安全生产许可证首次申请": "AQXK-001",
+      "建筑施工企业安全生产许可证延期需审查": "AQXK-002",
+      "建筑施工企业安全生产许可证变更": "AQXK-003",
+      "建筑施工企业安全生产许可证延期不审查": "AQXK-004",
+      "建筑施工企业安全生产许可证重新核定": "AQXK-005",
+      "建筑施工企业安全生产许可证经济类型变更": "AQXK-006"
+    };
+    const pageSize = 20;
+    let currentPage = 1;
+    let currentFilteredRecords = [...detailRecords];
 
     function normalizeText(value) {
       return String(value || "")
@@ -725,9 +891,13 @@
         startDate: normalizeDateKey(formData.get("startDate")),
         endDate: normalizeDateKey(formData.get("endDate")),
         company: String(formData.get("companyName") || "").trim(),
-        matter: formData.get("matterName"),
-        agency: formData.get("agencyName"),
+        matter: String(formData.get("matterName") || "").trim(),
         status: formData.get("statusName")
+        ,
+        acceptedUser: String(formData.get("acceptedUser") || "").trim(),
+        reviewedUser: String(formData.get("reviewedUser") || "").trim(),
+        decisionUser: String(formData.get("decisionUser") || "").trim(),
+        inspectionUser: String(formData.get("inspectionUser") || "").trim()
       };
     }
 
@@ -736,6 +906,11 @@
       const current = normalizeText(company);
       const target = normalizeText(filterCompany);
       return current === target || current.includes(target);
+    }
+
+    function matchesKeyword(value, keyword) {
+      if (!keyword) return true;
+      return normalizeText(value).includes(normalizeText(keyword));
     }
 
     function filterRecords() {
@@ -748,13 +923,16 @@
       }
 
       return detailRecords.filter((record) => {
-        const currentDate = normalizeDateKey(record.submitDate);
+        const currentDate = normalizeDateKey((record.decision.time || "").slice(0, 10));
         if (startDate && currentDate < startDate) return false;
         if (endDate && currentDate > endDate) return false;
         if (!matchesCompanyFilter(record.company, filters.company)) return false;
-        if (filters.matter && record.matter !== filters.matter) return false;
-        if (filters.agency && record.agency !== filters.agency) return false;
+        if (filters.matter && !normalizeText(record.matter).includes(normalizeText(filters.matter))) return false;
         if (filters.status && record.status !== filters.status) return false;
+        if (!matchesKeyword(record.accepted.approver, filters.acceptedUser)) return false;
+        if (!matchesKeyword(record.reviewed.approver, filters.reviewedUser)) return false;
+        if (!matchesKeyword(record.decision.approver, filters.decisionUser)) return false;
+        if (!matchesKeyword(record.inspection.approver, filters.inspectionUser)) return false;
         return true;
       });
     }
@@ -782,8 +960,35 @@
       elements.companySuggestion.hidden = false;
     }
 
+    function getMatterSuggestionList(keyword) {
+      const normalizedKeyword = normalizeText(keyword);
+      const matched = normalizedKeyword
+        ? matterOptions.filter((item) => normalizeText(item).includes(normalizedKeyword))
+        : matterOptions;
+      return matched.slice(0, 12);
+    }
+
+    function renderMatterSuggestions(keyword = "") {
+      const matched = getMatterSuggestionList(keyword);
+
+      if (!matched.length) {
+        elements.matterSuggestion.innerHTML = `<div class="suggestion-empty">没有匹配事项</div>`;
+        elements.matterSuggestion.hidden = false;
+        return;
+      }
+
+      elements.matterSuggestion.innerHTML = matched
+        .map((item) => `<button class="suggestion-item" type="button" data-value="${item}">${item}</button>`)
+        .join("");
+      elements.matterSuggestion.hidden = false;
+    }
+
     function closeCompanySuggestions() {
       elements.companySuggestion.hidden = true;
+    }
+
+    function closeMatterSuggestions() {
+      elements.matterSuggestion.hidden = true;
     }
 
     function formatStageCell(value) {
@@ -798,24 +1003,55 @@
     }
 
     function buildEmptyRow() {
-      return `<tr><td colspan="18"><div class="empty-state">当前条件下没有安全证办事明细。</div></td></tr>`;
+      return `<tr><td colspan="20"><div class="empty-state">当前条件下没有安全证办事明细。</div></td></tr>`;
+    }
+
+    function getMatterCode(matter) {
+      return matterCodeMap[matter] || "-";
+    }
+
+    function formatRectifications(rectifications) {
+      if (!rectifications || !rectifications.length) {
+        return `<span class="cell-sub">无补正</span>`;
+      }
+
+      return `<div class="rectify-list">${rectifications.map((item, index) => `
+        <div class="rectify-item">
+          <strong>第 ${index + 1} 次</strong>
+          <div>${item.time}</div>
+          <div>${item.result}</div>
+          <div class="cell-sub">${item.note}</div>
+        </div>
+      `).join("")}</div>`;
+    }
+
+    function renderPagination(totalCount) {
+      const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+      currentPage = Math.min(currentPage, totalPages);
+      elements.pageIndicator.textContent = `第 ${currentPage} / ${totalPages} 页`;
+      elements.prevPageBtn.disabled = currentPage <= 1;
+      elements.nextPageBtn.disabled = currentPage >= totalPages;
+      elements.pageIndicator.parentElement.hidden = totalCount === 0;
     }
 
     function renderTable(records) {
+      currentFilteredRecords = [...records];
+
       if (!records.length) {
         elements.detailTableBody.innerHTML = buildEmptyRow();
+        renderPagination(0);
         return;
       }
 
-      elements.detailTableBody.innerHTML = records.map((record, index) => `
+      const startIndex = (currentPage - 1) * pageSize;
+      const pagedRecords = records.slice(startIndex, startIndex + pageSize);
+
+      elements.detailTableBody.innerHTML = pagedRecords.map((record, index) => `
         <tr>
-          <td class="center-cell">${index + 1}</td>
-          <td>
-            ${record.company}
-            <span class="cell-sub">${record.agency}</span>
-          </td>
+          <td class="center-cell">${startIndex + index + 1}</td>
+          <td>${record.company}</td>
           <td>${record.matter}</td>
-          <td>${record.agency}</td>
+          <td class="center-cell">${getMatterCode(record.matter)}</td>
           <td class="center-cell">${record.submitDate}</td>
           <td class="center-cell">${formatStageCell(record.accepted.approver)}</td>
           <td class="center-cell">${formatStageCell(record.accepted.time)}</td>
@@ -823,15 +1059,18 @@
           <td class="center-cell">${formatStageCell(record.reviewed.approver)}</td>
           <td class="center-cell">${formatStageCell(record.reviewed.time)}</td>
           <td class="center-cell">${formatStageCell(record.reviewed.result)}</td>
-          <td class="center-cell">${formatStageCell(record.inspection.approver)}</td>
-          <td class="center-cell">${formatStageCell(record.inspection.time)}</td>
-          <td class="center-cell">${formatStageCell(record.inspection.result)}</td>
           <td class="center-cell">${formatStageCell(record.decision.approver)}</td>
           <td class="center-cell">${formatStageCell(record.decision.time)}</td>
           <td class="center-cell">${formatStageCell(record.decision.result)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.approver)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.time)}</td>
+          <td class="center-cell">${formatStageCell(record.inspection.result)}</td>
+          <td class="center-cell">${record.evaluationResult || "-"}</td>
+          <td>${formatRectifications(record.rectifications)}</td>
           <td class="center-cell"><span class="status-pill ${formatStatusClass(record.status)}">${record.status}</span></td>
         </tr>
       `).join("");
+      renderPagination(records.length);
     }
 
     function escapeCsv(value) {
@@ -842,18 +1081,21 @@
     function exportResults() {
       const rows = filterRecords();
       const header = [
-        "序号", "企业名称", "事项名称", "审批机构", "申报时间",
+        "序号", "企业名称", "事项名称", "事项编号", "最后提交时间",
         "受理审批人", "受理审批时间", "受理审批结果",
         "审核审批人", "审核审批时间", "审核审批结果",
+        "决定审批人", "决定审批时间", "决定审批结果",
         "现场检查审批人", "现场检查审批时间", "现场检查审批结果",
-        "决定审批人", "决定审批时间", "决定审批结果", "当前状态"
+        "考评结果",
+        "材料补正",
+        "当前状态"
       ];
 
       const body = rows.map((item, index) => [
         index + 1,
         item.company,
         item.matter,
-        item.agency,
+        getMatterCode(item.matter),
         item.submitDate,
         item.accepted.approver,
         item.accepted.time,
@@ -861,12 +1103,14 @@
         item.reviewed.approver,
         item.reviewed.time,
         item.reviewed.result,
-        item.inspection.approver,
-        item.inspection.time,
-        item.inspection.result,
         item.decision.approver,
         item.decision.time,
         item.decision.result,
+        item.inspection.approver,
+        item.inspection.time,
+        item.inspection.result,
+        item.evaluationResult,
+        item.rectifications.map((rectify, rectifyIndex) => `第${rectifyIndex + 1}次 ${rectify.time} ${rectify.result} ${rectify.note}`).join("；"),
         item.status
       ]);
 
@@ -913,24 +1157,61 @@
       });
     }
 
+    function initMatterAutocomplete() {
+      elements.matterName.addEventListener("focus", () => {
+        renderMatterSuggestions(elements.matterName.value);
+      });
+
+      elements.matterName.addEventListener("input", () => {
+        renderMatterSuggestions(elements.matterName.value);
+      });
+
+      elements.matterName.addEventListener("blur", () => {
+        window.setTimeout(() => {
+          closeMatterSuggestions();
+        }, 120);
+      });
+
+      elements.matterSuggestion.addEventListener("click", (event) => {
+        const target = event.target.closest("[data-value]");
+        if (!target) return;
+        elements.matterName.value = target.dataset.value;
+        closeMatterSuggestions();
+      });
+    }
+
     function init() {
-      fillOptions(elements.matterName, [...new Set(detailRecords.map((item) => item.matter))]);
-      fillOptions(elements.agencyName, [...new Set(detailRecords.map((item) => item.agency))]);
       fillOptions(elements.statusName, [...new Set(detailRecords.map((item) => item.status))]);
       initCompanyAutocomplete();
+      initMatterAutocomplete();
 
       elements.detailFilterForm.addEventListener("submit", (event) => {
         event.preventDefault();
+        currentPage = 1;
         renderPage();
       });
 
       elements.resetBtn.addEventListener("click", () => {
         elements.detailFilterForm.reset();
+        currentPage = 1;
         renderPage();
       });
 
       elements.exportBtn.addEventListener("click", () => {
         exportResults();
+      });
+
+      elements.prevPageBtn.addEventListener("click", () => {
+        if (currentPage <= 1) return;
+        currentPage -= 1;
+        renderTable(currentFilteredRecords);
+      });
+
+      elements.nextPageBtn.addEventListener("click", () => {
+        const totalPages = Math.max(1, Math.ceil(currentFilteredRecords.length / pageSize));
+        if (currentPage >= totalPages) return;
+        currentPage += 1;
+        renderTable(currentFilteredRecords);
       });
 
       renderPage();
