@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核查办件分析</title>
+  <style>
+    :root {
+      --bg: #eef3f7;
+      --panel: rgba(255, 255, 255, 0.9);
+      --line: rgba(25, 58, 87, 0.1);
+      --text: #1b3147;
+      --muted: #667a8f;
+      --primary: #1685b8;
+      --teal: #1e9b82;
+      --amber: #f19a34;
+      --danger: #df6a49;
+      --navy: #0e4b71;
+      --violet: #6f67d8;
+      --cyan: #33a6b8;
+      --rose: #d86e83;
+      --shadow: 0 22px 54px rgba(15, 35, 55, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(22, 133, 184, 0.16), transparent 24%),
+        radial-gradient(circle at 100% 16%, rgba(241, 154, 52, 0.12), transparent 20%),
+        linear-gradient(180deg, #f7fafc 0%, #edf2f6 44%, #e7edf3 100%);
+      color: var(--text);
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(12, 35, 58, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(12, 35, 58, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 92%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .page-shell {
+      width: min(1540px, calc(100vw - 28px));
+      margin: 8px auto;
+      padding: 10px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 249, 252, 0.94)),
+        rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-shell::after {
+      content: "";
+      position: absolute;
+      inset: -90px auto auto -80px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(22, 133, 184, 0.16), transparent 72%);
+      pointer-events: none;
+    }
+
+    .hero,
+    .section-panel,
+    .panel-card,
+    .insight-card {
+      position: relative;
+      z-index: 1;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero,
+    .section-panel {
+      border-radius: var(--radius-xl);
+      padding: 10px 12px;
+    }
+
+    .hero {
+      margin-bottom: 8px;
+      background:
+        linear-gradient(135deg, rgba(14, 50, 78, 0.98), rgba(10, 113, 151, 0.92) 56%, rgba(18, 148, 126, 0.84));
+      color: #eef8ff;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -90px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.12rem, 2vw, 1.7rem);
+      line-height: 1.04;
+      letter-spacing: 0.02em;
+    }
+
+    .section-panel {
+      margin-bottom: 8px;
+      overflow: visible;
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(25, 58, 87, 0.12);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text);
+    }
+
+    .field-actions {
+      display: flex;
+      align-items: end;
+      justify-content: flex-end;
+      gap: 8px;
+      white-space: nowrap;
+      flex-wrap: wrap;
+    }
+
+    .button-primary,
+    .button-secondary,
+    .button-ghost {
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--primary), #0d6d99);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(22, 133, 184, 0.24);
+    }
+
+    .button-secondary {
+      background: linear-gradient(135deg, var(--teal), #177b68);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(30, 155, 130, 0.2);
+    }
+
+    .button-ghost {
+      background: rgba(16, 63, 94, 0.06);
+      color: var(--navy);
+    }
+
+    .button-primary:hover,
+    .button-secondary:hover,
+    .button-ghost:hover {
+      transform: translateY(-1px);
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .insight-card,
+    .panel-card {
+      border-radius: var(--radius-lg);
+      padding: 8px 10px;
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .metric-value {
+      margin-top: 2px;
+      font-size: clamp(0.98rem, 1.45vw, 1.4rem);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .metric-note {
+      margin-top: 2px;
+      font-size: 0.68rem;
+      line-height: 1.25;
+      color: var(--muted);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--navy);
+    }
+
+    .card-head span {
+      font-size: 0.76rem;
+      color: var(--muted);
+    }
+
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 700px;
+      border-radius: 16px;
+      border: 1px solid rgba(25, 58, 87, 0.08);
+      background: rgba(255, 255, 255, 0.84);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 1180px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #dff4f5;
+      color: var(--navy);
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(22, 133, 184, 0.14);
+      border-right: 1px solid rgba(22, 133, 184, 0.08);
+      white-space: nowrap;
+    }
+
+    thead th:first-child,
+    tbody td:first-child,
+    tfoot td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: rgba(246, 250, 252, 0.96);
+    }
+
+    thead th:first-child {
+      z-index: 3;
+      background: #dff4f5;
+    }
+
+    tbody td,
+    tfoot td {
+      padding: 11px 10px;
+      border-bottom: 1px solid rgba(25, 58, 87, 0.08);
+      border-right: 1px solid rgba(25, 58, 87, 0.05);
+      font-size: 0.82rem;
+      color: var(--text);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    tbody tr:hover td {
+      background: rgba(21, 126, 171, 0.06);
+    }
+
+    tbody td:first-child,
+    tfoot td:first-child {
+      text-align: left;
+      font-weight: 700;
+    }
+
+    tfoot td {
+      font-weight: 800;
+      background: rgba(226, 243, 245, 0.92);
+      color: var(--navy);
+    }
+
+    .stage-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 74px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .table-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.6;
+    }
+
+    .empty-state {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    @media (max-width: 1180px) {
+      .summary-grid,
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .field-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        width: min(100vw - 12px, 100%);
+        margin: 6px auto;
+        padding: 10px;
+        border-radius: 20px;
+      }
+
+      .hero,
+      .section-panel,
+      .insight-card,
+      .panel-card {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field-actions {
+        flex-wrap: wrap;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <section class="hero">
+      <h1>核查办件分析</h1>
+    </section>
+
+    <section class="section-panel">
+      <div class="filter-grid">
+        <div class="field" style="grid-column: span 2;">
+          <label for="monthStart">开始月份</label>
+          <input id="monthStart" type="month" value="2026-01">
+        </div>
+        <div class="field" style="grid-column: span 2;">
+          <label for="monthEnd">结束月份</label>
+          <input id="monthEnd" type="month" value="2026-06">
+        </div>
+        <div class="field" style="grid-column: span 3;">
+          <label for="districtFilter">区县</label>
+          <select id="districtFilter">
+            <option value="全部区县">全部区县</option>
+          </select>
+        </div>
+        <div class="field" style="grid-column: span 3;">
+          <label for="focusStage">重点阶段</label>
+          <select id="focusStage">
+            <option value="全部阶段总量">全部阶段总量</option>
+          </select>
+        </div>
+        <div class="field-actions" style="grid-column: span 12;">
+          <button class="button-primary" id="queryButton">查询统计</button>
+          <button class="button-ghost" id="resetButton">重置</button>
+          <button class="button-secondary" id="exportButton">导出当前结果</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="insight-card">
+        <div class="metric-label">筛选范围总办件量</div>
+        <div class="metric-value" id="cardTotal">0</div>
+        <div class="metric-note" id="cardTotalNote">按所选月份汇总全部区县七个阶段办件数量。</div>
+      </article>
+      <article class="insight-card">
+        <div class="metric-label">工作量最高阶段</div>
+        <div class="metric-value" id="cardStage">-</div>
+        <div class="metric-note" id="cardStageNote">当前月份范围内，阶段工作量最高项。</div>
+      </article>
+      <article class="insight-card">
+        <div class="metric-label">办件量最高区县</div>
+        <div class="metric-value" id="cardDistrict">-</div>
+        <div class="metric-note" id="cardDistrictNote">汇总区县各阶段办件量后排序。</div>
+      </article>
+      <article class="insight-card">
+        <div class="metric-label">已完成占比</div>
+        <div class="metric-value" id="cardCompleteRate">0%</div>
+        <div class="metric-note" id="cardCompleteRateNote">已完成阶段数量占全部阶段办件总量比例。</div>
+      </article>
+    </section>
+
+    <section class="section-panel">
+      <div class="card-head" style="margin-bottom: 10px;">
+        <div>
+          <h2>区县分阶段汇总表</h2>
+          <span>逐区县统计各阶段办件数量，可直接导出当前筛选结果</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr id="tableHeadRow"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+          <tfoot>
+            <tr id="tableFootRow"></tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="table-note" id="tableNote">统计规则：区县行汇总当前月份范围内所有月度数据；底部合计行为全部区县汇总值。</div>
+    </section>
+  </div>
+
+  <script>
+    const stages = [
+      "启动核查",
+      "初审",
+      "复审",
+      "责改",
+      "复查初审",
+      "复查复审",
+      "已完成"
+    ];
+
+    const stageColors = {
+      "启动核查": "#1685b8",
+      "初审": "#1e9b82",
+      "复审": "#f19a34",
+      "责改": "#df6a49",
+      "复查初审": "#6f67d8",
+      "复查复审": "#33a6b8",
+      "已完成": "#d86e83"
+    };
+
+    const districts = [
+      "东城区",
+      "西城区",
+      "朝阳区",
+      "海淀区",
+      "丰台区",
+      "石景山区",
+      "门头沟区",
+      "房山区",
+      "通州区",
+      "顺义区",
+      "昌平区",
+      "大兴区",
+      "怀柔区",
+      "平谷区",
+      "密云区",
+      "延庆区",
+      "经开区"
+    ];
+
+    const months = [
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04",
+      "2026-05",
+      "2026-06",
+      "2026-07",
+      "2026-08",
+      "2026-09",
+      "2026-10",
+      "2026-11",
+      "2026-12"
+    ];
+
+    function buildSeededDataset() {
+      const dataset = [];
+
+      months.forEach((month, monthIndex) => {
+        districts.forEach((district, districtIndex) => {
+          const districtBase = 26 + districtIndex * 2 + (districtIndex % 4) * 3;
+          const monthWave = 1 + (monthIndex % 3) * 0.12 + (monthIndex >= 6 ? 0.08 : 0);
+          const start = Math.round(districtBase * monthWave + ((districtIndex * 7 + monthIndex * 11) % 12));
+          const firstReview = Math.round(start * 0.78 + (districtIndex % 5));
+          const secondReview = Math.round(start * 0.57 + (monthIndex % 4) + (districtIndex % 3));
+          const rectify = Math.round(start * 0.22 + ((districtIndex + monthIndex) % 4));
+          const recheckFirst = Math.round(rectify * 0.82 + (monthIndex % 3));
+          const recheckSecond = Math.round(recheckFirst * 0.71 + (districtIndex % 3));
+          const completed = Math.round(firstReview * 0.42 + secondReview * 0.39 + recheckSecond * 0.84);
+
+          dataset.push({
+            month,
+            district,
+            values: {
+              "启动核查": start,
+              "初审": firstReview,
+              "复审": secondReview,
+              "责改": rectify,
+              "复查初审": recheckFirst,
+              "复查复审": recheckSecond,
+              "已完成": completed
+            }
+          });
+        });
+      });
+
+      return dataset;
+    }
+
+    const rawDataset = buildSeededDataset();
+
+    const monthStartInput = document.getElementById("monthStart");
+    const monthEndInput = document.getElementById("monthEnd");
+    const districtFilterSelect = document.getElementById("districtFilter");
+    const focusStageSelect = document.getElementById("focusStage");
+    const queryButton = document.getElementById("queryButton");
+    const resetButton = document.getElementById("resetButton");
+    const exportButton = document.getElementById("exportButton");
+    const tableHeadRow = document.getElementById("tableHeadRow");
+    const tableBody = document.getElementById("tableBody");
+    const tableFootRow = document.getElementById("tableFootRow");
+    const tableNote = document.getElementById("tableNote");
+
+    const cardTotal = document.getElementById("cardTotal");
+    const cardTotalNote = document.getElementById("cardTotalNote");
+    const cardStage = document.getElementById("cardStage");
+    const cardStageNote = document.getElementById("cardStageNote");
+    const cardDistrict = document.getElementById("cardDistrict");
+    const cardDistrictNote = document.getElementById("cardDistrictNote");
+    const cardCompleteRate = document.getElementById("cardCompleteRate");
+    const cardCompleteRateNote = document.getElementById("cardCompleteRateNote");
+
+    districtFilterSelect.innerHTML += districts.map((district) => `<option value="${district}">${district}</option>`).join("");
+    focusStageSelect.innerHTML += stages.map((stage) => `<option value="${stage}">${stage}</option>`).join("");
+
+    function formatNumber(value) {
+      return value.toLocaleString("zh-CN");
+    }
+
+    function normalizeMonthRange(startMonth, endMonth) {
+      if (!startMonth) {
+        startMonth = months[0];
+      }
+
+      if (!endMonth) {
+        endMonth = months[months.length - 1];
+      }
+
+      return startMonth <= endMonth ? [startMonth, endMonth] : [endMonth, startMonth];
+    }
+
+    function getFilteredRows() {
+      const [startMonth, endMonth] = normalizeMonthRange(monthStartInput.value, monthEndInput.value);
+      const selectedDistrict = districtFilterSelect.value || "全部区县";
+
+      return rawDataset.filter((item) => {
+        const monthMatched = item.month >= startMonth && item.month <= endMonth;
+        const districtMatched = selectedDistrict === "全部区县" || item.district === selectedDistrict;
+        return monthMatched && districtMatched;
+      });
+    }
+
+    function aggregateData(filteredRows) {
+      const districtMap = new Map();
+      const monthMap = new Map();
+      const stageTotals = Object.fromEntries(stages.map((stage) => [stage, 0]));
+
+      districts.forEach((district) => {
+        districtMap.set(district, {
+          district,
+          stages: Object.fromEntries(stages.map((stage) => [stage, 0])),
+          total: 0
+        });
+      });
+
+      filteredRows.forEach((row) => {
+        if (!monthMap.has(row.month)) {
+          monthMap.set(row.month, {
+            month: row.month,
+            stages: Object.fromEntries(stages.map((stage) => [stage, 0])),
+            total: 0
+          });
+        }
+
+        const districtRow = districtMap.get(row.district);
+        const monthRow = monthMap.get(row.month);
+
+        stages.forEach((stage) => {
+          const value = row.values[stage];
+          districtRow.stages[stage] += value;
+          districtRow.total += value;
+
+          monthRow.stages[stage] += value;
+          monthRow.total += value;
+
+          stageTotals[stage] += value;
+        });
+      });
+
+      return {
+        districtRows: Array.from(districtMap.values()),
+        monthRows: Array.from(monthMap.values()).sort((a, b) => a.month.localeCompare(b.month)),
+        stageTotals
+      };
+    }
+
+    function renderSummary(aggregated, selectedFocusStage, selectedDistrict, range) {
+      const totalCases = Object.values(aggregated.stageTotals).reduce((sum, value) => sum + value, 0);
+      const topStage = stages.reduce((best, stage) => (
+        aggregated.stageTotals[stage] > aggregated.stageTotals[best] ? stage : best
+      ), stages[0]);
+      const sortedDistricts = aggregated.districtRows.slice().sort((a, b) => b.total - a.total);
+      const topDistrict = sortedDistricts[0];
+      const completeRate = totalCases === 0 ? 0 : (aggregated.stageTotals["已完成"] / totalCases) * 100;
+
+      cardTotal.textContent = formatNumber(totalCases);
+      cardTotalNote.textContent = selectedDistrict === "全部区县"
+        ? `统计区间：${range[0]} 至 ${range[1]}，覆盖 ${aggregated.monthRows.length} 个自然月。`
+        : `统计对象：${selectedDistrict}，覆盖 ${aggregated.monthRows.length} 个自然月。`;
+
+      cardStage.textContent = topStage;
+      cardStageNote.textContent = `${topStage}阶段累计 ${formatNumber(aggregated.stageTotals[topStage])} 件，为当前工作量最高阶段。`;
+
+      if (selectedDistrict === "全部区县") {
+        cardDistrict.textContent = topDistrict ? topDistrict.district : "-";
+        cardDistrictNote.textContent = topDistrict
+          ? `区县七阶段合计 ${formatNumber(topDistrict.total)} 件。`
+          : "当前筛选无可展示数据。";
+      } else {
+        const selectedRow = aggregated.districtRows.find((row) => row.district === selectedDistrict);
+        cardDistrict.textContent = selectedDistrict;
+        cardDistrictNote.textContent = selectedRow
+          ? `当前区县七阶段合计 ${formatNumber(selectedRow.total)} 件。`
+          : "当前筛选无可展示数据。";
+      }
+
+      cardCompleteRate.textContent = `${completeRate.toFixed(1)}%`;
+      cardCompleteRateNote.textContent = `已完成阶段 ${formatNumber(aggregated.stageTotals["已完成"])} 件；当前${selectedDistrict === "全部区县" ? "排行" : "视角"}按${selectedFocusStage}展示。`;
+    }
+
+    function renderTable(aggregated, selectedDistrict, range) {
+      tableHeadRow.innerHTML = `
+        <th>区县</th>
+        ${stages.map((stage) => `<th><span class="stage-chip" style="background:${stageColors[stage]};">${stage}</span></th>`).join("")}
+        <th>阶段总量</th>
+      `;
+
+      const bodyRows = aggregated.districtRows
+        .slice()
+        .filter((row) => selectedDistrict === "全部区县" || row.district === selectedDistrict)
+        .sort((a, b) => b.total - a.total);
+
+      if (!bodyRows.some((row) => row.total > 0)) {
+        tableBody.innerHTML = `<tr><td colspan="${stages.length + 2}" class="empty-state">当前筛选条件下暂无统计数据。</td></tr>`;
+      } else {
+        tableBody.innerHTML = bodyRows.map((row) => `
+          <tr>
+            <td>${row.district}</td>
+            ${stages.map((stage) => `<td>${formatNumber(row.stages[stage])}</td>`).join("")}
+            <td>${formatNumber(row.total)}</td>
+          </tr>
+        `).join("");
+      }
+
+      const totalStageSum = Object.values(aggregated.stageTotals).reduce((sum, value) => sum + value, 0);
+      tableFootRow.innerHTML = `
+        <td>合计</td>
+        ${stages.map((stage) => `<td>${formatNumber(aggregated.stageTotals[stage])}</td>`).join("")}
+        <td>${formatNumber(totalStageSum)}</td>
+      `;
+
+      tableNote.textContent = selectedDistrict === "全部区县"
+        ? `统计规则：区县行为 ${range[0]} 至 ${range[1]} 的月度累计值；合计行为全部区县汇总值。`
+        : `统计规则：当前仅展示 ${selectedDistrict} 在 ${range[0]} 至 ${range[1]} 的阶段累计值。`;
+    }
+
+    function exportCurrentTable(aggregated, selectedDistrict, range) {
+      const header = ["区县", ...stages, "阶段总量"];
+      const rows = aggregated.districtRows
+        .slice()
+        .filter((row) => selectedDistrict === "全部区县" || row.district === selectedDistrict)
+        .sort((a, b) => b.total - a.total)
+        .map((row) => [
+          row.district,
+          ...stages.map((stage) => row.stages[stage]),
+          row.total
+        ]);
+
+      rows.push([
+        "合计",
+        ...stages.map((stage) => aggregated.stageTotals[stage]),
+        Object.values(aggregated.stageTotals).reduce((sum, value) => sum + value, 0)
+      ]);
+
+      const csv = [header, ...rows]
+        .map((line) => line.map((cell) => `"${String(cell).replace(/"/g, "\"\"")}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `核查办件分析_${selectedDistrict}_${range[0]}_${range[1]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderPage() {
+      const [startMonth, endMonth] = normalizeMonthRange(monthStartInput.value, monthEndInput.value);
+      monthStartInput.value = startMonth;
+      monthEndInput.value = endMonth;
+
+      const filteredRows = getFilteredRows();
+      const aggregated = aggregateData(filteredRows);
+      const selectedDistrict = districtFilterSelect.value || "全部区县";
+      const selectedFocusStage = focusStageSelect.value || "全部阶段总量";
+      const range = [startMonth, endMonth];
+
+      renderSummary(aggregated, selectedFocusStage, selectedDistrict, range);
+      renderTable(aggregated, selectedDistrict, range);
+
+      exportButton.onclick = () => exportCurrentTable(aggregated, selectedDistrict, range);
+    }
+
+    queryButton.addEventListener("click", renderPage);
+    districtFilterSelect.addEventListener("change", renderPage);
+    focusStageSelect.addEventListener("change", renderPage);
+    monthStartInput.addEventListener("change", renderPage);
+    monthEndInput.addEventListener("change", renderPage);
+    resetButton.addEventListener("click", () => {
+      monthStartInput.value = "2026-01";
+      monthEndInput.value = "2026-06";
+      districtFilterSelect.value = "全部区县";
+      focusStageSelect.value = "全部阶段总量";
+      renderPage();
+    });
+
+    renderPage();
+  </script>
+</body>
+</html>
