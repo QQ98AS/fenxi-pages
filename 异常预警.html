@@ -120,7 +120,7 @@
     .hero button:hover { background: rgba(255,255,255,.22); }
     .filters {
       display: grid;
-      grid-template-columns: 1.3fr .75fr .85fr 1fr auto;
+      grid-template-columns: 1.3fr .75fr .85fr 1fr auto auto;
       gap: 12px;
       align-items: end;
       margin-top: 14px;
@@ -152,6 +152,17 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .filter-action {
+      height: 36px;
+      padding: 0 16px;
+      border: 1px solid #9cc8e9;
+      border-radius: 4px;
+      background: #f3faff;
+      color: var(--blue-deep);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filter-action:hover { background: var(--blue-soft); }
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -237,14 +248,54 @@
     .modal-head h3 { margin: 0; color: #1c3c5a; font-size: 16px; }
     .modal-close { border: 0; background: transparent; color: var(--muted); font-size: 22px; cursor: pointer; }
     .modal-body { padding: 16px 18px 20px; }
-    .criteria-list { display: grid; grid-template-rows: repeat(4, 34px); gap: 0; text-align: left; }
-    .criteria-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 34px; padding: 0; border-bottom: 1px dashed #dce8f2; line-height: 1.2; }
+    .modal-tabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 18px; }
+    .modal-tab { padding: 11px 16px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); cursor: pointer; }
+    .modal-tab.active { border-bottom-color: var(--blue); color: var(--blue-deep); font-weight: 700; }
+    .pagination { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 14px; border-top: 1px solid var(--line); }
+    .page-btn { min-width: 32px; height: 30px; padding: 0 10px; border: 1px solid #9cc8e9; border-radius: 4px; background: #fff; color: var(--blue-deep); cursor: pointer; }
+    .page-btn:disabled { cursor: not-allowed; opacity: .45; }
+    .page-info { color: var(--muted); font-size: 12px; }
+    .reason-section { margin-bottom: 16px; }
+    .reason-section:last-child { margin-bottom: 0; }
+    .reason-section h4 { margin: 0 0 8px; color: #315a7d; font-size: 14px; }
+    .reason-list { margin: 0; padding-left: 20px; color: var(--ink); line-height: 1.8; }
+    .reason-list li.warn { color: var(--red); }
+    .reason-qualification { margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .reason-qualification:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+    .reason-qualification h3 { margin: 0 0 12px; color: #1c3c5a; font-size: 16px; }
+    .reason-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .reason-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .reason-table th, .reason-table td { padding: 8px 6px; border: 1px solid var(--line); text-align: center; }
+    .reason-table th { background: #f7fbfe; color: #51677b; }
+    .reason-table .warn { color: var(--red); font-weight: 700; }
+    .matched-people-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .matched-people-table th, .matched-people-table td { padding: 9px 8px; border: 1px solid var(--line); text-align: center; }
+    .matched-people-table th { background: #f7fbfe; color: #51677b; }
+    .matched-people-table tr.warn td { color: var(--red); font-weight: 700; }
+    .matched-people-table .certificate-detail { display: grid; gap: 5px; text-align: left; }
+    .matched-people-table .certificate-item { padding-bottom: 5px; border-bottom: 1px dashed var(--line); }
+    .matched-people-table .certificate-item:last-child { padding-bottom: 0; border-bottom: 0; }
+    .matched-people-table .certificate-item.warn { color: var(--red); font-weight: 700; }
+    @media (max-width: 620px) { .reason-comparison { grid-template-columns: 1fr; } }
+    .criteria-list { display: grid; grid-template-rows: repeat(4, 34px); gap: 0; height: 136px; text-align: center; align-content: start; }
+    .specialty-stack { display: grid; gap: 0; }
+    .specialty-block { display: grid; grid-template-rows: repeat(4, 34px); min-height: 136px; border-bottom: 1px solid var(--line); }
+    .specialty-block:last-child { border-bottom: 0; }
+    .specialty-name { display: flex; grid-row: 1 / -1; align-items: center; justify-content: center; min-height: 136px; padding: 8px; color: var(--ink); font-weight: 700; text-align: center; }
+    .criteria-list .specialty-block .criteria-line { min-height: 34px; }
+    td.comparison-cell { vertical-align: top; padding-top: 10px; padding-bottom: 10px; }
+    .criteria-line { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 34px; padding: 0; border-bottom: 1px dashed #dce8f2; line-height: 1.2; text-align: center; }
     .criteria-line-value-only { justify-content: flex-end; }
-    .criteria-line-value-only > strong, .criteria-line-value-only > button { width: 100%; text-align: right; }
+    .criteria-line-value-only > strong, .criteria-line-value-only > button { width: 100%; text-align: center; }
     .criteria-line:last-child { border-bottom: 0; }
     .criteria-line small { color: var(--muted); }
     .criteria-line strong.ok { color: var(--green); }
     .criteria-line strong.warn { color: var(--red); }
+    .criteria-list .criteria-line strong.ok,
+    .criteria-list .criteria-line-value-only > strong.ok,
+    .criteria-list .criteria-line-value-only > button:not(.warn) { color: var(--ink); }
+    .criteria-list .criteria-line span { color: var(--ink); }
+    .criteria-line-value-only > strong span.warn { color: var(--red); font-weight: 700; }
     .criteria-note { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.5; }
     .legend { display: flex; gap: 18px; align-items: center; color: var(--muted); font-size: 12px; }
     .legend span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: var(--green); }
@@ -278,7 +329,8 @@
       .top-tabs { gap: 4px; }
       .top-tab { padding: 0 7px; font-size: 12px; }
       .filters { grid-template-columns: 1fr; padding: 12px; }
-    .filters .primary-btn { width: 100%; }
+      .filters .primary-btn,
+      .filters .filter-action { width: 100%; }
       .panel-head { padding: 13px 12px; }
       .panel-head h2 { font-size: 15px; }
       .panel-head p { line-height: 1.6; }
@@ -327,17 +379,6 @@
 
       <main class="main">
         <div class="breadcrumb">首页 <strong>异常预警</strong><strong>检测资质人员配备对照表</strong></div>
-        <section class="hero">
-          <div>
-            <h1>检测资质人员配备异常预警</h1>
-            <p>按专项资质对照主要人员配备标准，分别展示注册人员、技术人员的应有人数与实有人数，快速识别人员缺口。</p>
-          </div>
-          <div class="hero-actions">
-            <button type="button" id="resetButton">重置筛选</button>
-            <button type="button" id="exportButton">导出分析</button>
-          </div>
-        </section>
-
         <section class="filters">
           <div class="field">
             <label for="institutionFilter">检测机构</label>
@@ -365,20 +406,15 @@
             </select>
           </div>
           <button class="primary-btn" type="button" id="queryButton">查询</button>
-        </section>
-
-        <section class="summary-grid" aria-label="异常预警统计">
-          <div class="summary-card"><span>检测机构</span><strong id="institutionTotal">0</strong><em>家</em></div>
-          <div class="summary-card"><span>纳入资质</span><strong id="qualificationTotal">0</strong><em>项</em></div>
-          <div class="summary-card"><span>当前异常机构</span><strong id="warningTotal">0</strong><em>家</em></div>
-          <div class="summary-card"><span>本次检查日</span><strong id="checkDate">-</strong><em></em></div>
+          <button class="filter-action" type="button" id="resetButton">重置筛选</button>
+          <button class="filter-action" type="button" id="exportButton">导出分析</button>
         </section>
 
         <section class="panel">
           <div class="panel-head">
             <div>
               <h2>检测资质人员配备对照表</h2>
-              <p>综合资质按人员数量、职称要求、养老社保三个维度分别核验；任一维度不达标，综合结果即为不达标。</p>
+              <p>检测资质从人员数量、职称专业等级两个维度分别核验；任一维度不达标，综合结果即为不达标。人员数量是依据企业是否给人员缴纳养老社保判定。一人持有不同等级的证书时，按2次达标计算；一人承担多个岗位角色时，按2次达标计算。人员以企业最后一笔业务中的人员信息为准：若最后一笔业务为简单变更且未出现人员，则从上一次业务摘取；若仅涉及部分人员，则向前查找，补齐其他岗位角色人员。</p>
             </div>
           </div>
           <div class="table-wrap">
@@ -387,22 +423,36 @@
                 <tr>
                   <th>序号</th>
                   <th style="width: 190px;">检测机构</th>
-                  <th style="width: 150px;">资质类别</th>
+                  <th style="width: 180px;">检测专项</th>
+                  <th style="width: 125px;">人员类型</th>
                   <th style="width: 230px;">人员数量对照<br><small>应有 / 实有</small></th>
-                  <th style="width: 260px;">职称等级对照<br><small>应有等级 / 实际等级</small></th>
+                  <th style="width: 260px;">职称专业等级对照<br><small>应有等级 / 实际等级</small></th>
                   <th style="width: 90px;">综合结果</th>
-                  <th style="width: 70px;">操作</th>
                 </tr>
               </thead>
               <tbody id="analysisBody"></tbody>
             </table>
+          </div>
+          <div class="pagination" id="pagination">
+            <span class="page-info" id="totalInfo">共 0 条</span>
+            <button class="page-btn" type="button" id="firstPage">首页</button>
+            <button class="page-btn" type="button" id="prevPage">上一页</button>
+            <span class="page-info" id="pageInfo">第 1 / 1 页</span>
+            <button class="page-btn" type="button" id="nextPage">下一页</button>
+            <button class="page-btn" type="button" id="lastPage">末页</button>
           </div>
         </section>
       </main>
     </div>
   </div>
   <div class="modal-backdrop" id="socialModal" role="dialog" aria-modal="true" aria-labelledby="socialModalTitle">
-    <div class="modal"><div class="modal-head"><h3 id="socialModalTitle">非本单位缴纳养老社保人员</h3><button class="modal-close" type="button" id="socialModalClose" aria-label="关闭">×</button></div><div class="modal-body" id="socialModalBody"></div></div>
+    <div class="modal">
+      <div class="modal-head"><h3 id="socialModalTitle">不合格原因</h3><button class="modal-close" type="button" id="socialModalClose" aria-label="关闭">×</button></div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" type="button" data-modal-tab="qualification">本次匹配人员</button>
+      </div>
+      <div class="modal-body" id="socialModalBody"></div>
+    </div>
   </div>
 
   <script>
@@ -413,7 +463,10 @@
           code: "91110101MA01A0012X",
           qualification: "建筑材料及构配件",
           registration: { required: 0, actual: 0 },
-          technical: { required: 20, actual: 21 },
+          technical: { required: 20, actual: 17 },
+          technicalMiddleQualified: 6,
+          technicalLeaderActual: 0,
+          qualityLeaderActual: 0,
           cumulativeGapDays: 0,
           continuousGapDays: 0,
           gapStartDate: "",
@@ -423,9 +476,23 @@
         {
           institution: "北京建工恒均工程检测有限公司",
           code: "91110101MA01A0012X",
-          qualification: "主体结构及装饰装修",
-          registration: { required: 2, actual: 2 },
+          qualification: "钢结构",
+          displayInstitution: "北京建工恒均工程检测有限公司",
+          displayCode: "91110101MA01A0012X",
+          registration: { required: 1, actual: 1 },
+          registrationProfession: "结构工程师",
+          registrationTitleProfession: "结构工程师",
+          registrationTitleLevel: "二级",
+          registrationTitleRequired: 1,
+          registrationTitleActual: 1,
+          registrationSpecialties: [{ profession: "结构工程师", level: "二级", required: 1, actual: 1 }],
           technical: { required: 15, actual: 13 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 3,
+          technicalSeniorRequired: 2,
+          technicalSeniorQualified: 2,
+          technicalLeaderActual: 0,
+          qualityLeaderActual: 0,
           cumulativeGapDays: 18,
           continuousGapDays: 18,
           gapStartDate: "2026-08-29",
@@ -436,8 +503,30 @@
           institution: "北京东泰盛检测技术有限公司",
           code: "91110105MA02B0046P",
           qualification: "地基基础",
+          displayInstitution: "北京建工恒均工程检测有限公司",
+          displayCode: "91110101MA01A0012X",
+          registration: { required: 1, actual: 1 },
+          registrationProfession: "土木工程师（岩土）",
+          registrationSpecialties: [{ profession: "土木工程师（岩土）", level: "", required: 1, actual: 1 }],
+          technical: { required: 15, actual: 16 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 5,
+          technicalSeniorRequired: 2,
+          technicalSeniorQualified: 2,
+          cumulativeGapDays: 0,
+          continuousGapDays: 0,
+          gapStartDate: "",
+          gapEndDate: "",
+          note: "注册岩土工程师不少于1名；技术人员不少于15人，其中中级及以上技术职称人员不少于4人。"
+        },
+        {
+          institution: "北京东泰盛检测技术有限公司",
+          code: "91110105MA02B0046P",
+          qualification: "地基基础",
           registration: { required: 1, actual: 1 },
           technical: { required: 15, actual: 16 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 5,
           cumulativeGapDays: 0,
           continuousGapDays: 0,
           gapStartDate: "",
@@ -450,6 +539,10 @@
           qualification: "建筑材料及构配件",
           registration: { required: 0, actual: 0 },
           technical: { required: 20, actual: 18 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 3,
+          technicalSeniorRequired: 2,
+          technicalSeniorQualified: 1,
           cumulativeGapDays: 26,
           continuousGapDays: 26,
           gapStartDate: "2026-08-21",
@@ -460,8 +553,18 @@
           institution: "奥来国信（北京）检测技术有限公司",
           code: "91110108MA04D0035Q",
           qualification: "钢结构",
-          registration: { required: 2, actual: 2 },
+          registration: { required: 1, actual: 1 },
+          registrationProfession: "结构工程师",
+          registrationTitleProfession: "结构工程师",
+          registrationTitleLevel: "二级",
+          registrationTitleRequired: 1,
+          registrationTitleActual: 1,
+          registrationSpecialties: [{ profession: "结构工程师", level: "二级", required: 1, actual: 1 }],
           technical: { required: 15, actual: 15 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 5,
+          technicalLeaderActual: 0,
+          qualityLeaderActual: 0,
           cumulativeGapDays: 0,
           continuousGapDays: 0,
           gapStartDate: "",
@@ -474,6 +577,16 @@
           qualification: "综合资质",
           registration: { required: 4, actual: 3 },
           technical: { required: 150, actual: 142 },
+          registrationSpecialties: [
+            { profession: "结构工程师", level: "一级", required: 2, actual: 2 },
+            { profession: "土木工程师", level: "", required: 2, actual: 1 }
+          ],
+          registrationIntermediateRequired: 0,
+          registrationIntermediateActual: 0,
+          technicalMiddleRequired: 60,
+          technicalMiddleQualified: 55,
+          technicalSeniorRequired: 30,
+          technicalSeniorQualified: 28,
           cumulativeGapDays: 62,
           continuousGapDays: 62,
           gapStartDate: "2026-07-16",
@@ -494,6 +607,10 @@
           qualification: "建筑节能",
           registration: { required: 0, actual: 0 },
           technical: { required: 20, actual: 20 },
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 5,
+          technicalSeniorRequired: 1,
+          technicalSeniorQualified: 1,
           cumulativeGapDays: 0,
           continuousGapDays: 0,
           gapStartDate: "",
@@ -506,6 +623,14 @@
           qualification: "桥梁及地下工程",
           registration: { required: 2, actual: 1 },
           technical: { required: 15, actual: 12 },
+          registrationIntermediateRequired: 2,
+          registrationIntermediateActual: 1,
+          registrationSpecialties: [
+            { profession: "结构工程师", level: "一级", required: 1, actual: 1 },
+            { profession: "土木工程师（岩土）", level: "", required: 2, actual: 0 }
+          ],
+          technicalMiddleRequired: 4,
+          technicalMiddleQualified: 3,
           cumulativeGapDays: 74,
           continuousGapDays: 74,
           gapStartDate: "2026-07-04",
@@ -520,8 +645,14 @@
       var yearSelect = document.getElementById("yearFilter");
       var quarterSelect = document.getElementById("quarterFilter");
       var renderedGroups = [];
+      var currentPage = 1;
+      var pageSize = 5;
 
       rows.forEach(function (row) {
+        if (row.displayInstitution) {
+          row.institution = row.displayInstitution;
+          row.code = row.displayCode;
+        }
         row.qualificationType = row.qualification === "综合资质" ? "综合资质" : "专项资质";
         var requiredSocial = row.registration.required + row.technical.required;
         var paidInCompany = row.registration.actual + row.technical.actual;
@@ -539,12 +670,53 @@
           technical: { required: row.technical.required, actual: row.technical.actual }
         };
         row.peopleCategories = [
-          { key: "technicalLeader", label: "技术负责人", required: 1, actual: 1, requiredTitle: "正高级", actualTitle: "正高级" },
-          { key: "qualityLeader", label: "质量负责人", required: 1, actual: 1, requiredTitle: "高级", actualTitle: "高级" },
+          { key: "technicalLeader", label: "技术负责人", required: 1, actual: row.technicalLeaderActual == null ? 1 : row.technicalLeaderActual, requiredTitle: "正高级", actualTitle: row.technicalLeaderActual === 0 ? "不满足要求" : "正高级" },
+          { key: "qualityLeader", label: "质量负责人", required: 1, actual: row.qualityLeaderActual == null ? 1 : row.qualityLeaderActual, requiredTitle: "高级", actualTitle: row.qualityLeaderActual === 0 ? "不满足要求" : "高级" },
           { key: "registration", label: "注册人员", required: row.registration.required, actual: row.registration.actual, requiredTitle: "中级及以上", actualTitle: row.registration.actual >= row.registration.required ? "中级及以上" : "低于中级" },
           { key: "technical", label: "技术人员", required: row.technical.required, actual: row.technical.actual, requiredTitle: "中级及以上", actualTitle: row.technical.actual >= row.technical.required ? "中级及以上" : "低于中级" }
         ];
+        row.qualificationRules = buildQualificationRules(row);
       });
+
+      function buildQualificationRules(row) {
+        var leader = function (category, profession, level, required, actual) {
+          return { dimension: "title", category: category, profession: profession, level: level, required: required, actual: actual == null ? 0 : actual };
+        };
+        var rules = [];
+        var registrationSpecs = row.registrationSpecialties || [];
+
+        rules.push({ dimension: "quantity", category: "注册人员", profession: "", level: "", required: row.registration.required, actual: row.registration.actual });
+        rules.push({ dimension: "quantity", category: "技术人员", profession: "", level: "", required: row.technical.required, actual: row.technical.actual });
+
+        registrationSpecs.forEach(function (spec) {
+          rules.push({
+            dimension: "title",
+            category: "注册人员",
+            profession: spec.profession,
+            level: spec.level || "",
+            required: spec.required,
+            actual: spec.actual
+          });
+        });
+
+        if (row.qualification === "综合资质") {
+          rules.push(leader("技术人员", "工程类", "中级及以上", 60, row.technicalMiddleQualified));
+          rules.push(leader("技术人员", "工程类", "高级及以上", 30, row.technicalSeniorQualified));
+          rules.push(leader("技术负责人", "工程类", "正高级", 1, row.technicalLeaderActual == null ? 1 : row.technicalLeaderActual));
+          rules.push(leader("质量负责人", "工程类", "高级", 1, row.qualityLeaderActual == null ? 1 : row.qualityLeaderActual));
+          return rules;
+        }
+
+        var middleRequired = row.technicalMiddleRequired == null ? 4 : row.technicalMiddleRequired;
+        var seniorRequired = row.technicalSeniorRequired == null ? 0 : row.technicalSeniorRequired;
+        rules.push(leader("技术人员", "工程类", "中级及以上", middleRequired, row.technicalMiddleQualified));
+        if (seniorRequired > 0) {
+          rules.push(leader("技术人员", "工程类", "高级及以上", seniorRequired, row.technicalSeniorQualified));
+        }
+        rules.push(leader("技术负责人", "工程类", "正高级", 1, row.technicalLeaderActual == null ? 1 : row.technicalLeaderActual));
+        rules.push(leader("质量负责人", "工程类", "高级", 1, row.qualityLeaderActual == null ? 1 : row.qualityLeaderActual));
+        return rules;
+      }
 
       function checkDate(year, quarter) {
         return quarter === "4" ? (Number(year) + 1) + "年1月20日" : year + "年" + ({ "1": 4, "2": 7, "3": 10 }[quarter]) + "月20日";
@@ -576,7 +748,18 @@
           }
           groups[key].items.push(item);
         });
-        return Object.keys(groups).map(function (key) { return groups[key]; });
+        return Object.keys(groups).map(function (key) {
+          var group = groups[key];
+          var hasComprehensive = group.items.some(function (item) {
+            return item.qualificationType === "综合资质";
+          });
+          if (hasComprehensive) {
+            group.items = group.items.filter(function (item) {
+              return item.qualificationType === "综合资质";
+            });
+          }
+          return group;
+        });
       }
 
       function groupDays(group, field) {
@@ -631,14 +814,42 @@
           '<small class="criteria-note">综合资质还需满足：注册人员结构工程一级2人、土木工程师2人；技术人员中级及以上60人、高级及以上30人。</small></div>';
       }
 
-      function categoryHtml(item, field, group, groupIndex) {
-        return '<div class="criteria-list">' + item.peopleCategories.map(function (person) {
-          var value = field === "count" ? person.actual + ' / ' + person.required + ' 人' : person.actualTitle + ' / ' + person.requiredTitle;
-          var ok = field === "count" ? person.actual >= person.required : person.actualTitle.indexOf('低于') < 0;
-          var needsDetail = field === "count" && (!ok || groupExternalPeople(group).length > 0);
-          var valueHtml = needsDetail ? '<button class="social-link ' + (ok ? '' : 'warn') + '" type="button" data-social-detail="' + groupIndex + '">' + value + '</button>' : '<strong class="' + (ok ? 'ok' : 'warn') + '">' + value + '</strong>';
-          return '<div class="criteria-line' + (field === "title" ? ' criteria-line-value-only' : '') + '">' + (field === "title" ? '' : '<span>' + person.label + '</span>') + valueHtml + '</div>';
+      function specialtyStackHtml(group, groupIndex, renderBlock) {
+        return '<div class="specialty-stack">' + group.items.map(function (item) {
+          return '<div class="specialty-block">' + renderBlock(item, groupIndex) + '</div>';
         }).join('') + '</div>';
+      }
+
+      function categoryHtml(item, field, group, groupIndex) {
+        var categories = item.peopleCategories;
+        return categories.map(function (person) {
+          var rules = item.qualificationRules.filter(function (rule) {
+            return rule.category === person.label && rule.dimension === (field === "count" ? "quantity" : "title");
+          });
+          if (field === "count") {
+            var rule = rules[0];
+            var required = rule ? rule.required : person.required;
+            var actual = rule ? rule.actual : person.actual;
+            var ok = actual >= required;
+            var value = actual + ' / ' + required + ' 人';
+            var needsDetail = !ok || groupExternalPeople(group).length > 0;
+            var attr = !ok ? 'data-reason="' + groupIndex + '"' : 'data-social-detail="' + groupIndex + '"';
+            var content = needsDetail
+              ? '<button class="social-link ' + (ok ? '' : 'warn') + '" type="button" ' + attr + '>' + value + '</button>'
+              : '<strong class="' + (ok ? 'ok' : 'warn') + '">' + value + '</strong>';
+            return '<div class="criteria-line criteria-line-value-only">' + content + '</div>';
+          }
+          if (!rules.length) {
+            return '<div class="criteria-line criteria-line-value-only"><strong>—</strong></div>';
+          }
+          var value = rules.map(function (rule) {
+            var belowRequirement = rule.actual < rule.required;
+            var parts = [rule.profession, rule.level].filter(Boolean);
+            var requirement = parts.length ? parts.join(" ") + " " : "";
+            return '<span class="' + (belowRequirement ? 'warn' : '') + '">' + requirement + '≥' + rule.required + '人，实际' + rule.actual + '人</span>';
+          }).join('；');
+          return '<div class="criteria-line criteria-line-value-only"><strong>' + value + '</strong></div>';
+        }).join('');
       }
 
       function groupDateRangeMatches(group, startDate, endDate) {
@@ -652,32 +863,142 @@
         var qualification = qualificationSelect.value;
         var year = yearSelect.value;
         var quarter = quarterSelect.value;
-        var filtered = rows.filter(function (row) {
-          return !qualification || row.qualificationType === qualification;
-        });
-        renderedGroups = groupRows(filtered).filter(function (group) {
+        renderedGroups = groupRows(rows).map(function (group) {
+          if (qualification) {
+            group.items = group.items.filter(function (item) {
+              return item.qualificationType === qualification;
+            });
+          }
+          return group;
+        }).filter(function (group) {
+          return group.items.length > 0;
+        }).filter(function (group) {
           return !keyword || group.institution.indexOf(keyword) >= 0 || group.code.indexOf(keyword) >= 0;
+        }).sort(function (left, right) {
+          return (isAbnormalGroup(left) ? 0 : 1) - (isAbnormalGroup(right) ? 0 : 1);
         });
-        updateSummary(renderedGroups);
-        document.getElementById("checkDate").textContent = checkDate(year, quarter);
-        body.innerHTML = renderedGroups.length ? renderedGroups.map(function (group, index) {
-          var item = group.items[0];
+        var totalPages = Math.max(1, Math.ceil(renderedGroups.length / pageSize));
+        currentPage = Math.min(currentPage, totalPages);
+        var start = (currentPage - 1) * pageSize;
+        var pageGroups = renderedGroups.slice(start, start + pageSize);
+        body.innerHTML = pageGroups.length ? pageGroups.map(function (group, pageIndex) {
+          var index = start + pageIndex;
           var externalPeople = groupExternalPeople(group);
           var socialOk = externalPeople.length === 0;
-          var quantityOk = item.peopleCategories.every(function (person) { return person.actual >= person.required; });
-          var titleOk = item.peopleCategories.every(function (person) { return person.actualTitle.indexOf('低于') < 0; });
-          var resultOk = quantityOk && titleOk && socialOk;
+          var rulesOk = group.items.every(function (qualification) {
+            return qualification.qualificationRules.every(function (rule) { return rule.actual >= rule.required; });
+          });
+          var resultOk = rulesOk && socialOk;
           return '<tr data-index="' + index + '">' +
             '<td>' + (index + 1) + '</td>' +
             '<td class="institution">' + group.institution + '<span class="subtext">' + group.code + '</span></td>' +
-            '<td>' + qualificationListHtml(group) + '</td>' +
-            '<td>' + categoryHtml(item, "count", group, index) + '</td>' +
-            '<td>' + categoryHtml(item, "title") + '</td>' +
-            '<td><span class="status ' + (resultOk ? 'ok' : 'warn') + '">' + (resultOk ? '合格' : '不合格') + '</span></td>' +
-            '<td><button class="detail-btn" type="button" data-detail>明细</button></td>' +
+            '<td>' + specialtyStackHtml(group, index, function (item) { return '<div class="specialty-name">' + item.qualification + '</div>'; }) + '</td>' +
+            '<td>' + specialtyStackHtml(group, index, function (item) { return item.peopleCategories.map(function (person) { return '<div class="criteria-line">' + person.label + '</div>'; }).join(''); }) + '</td>' +
+            '<td class="comparison-cell">' + specialtyStackHtml(group, index, function (item, groupIndex) { return categoryHtml(item, "count", group, groupIndex); }) + '</td>' +
+            '<td class="comparison-cell">' + specialtyStackHtml(group, index, function (item) { return categoryHtml(item, "title", group, index); }) + '</td>' +
+            '<td>' + (resultOk ? '<span class="status ok">合格</span>' : '<button class="status warn reason-link" type="button" data-reason="' + index + '">不合格</button>') + '</td>' +
             '</tr>';
-      }).join("") : '<tr><td class="empty" colspan="7">暂无符合条件的统计结果</td></tr>';
+      }).join("") : '<tr><td class="empty" colspan="7">暂无异常机构</td></tr>';
+        document.getElementById("pageInfo").textContent = "第 " + currentPage + " / " + totalPages + " 页";
+        document.getElementById("totalInfo").textContent = "共 " + renderedGroups.length + " 条";
+        document.getElementById("firstPage").disabled = currentPage <= 1;
+        document.getElementById("prevPage").disabled = currentPage <= 1;
+        document.getElementById("nextPage").disabled = currentPage >= totalPages;
+        document.getElementById("lastPage").disabled = currentPage >= totalPages;
 
+      }
+
+      function isAbnormalGroup(group) {
+        var externalPeople = groupExternalPeople(group);
+        return group.items.some(function (item) {
+          var ruleFailed = item.qualificationRules.some(function (rule) { return rule.actual < rule.required; });
+          return ruleFailed || externalPeople.length > 0;
+        });
+      }
+
+      function reasonHtml(group) {
+        var sampleNames = ["张伟", "王芳", "李娜", "刘洋", "陈静", "杨磊", "赵敏", "黄杰", "周玲", "吴涛", "徐丽", "孙强", "胡晓梅", "朱建国", "高峰", "林晓燕", "何军", "郭秀兰", "马超", "罗丹"];
+        var peopleByKey = {};
+        var people = [];
+        group.items.forEach(function (item) {
+          item.peopleCategories.forEach(function (person, categoryIndex) {
+            var titleRules = item.qualificationRules.filter(function (rule) {
+              return rule.dimension === "title" && rule.category === person.label;
+            });
+            var quantityRule = item.qualificationRules.find(function (rule) {
+              return rule.dimension === "quantity" && rule.category === person.label;
+            });
+            var matchedCount = Math.max(0, Number(person.actual) || 0);
+            var quantityShortage = quantityRule && quantityRule.actual < quantityRule.required;
+            function getPerson(personIndex, socialPerson) {
+              var key = person.key + ":" + personIndex;
+              var name = sampleNames[(categoryIndex * 5 + personIndex) % sampleNames.length];
+              if (!peopleByKey[key]) {
+                peopleByKey[key] = {
+                  name: name,
+                  insuranceUnit: socialPerson ? socialPerson.insuranceUnit : item.institution,
+                  certificates: []
+                };
+                people.push(peopleByKey[key]);
+              }
+              return peopleByKey[key];
+            }
+            if (titleRules.length) {
+              titleRules.forEach(function (rule, ruleIndex) {
+                var count = Math.min(matchedCount, Math.max(0, Number(rule.actual) || 0));
+                for (var personIndex = 0; personIndex < count; personIndex += 1) {
+                  var socialIndex = person.key === "technical" ? item.registration.actual + personIndex : personIndex;
+                  var socialPerson = item.socialPeople[socialIndex];
+                  var failed = rule.actual < rule.required || quantityShortage || (socialPerson && !socialPerson.paidInCompany);
+                  getPerson(personIndex, socialPerson).certificates.push({
+                    qualification: item.qualification,
+                    expectedLevel: rule.level || "—",
+                    expectedProfession: rule.profession || "—",
+                    expectedCount: rule.required,
+                    actualCount: rule.actual,
+                    failed: failed
+                  });
+                }
+              });
+            } else {
+              for (var index = 0; index < matchedCount; index += 1) {
+                var personSocial = item.socialPeople[index % item.socialPeople.length];
+                getPerson(index, personSocial).certificates.push({
+                  qualification: item.qualification,
+                  expectedLevel: "—",
+                  expectedProfession: "—",
+                  expectedCount: 0,
+                  actualCount: 0,
+                  failed: !!quantityShortage || (personSocial && !personSocial.paidInCompany)
+                });
+              }
+            }
+          });
+        });
+        var tableRows = people.map(function (person) {
+          return person.certificates.map(function (certificate, certificateIndex) {
+            var identityCells = certificateIndex === 0
+              ? '<td rowspan="' + person.certificates.length + '">' + person.name + '</td><td rowspan="' + person.certificates.length + '">' + person.insuranceUnit + '</td>'
+              : "";
+            var expectedText = [certificate.expectedProfession, certificate.expectedLevel].filter(function (value) {
+              return value && value !== "—";
+            }).join(" ");
+            expectedText += " ≥" + certificate.expectedCount + "人";
+            var actualText = "实际" + certificate.actualCount + "人";
+            return '<tr class="' + (certificate.failed ? "warn" : "") + '">' + identityCells +
+              '<td>' + certificate.qualification + '</td>' +
+              '<td>' + expectedText + '</td>' +
+              '<td>' + actualText + '</td></tr>';
+          }).join("");
+        }).join("");
+        if (!tableRows) tableRows = '<tr><td colspan="5">暂无匹配人员记录</td></tr>';
+        return '<table class="matched-people-table"><thead><tr><th>人员姓名</th><th>养老社保缴纳单位名称</th><th>检测专项</th><th colspan="2">职称专业等级对照<br><small>应有等级 / 实际等级</small></th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+      }
+
+      function openModal(group) {
+        document.getElementById("socialModalTitle").textContent = "不合格原因";
+        document.getElementById("socialModalBody").innerHTML = reasonHtml(group);
+        document.getElementById("socialModal").classList.add("open");
       }
 
       function updateSummary(groups) {
@@ -693,11 +1014,26 @@
       }
 
       document.getElementById("queryButton").addEventListener("click", render);
+      document.getElementById("prevPage").addEventListener("click", function () {
+        if (currentPage > 1) { currentPage -= 1; render(); }
+      });
+      document.getElementById("firstPage").addEventListener("click", function () {
+        if (currentPage !== 1) { currentPage = 1; render(); }
+      });
+      document.getElementById("nextPage").addEventListener("click", function () {
+        currentPage += 1;
+        render();
+      });
+      document.getElementById("lastPage").addEventListener("click", function () {
+        var totalPages = Math.max(1, Math.ceil(renderedGroups.length / pageSize));
+        if (currentPage !== totalPages) { currentPage = totalPages; render(); }
+      });
       document.getElementById("resetButton").addEventListener("click", function () {
         institutionInput.value = "";
         qualificationSelect.value = "";
         yearSelect.value = "2026";
         quarterSelect.value = "1";
+        currentPage = 1;
         render();
       });
       document.getElementById("exportButton").addEventListener("click", function () {
@@ -730,39 +1066,13 @@
         var socialButton = event.target.closest("[data-social-detail]");
         if (socialButton) {
           var socialGroup = renderedGroups[Number(socialButton.dataset.socialDetail)];
-          var people = socialGroup.items.reduce(function (all, item) { return all.concat(item.social.externalPeople || []); }, []);
-          document.getElementById("socialModalBody").innerHTML = people.length ? '<div class="social-detail"><table><thead><tr><th>人员</th><th>养老社保缴费单位</th></tr></thead><tbody>' + people.map(function (person) {
-            return '<tr><td>' + person.name + '</td><td class="external">' + person.insuranceUnit + '</td></tr>';
-          }).join("") + '</tbody></table></div>' : '<p>暂无非本单位缴纳养老社保人员。</p>';
-          document.getElementById("socialModal").classList.add("open");
+          openModal(socialGroup);
           return;
         }
-        var button = event.target.closest("[data-detail]");
-        if (!button) return;
-        var row = button.closest("tr");
-        var index = Number(row.dataset.index);
-        var current = renderedGroups[index];
-        var next = row.nextElementSibling;
-        if (next && next.classList.contains("detail-row")) {
-          next.remove();
-          button.textContent = "明细";
-          return;
-        }
-        var detail = document.createElement("tr");
-        detail.className = "detail-row";
-        var detailItemsHtml = current.items.map(function (item) {
-          var itemRules = item.subRules ? '<p>' + item.subRules.join('</p><p>') + '</p>' : '';
-          return '<p><b>' + item.qualification + '</b>：' + item.note + '</p>' + itemRules;
-        }).join("");
-        detail.innerHTML = '<td colspan="7"><div class="detail-box">' +
-          '<div><h3>企业资质明细</h3>' + detailItemsHtml + '</div>' +
-          '<div><h3>当前缺口</h3>' + current.items.map(function (item) {
-            return '<p>' + item.qualification + '：注册 <b>' + Math.max(0, item.registration.required - item.registration.actual) + ' 人</b>，技术 <b>' + Math.max(0, item.technical.required - item.technical.actual) + ' 人</b></p>';
-          }).join("") + '</div>' +
-          '<div><h3>不满足时长</h3><p>累计不满足：<b>' + groupDays(current, "cumulativeGapDays") + ' 天</b></p><p>持续不满足：<b>' + groupDays(current, "continuousGapDays") + ' 天</b></p></div>' +
-          '</div></td>';
-        row.parentNode.insertBefore(detail, next);
-        button.textContent = "收起";
+        var reasonButton = event.target.closest("[data-reason]");
+        if (!reasonButton) return;
+        var reasonGroup = renderedGroups[Number(reasonButton.dataset.reason)];
+        openModal(reasonGroup);
       });
       document.getElementById("socialModalClose").addEventListener("click", function () {
         document.getElementById("socialModal").classList.remove("open");
